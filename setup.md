@@ -12,7 +12,7 @@
 - Step 8: Still, under System Variable, scroll down and look for “path” and click edit
 - Step 9: Click “New” and type in “%MAVEN_HOME%\bin” press “OK” and close the window
 - Step 10: In Visual Studio Code, open the Command Palette (Ctrl+Shift+P) and then select the command **Java: Create Java Project**.
-- Step 11: Select the option **JavaFX** in the list, follow the wizard, which will help you scaffold a new JavaFX project via Maven Archetype.
-![start JavaFX Project](https://drive.google.com/file/d/1fT4U11MtNQedeGzbnhfm7CAngavR3LtC/view?usp=share_link)
-- To run the JavaFX application, you can open the **Maven** Explorer, expand `hellofx` > `Plugins` > `javafx` and run the Maven goal: `javafx:run`.
-![Run JavaFX Project](https://drive.google.com/file/d/1VAcnbA2EEVp5OiBsGJqOVfkx5glZHfXm/view?usp=share_link)
+- Step 11: Select the option **JavaFX** in the list, follow the wizard, which will help you scaffold a new JavaFX project via Maven Archetype.  
+![start JavaFX Project](https://github.com/Kiraow188/CSC1109-Project/blob/Jace-Branch/md_src/Pasted%20image%2020230213214519.png)
+- To run the JavaFX application, you can open the **Maven** Explorer, expand `hellofx` > `Plugins` > `javafx` and run the Maven goal: `javafx:run`.  
+![Run JavaFX Project](https://github.com/Kiraow188/CSC1109-Project/blob/Jace-Branch/md_src/ezgif-4-6d89dd086b.gif)

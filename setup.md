@@ -1,3 +1,4 @@
+# Setup JavaFX and Maven on VScode
 - Step 1: Install the [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack).
 - Step 2: Install Maven for Java in Visual Studio Code [Maven for Java - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-maven)
 - Step 3: Download Maven on windows [Maven – Download Apache Maven](https://maven.apache.org/download.cgi) please select **BINARY ZIP ARCHIVE** (apache-maven-3.9.0-bin.zip)
@@ -16,3 +17,16 @@
 ![start JavaFX Project](https://github.com/Kiraow188/CSC1109-Project/blob/Jace-Branch/md_src/Pasted%20image%2020230213214519.png)
 - To run the JavaFX application, you can open the **Maven** Explorer, expand `hellofx` > `Plugins` > `javafx` and run the Maven goal: `javafx:run`.  
 ![Run JavaFX Project](https://github.com/Kiraow188/CSC1109-Project/blob/Jace-Branch/md_src/ezgif-4-6d89dd086b.gif)
+# Setup Scenebuilder on Windows
+Scenebuilder is a tool to help visually build JavaFX application  
+**Install scene builder**  
+[Scene Builder - Gluon (gluonhq.com)](https://gluonhq.com/products/scene-builder/)  
+_Take note of the installation path!_  
+**Install scene builder add-on in visual studio code:**  
+[SceneBuilder extension for Visual Studio Code - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=bilalekrem.scenebuilderextension#:~:text=You%20can%20configure%20by%20clicking,your%20file%20into%20Scene%20Builder.)  
+1. press ctrl+shift+p
+2. type in “configure scene builder path”
+3. find your scene builder installation path and select that folder
+4. Go to main.fxml and hit ctrl+shift+p 
+5. type in “open in scene builder”  
+![Scenebuilder](https://github.com/Kiraow188/CSC1109-Project/blob/Jace-Branch/md_src/scenebuilder.png)

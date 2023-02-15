@@ -29,6 +29,7 @@ public class ATM extends Application {
         // Creates FirebaseOptions object and sets it to use the credentials obtained from the service account.
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(credentials)
+                .setDatabaseUrl("https://sitatm-5e8bf.firebaseio.com")
                 .build();
         // Initializes the Firebase app with the specified options.
         FirebaseApp.initializeApp(options);

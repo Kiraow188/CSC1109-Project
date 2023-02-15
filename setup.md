@@ -1,3 +1,15 @@
+# How to setup using Intellij  
+Make sure the JavaFX plugin is enabled  
+To be able to work with JavaFX in IntelliJ IDEA, the JavaFX bundled plugin must be enabled:  
+1. In the Settings dialog (Ctrl+Alt+S), select Plugins.
+2. Switch to the Installed tab and make sure that the JavaFX plugin is enabled.
+3. If the plugin is disabled, select the checkbox next to it.
+4. Apply the changes and close the dialog. Restart the IDE if prompted.  
+**Install scene builder**  
+[Scene Builder - Gluon (gluonhq.com)](https://gluonhq.com/products/scene-builder/)  
+Remember the installation path to scenebuilder.exe
+On Intellij go to File > Settings > Language & Framework > JavaFX > paste or navigate to scenebuilder.exe > click "OK"  
+![intellij Scenebuilder](https://github.com/Kiraow188/CSC1109-Project/blob/Jace-Branch/md_src/scenebuilderIntellij.png)
 # Setup JavaFX and Maven on VScode
 - Step 1: Install the [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack).
 - Step 2: Install Maven for Java in Visual Studio Code [Maven for Java - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-maven)

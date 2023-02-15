@@ -1,15 +1,41 @@
 package com.sitatm.sitatm;
 
+// JavaFX libraries
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+
+// Google Firebase libraries
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.Firestore;
+import com.google.firebase.cloud.FirestoreClient;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+
+// Just java stuff
+import java.io.FileInputStream;
 import java.io.IOException;
 
 public class ATM extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+
+        // Open the ServiceAccountKey.json file for reading
+        FileInputStream serviceAccount = new FileInputStream("src/main/resources/ServiceAccountKey.json");
+        // Obtains GoogleCredentials from the service account input stream.
+        GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
+        // Creates FirebaseOptions object and sets it to use the credentials obtained from the service account.
+        FirebaseOptions options = new FirebaseOptions.Builder()
+                .setCredentials(credentials)
+                .build();
+        // Initializes the Firebase app with the specified options.
+        FirebaseApp.initializeApp(options);
+        // Obtains an instance of Firestore database.
+        Firestore db = FirestoreClient.getFirestore();
+
+
         // create a new FXMLLoader and load the FXML file "atm-view.fxml"
         FXMLLoader fxmlLoader = new FXMLLoader(ATM.class.getResource("atm-view.fxml"));
         // create a new Scene using the loaded FXML file and set it to the stage

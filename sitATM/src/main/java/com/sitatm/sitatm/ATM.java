@@ -13,16 +13,22 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
+
 
 // Just java stuff
 import java.io.FileInputStream;
 import java.io.IOException;
 
 public class ATM extends Application {
+
+    private Firestore db;
+    private FirebaseAuth auth;
+
     @Override
     public void start(Stage stage) throws IOException {
 
-        // Open the ServiceAccountKey.json file for reading
+        // Open the ServiceAccountKey.json file for readin                         g
         FileInputStream serviceAccount = new FileInputStream("src/main/resources/ServiceAccountKey.json");
         // Obtains GoogleCredentials from the service account input stream.
         GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
@@ -33,7 +39,9 @@ public class ATM extends Application {
         // Initializes the Firebase app with the specified options.
         FirebaseApp.initializeApp(options);
         // Obtains an instance of Firestore database.
-        Firestore db = FirestoreClient.getFirestore();
+        db = FirestoreClient.getFirestore();
+        // Obtain an instance of Firebase Authentication
+        auth = FirebaseAuth.getInstance();
 
 
         // create a new FXMLLoader and load the FXML file "atm-view.fxml"
@@ -50,6 +58,9 @@ public class ATM extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
+
+
 
     /**
     The main entry point for the JavaFX application.

@@ -10,6 +10,7 @@ module com.sitatm.sitatm {
     requires google.cloud.firestore;
     requires firebase.admin;
     requires com.google.auth;
+    requires java.sql;
 
     opens com.sitatm.sitatm to javafx.fxml;
     exports com.sitatm.sitatm;

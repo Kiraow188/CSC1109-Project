@@ -75,9 +75,9 @@
             <version>9.1.1</version>
         </dependency>
         <dependency>
-            <groupId>com.google.auth.Credentials</groupId>
-            <artifactId>google-auth-library-oauth2-http</artifactId>
-            <version>1.15.0</version>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.24</version>
         </dependency>
     </dependencies>
 

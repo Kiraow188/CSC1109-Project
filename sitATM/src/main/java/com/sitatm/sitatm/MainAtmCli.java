@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 public class MainAtmCli {
+
+    private final static int checking =1;
+	private final static int savings =2;
     public static void main(String[] args) throws Exception {
 
         String url = "jdbc:mysql://localhost:3306/sitatm";
@@ -40,16 +43,21 @@ public class MainAtmCli {
             // Customer table
             ResultSet resultSet = statement.executeQuery("SELECT * FROM customer WHERE pinNumber=" + pin); //
             String firstName = null;
-            int totalBalance = 0;
+            int checkingBalance = 0;
+            int savingsBalance = 0;
             int count = 0;
             while (resultSet.next()) {
                 //System.out.println(resultSet.getString(2));
                 firstName = resultSet.getString(2);
-                totalBalance = resultSet.getInt(5);
+                /// totalBalance = resultSet.getInt(5);
+                checkingBalance = resultSet.getInt(4);
+                savingsBalance = resultSet.getInt(5);
                 count++;
             }
             int choice;
+            int totalBalance = checkingBalance + savingsBalance;
             int deposit_amount;
+            int transfer_amount;
             int withdrawal_amount; // Not sure if we should impose a min withdraw amount
             if (count > 0) {
                 System.out.println("Hello " + firstName);
@@ -81,32 +89,106 @@ public class MainAtmCli {
                     choice = sc.nextInt();
                     switch (choice) {
                         case 1:
+                            int accType = checking;
+                            boolean persist = true;
+                            System.out.println("Please select the account: \nEnter 1 for Checking\nEnter 2 for Savings");
+                            accType = sc.nextInt();
+                            //loops until valid account type entered
+                            while (persist)
+                            {
+                                persist = false;
+                                switch (accType) {
+                                    case 1:
+                                        accType = checking;
+                                        break;
+                                    case 2:
+                                        accType = savings;
+                                        break;
+                                    default:
+                                        System.out.print("Invalid option, please reenter");
+                                        accType = sc.nextInt();
+                                        persist = true;
+                                }
+                            }
                             System.out.println("Enter amount to withdraw");
                             withdrawal_amount = sc.nextInt();
-                            if (withdrawal_amount > totalBalance) {
-                                System.out.println("Your balance is insufficient");
-                            } else {
-                                totalBalance = totalBalance - withdrawal_amount;
-                                int withdrawAmountBalance = statement.executeUpdate("UPDATE customer SET totalBalance = " + totalBalance + " WHERE pinNumber =" + pin);
-                                System.out.println("You have are successfully withdraw $" + withdrawal_amount + " and your current balance is $" + totalBalance);
+                            if (accType == checking)
+                            {
+                                while (withdrawal_amount > checkingBalance) {
+                                    System.out.println("Your balance is insufficient, please re-enter amount");
+                                    withdrawal_amount = sc.nextInt();
+                                } 
+                                checkingBalance = checkingBalance - withdrawal_amount;
+                                int withdrawAmountBalance = statement.executeUpdate("UPDATE customer SET aCheckingBalance = " + checkingBalance + " WHERE aPasscode =" + pin);
+                                System.out.println("You have are successfully withdraw $" + withdrawal_amount + " and your current balance is $" + checkingBalance);
+                            
+                            }
+                            else 
+                            {
+                                while (withdrawal_amount > savingsBalance) {
+                                    System.out.println("Your balance is insufficient, please re-enter amount");
+                                    withdrawal_amount = sc.nextInt();
+                                }
+                                savingsBalance = savingsBalance - withdrawal_amount;
+                                int withdrawAmountBalance = statement.executeUpdate("UPDATE customer SET aSavingsBalance = " + savingsBalance + " WHERE aPasscode =" + pin);
+                                System.out.println("You have are successfully withdraw $" + withdrawal_amount + " and your current balance is $" + savingsBalance);
                             }
                             break;
                         case 2:
                             System.out.println("Enter amount to transfer");
+                            transfer_amount = sc.nextInt();
+                            if (transfer_amount > totalBalance) {
+                                System.out.println("Your balance is insufficient");
+                            }else {
+                                totalBalance = totalBalance - transfer_amount;
+                                int transferAmountBalance = statement.executeUpdate("UPDATE customer SET aCheckingBalance = " + totalBalance + " WHERE aPasscode =" + pin);
+                                System.out.println("You have are successfully withdraw $" + transfer_amount + " and your current balance is $" + totalBalance); 
+                            }
                             break;
                         case 3:
                             System.out.println("Your current Balance is $" + totalBalance);
                             break;
                         case 4:
                             System.out.println("Here are your list of accounts");
+                            System.out.println("Your current Balance in your checking account is $" + checkingBalance);
+                            System.out.println("Your current Balance in your savings account is $" + savingsBalance);
                             break;
                         case 5:
+                            boolean persistent = true;
+                            System.out.println("Please select the account: \nEnter 1 for Checking\nEnter 2 for Savings");
+                            accType = sc.nextInt();
+                            //loops until valid account type entered
+                            while (persistent)
+                            {
+                                persistent = false;
+                                switch (accType) {
+                                    case 1:
+                                        accType = checking;
+                                        break;
+                                    case 2:
+                                        accType = savings;
+                                        break;
+                                    default:
+                                        System.out.print("Invalid option, please reenter");
+                                        accType = sc.nextInt();
+                                        persistent = true;
+                                }
+                            }
                             System.out.println("Enter amount to deposit");
-                            // input from customer
                             deposit_amount = sc.nextInt();
-                            totalBalance = totalBalance + deposit_amount;
-                            int depositAmountBalance = statement.executeUpdate("UPDATE customer SET totalBalance = " + totalBalance + " WHERE pinNumber =" + pin);
-                            System.out.println("Successfully  deposit $" + deposit_amount + " and your current balance is $" + totalBalance);
+                            if (accType == checking)
+                            {
+                                checkingBalance = checkingBalance + deposit_amount;
+                                int depositAmountBalance = statement.executeUpdate("UPDATE customer SET aCheckingBalance = " + checkingBalance + " WHERE aPasscode =" + pin);
+                                System.out.println("You have successfully deposited $" + deposit_amount + " and your current balance is $" + checkingBalance);
+                            
+                            }
+                            else 
+                            {
+                                savingsBalance = savingsBalance + deposit_amount;
+                                int depositAmountBalance = statement.executeUpdate("UPDATE customer SET aSavingsBalance = " + savingsBalance + " WHERE aPasscode =" + pin);
+                                System.out.println("You have successfully deposited $" + deposit_amount + " and your current balance is $" + savingsBalance);
+                            }
                             break;
                         case 6:
                             System.out.println("Other Services");

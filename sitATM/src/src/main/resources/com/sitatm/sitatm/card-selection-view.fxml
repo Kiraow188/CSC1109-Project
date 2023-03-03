@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane minHeight="700.0" minWidth="1000.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.CardSelectionController">
+   <children>
+      <ImageView fx:id="blackCard" fitHeight="481.0" fitWidth="304.0" layoutX="20.0" layoutY="110.0" pickOnBounds="true" preserveRatio="true" />
+      <Label layoutX="227.0" layoutY="14.0" text="Please select a card">
+         <font>
+            <Font size="64.0" />
+         </font></Label>
+      <ImageView fx:id="purpleCard" fitHeight="481.0" fitWidth="304.0" layoutX="348.0" layoutY="110.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="pinkCard" fitHeight="481.0" fitWidth="304.0" layoutX="676.0" layoutY="110.0" pickOnBounds="true" preserveRatio="true" />
+      <Label layoutX="121.0" layoutY="591.0" text="Customer">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="471.0" layoutY="591.0" text="Teller">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="793.0" layoutY="591.0" text="Admin">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

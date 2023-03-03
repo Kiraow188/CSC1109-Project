@@ -1,0 +1,9 @@
+/* #cardReader:hover{
+    -fx-image: url("/cardInsert.png")
+}
+#cardReader{
+    -fx-image: url("/insertCard.png")
+}
+#cardReader:pressed{
+    -fx-image: url("/insertCard.png")
+} */

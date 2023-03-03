@@ -26,7 +26,7 @@ public class MainAtmCli {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, pass);
-            java.sql.Statement statement = connection.createStatement();
+            Statement statement = connection.createStatement();
             // Customer table
             ResultSet resultSet = statement.executeQuery("SELECT * FROM customer WHERE pinNumber=" + pin); //
             String firstName = null;
@@ -215,7 +215,7 @@ public class MainAtmCli {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, pass);
-            java.sql.Statement statement = connection.createStatement();
+            Statement statement = connection.createStatement();
             String query = "SELECT * FROM teller WHERE username=? AND password=?";
             PreparedStatement pStatement = connection.prepareStatement(query);
             pStatement.setString(1, username);
@@ -313,7 +313,7 @@ public class MainAtmCli {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, pass);
-            java.sql.Statement statement = connection.createStatement();
+            Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE nric=" + NRIC + "OR passport_number=" + passportNumber);
             if (resultSet.next()) {
                 System.out.println("This account already exist!");
@@ -329,14 +329,14 @@ public class MainAtmCli {
 
         //Generate timestamp for account creation
         java.util.Date dt = new java.util.Date();
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String creationDateTime = sdf.format(dt);
 
         //Insert account into DB
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, pass);
-            java.sql.Statement statement = connection.createStatement();
+            Statement statement = connection.createStatement();
             String query = "INSERT INTO customer(full_name, nric, passport_number, country, gender, dob, mobile_number, address, email, date_created) VALUES(?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement pStatement = connection.prepareStatement(query);
             pStatement.setString(1, fullName);
@@ -394,12 +394,12 @@ public class MainAtmCli {
 
         //Generate timestamp for account creation
         java.util.Date dt = new java.util.Date();
-        java.text.SimpleDateFormat cd = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat cd = new SimpleDateFormat("yyyy-MM-dd");
         String creationDate = cd.format(dt);
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, pass);
-            java.sql.Statement statement = connection.createStatement();
+            Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT user_id,account_number FROM user WHERE account_number=" + cardNumber);
             String user = null;
             if (resultSet.next()) {

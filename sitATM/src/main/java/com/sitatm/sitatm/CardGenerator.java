@@ -85,14 +85,14 @@ public class CardGenerator {
         return Arrays.stream(arr).sum();
     }
 
-    /* Debug
-    public static void main (String[] args){
+
+    /*public static void main (String[] args){
         String cardNumberVisa = generateCardNumber(1);
         String cardNumberMasters = generateCardNumber(2);
         isValidCreditCardNumber(cardNumberVisa);
         isValidCreditCardNumber(cardNumberMasters);
         System.out.println(cardNumberVisa);
         System.out.println(cardNumberMasters);
-    }
-     */
+    }*/
+
 }

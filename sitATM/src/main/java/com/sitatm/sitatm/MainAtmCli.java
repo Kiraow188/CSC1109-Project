@@ -280,8 +280,8 @@ public class MainAtmCli {
     }
     public static void CreateNewCustomerAccount() throws NoSuchAlgorithmException {
         Scanner sc = new Scanner(System.in);
-        String NRIC = null;
-        String passportNumber = null;
+        String NRIC = "";
+        String passportNumber = "";
 
         System.out.println("Please enter customer's full name: ");
         String fullName = sc.nextLine();
@@ -300,23 +300,34 @@ public class MainAtmCli {
         String country = sc.nextLine();
         System.out.println("Please enter the customer's gender: ");
         String gender = sc.next();
+        //consume the end of line at the end of sc.next()
+        sc.nextLine();
         System.out.println("Please enter the customer's date of birth (YYYY-MM-DD): ");
         String dateOfBirth = sc.next();
         System.out.println("Please enter the customer's mobile number: ");
         String mobileNumber = sc.next();
         System.out.println("Please enter the customer's email: ");
         String email = sc.next();
+        //consume the end of line at the end of sc.next()
+        sc.nextLine();
         System.out.println("Please enter the customer's address: ");
         String address = sc.nextLine();
+
+        //Generate timestamp for account creation
+        java.util.Date dt = new java.util.Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String creationDateTime = sdf.format(dt);
+
 
         //Check if customer exist in the database
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, pass);
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE nric=" + NRIC + "OR passport_number=" + passportNumber);
+            ResultSet resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE nric='" + NRIC + "' OR passport_number='" + passportNumber + "'");
             if (resultSet.next()) {
                 System.out.println("This account already exist!");
+                showTellerMenu();
             }
             resultSet.close();
             statement.close();
@@ -327,12 +338,7 @@ public class MainAtmCli {
             System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
         }
 
-        //Generate timestamp for account creation
-        java.util.Date dt = new java.util.Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String creationDateTime = sdf.format(dt);
-
-        //Insert account into DB
+        //Insert customer account into DB
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, pass);
@@ -352,8 +358,12 @@ public class MainAtmCli {
             int rowsAffected = pStatement.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Customer account has been created successfully!");
-                //TODO: Create a card flow
-                //createCard(accNum);
+                ResultSet resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE nric='" + NRIC + "' OR passport_number='" + passportNumber + "'");
+                String userId = null;
+                if (resultSet.next()) {
+                    userId = resultSet.getString("user_id");
+                    createAccount(userId);
+                }
             }
             statement.close();
             connection.close();
@@ -363,8 +373,100 @@ public class MainAtmCli {
             throw new RuntimeException(e);
         }
     }
+    public static void createAccount(String userId) throws NoSuchAlgorithmException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\nAccount Creation Process");
+        System.out.println("Please select the Account type:" +
+                "\n[1] Savings Account" +
+                "\n[2] Current Account");
+        String accountType = null;
+        int selection = sc.nextInt();
+        while (selection != 1 && selection != 2) {
+            System.out.println("Invalid selection. Please try again.");
+            selection = sc.nextInt();
+        }
+        if (selection == 1){
+            accountType = "Savings Account";
+        } else if (selection == 2) {
+            accountType = "Current Account";
+        }
+        String bankAccountNumber = null;
+        while (bankAccountNumber == null) {
+            //Generate 9-digit account number with prefix
+            bankAccountNumber = BANG.generateNumber(selection);
+            //Debug
+            System.out.println("Bank Account Number Generated: " + bankAccountNumber);
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection connection = DriverManager.getConnection(url, user, pass);
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT account_number,user_id FROM account WHERE account_number=" + bankAccountNumber);
+                if (resultSet.next()) {
+                    System.out.println("This account number already exist!" +
+                            "\nRegenerating a new account number...");
+                    bankAccountNumber = null; //Reset Bank Account Number to null to regenerate a new account number
+                }
+                resultSet.close();
+                statement.close();
+                connection.close();
+            }catch (ClassNotFoundException e){
+                System.out.println("Error: MySQL driver not found.");
+            }catch (SQLException e) {
+                System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
+            }
+        }
 
-    public static void createCard(String cardNumber){
+        System.out.println("Customer to enter 6 Digit Pin: ");
+        String pin = null;
+        while (true) {
+            pin = sc.next();
+            if (pin.matches("\\d{6}")) {
+                break;
+            } else {
+                System.out.print("Invalid input. Please enter a 6 digit pin: ");
+            }
+        }
+        //Hash customer's pin with Salt and Pepper
+        String[] hashAlgo = PH.hashPin(pin);
+        String hashedPin = hashAlgo[0];
+        String salt = hashAlgo[1];
+        //Debug
+        System.out.println("Random Salt: " + hashAlgo[0]);
+        System.out.println("Hashed Password: " + hashAlgo[1]);
+
+        //Generate timestamp for account creation
+        java.util.Date dt = new java.util.Date();
+        SimpleDateFormat cd = new SimpleDateFormat("yyyy-MM-dd");
+        String creationDate = cd.format(dt);
+
+        //Insert customer account into DB
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, user, pass);
+            Statement statement = connection.createStatement();
+            String query = "INSERT INTO account(account_number, user_id, pin, salt, account_type, created_date) VALUES(?,?,?,?,?,?)";
+            PreparedStatement pStatement = connection.prepareStatement(query);
+            pStatement.setString(1, bankAccountNumber);
+            pStatement.setString(2, userId);
+            pStatement.setString(3, hashedPin);
+            pStatement.setString(4, salt);
+            pStatement.setString(5, accountType);
+            pStatement.setString(6, creationDate);
+            int rowsAffected = pStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Customer account has been created successfully!");
+                //TODO: Create a card flow
+                createCard(bankAccountNumber);
+            }
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void createCard(String accNum){
         Scanner sc = new Scanner(System.in);
         System.out.println("\nCard Creation Process");
         System.out.println("PLease select the card type:" +
@@ -381,12 +483,41 @@ public class MainAtmCli {
         } else if (selection == 2) {
             cardType = "Credit Card";
         }
+        //Generate Card Number
+        String cardNumber = null;
+        while (cardNumber == null) {
+            //Generate 16 digit card number depending on Visa or Masters
+            cardNumber = CCG.generateCardNumber(selection);
+            //Debug
+            System.out.println("ATM Card Number Generated: " + cardNumber);
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection connection = DriverManager.getConnection(url, user, pass);
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT card_number,account_number FROM card WHERE card_number=" + cardNumber);
+                if (resultSet.next()) {
+                    System.out.println("This card number already exist!" +
+                            "\nRegenerating a new card number...");
+                    cardNumber = null; //Reset cardNumber to null to regenerate a new card number
+                }
+                resultSet.close();
+                statement.close();
+                connection.close();
+            }catch (ClassNotFoundException e){
+                System.out.println("Error: MySQL driver not found.");
+            }catch (SQLException e) {
+                System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
+            }
+        }
+
+        //Create Expiry date (+5 years from date of issue)
         Calendar expiryDate = Calendar.getInstance();
         expiryDate.add(Calendar.YEAR, 5); // add 5 years
         SimpleDateFormat sdf = new SimpleDateFormat("MM/yyyy");
         String formattedExpiryDate = sdf.format(expiryDate.getTime());
         //debug
         System.out.println(formattedExpiryDate);
+
         //generate CVV
         String cvv = CVVG.generateCVV(cardNumber, formattedExpiryDate);
         //debug
@@ -400,22 +531,17 @@ public class MainAtmCli {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, pass);
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT user_id,account_number FROM user WHERE account_number=" + cardNumber);
-            String user = null;
-            if (resultSet.next()) {
-                user =resultSet.getString("user_id");
-            }
-            String query = "INSERT INTO card(card_number,user_id,card_type,expiry_date,cvv,created_date) VALUES(?,?,?,?,?,?)";
+            String query = "INSERT INTO card(card_number,account_number,card_type,expiry_date,cvv,created_date) VALUES(?,?,?,?,?,?)";
             PreparedStatement pStatement = connection.prepareStatement(query);
             pStatement.setString(1, cardNumber);
-            pStatement.setString(2, user);
+            pStatement.setString(2, accNum);
             pStatement.setString(3, cardType);
             pStatement.setString(4, formattedExpiryDate);
             pStatement.setString(5, cvv);
             pStatement.setString(6, creationDate);
             int rowsAffected = pStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("The customer has been successfully created!");
+                System.out.println("The customer's card is successfully created!");
             } else {
                 System.out.println("Sum ting wong!");
             }
@@ -426,9 +552,7 @@ public class MainAtmCli {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-
     }
-
     public static void main(String[] args) throws Exception {
         System.out.println("\n" +
                 "           ____    __    ____  _______  __        ______   ______   .___  ___.  _______ \n" +

@@ -17,6 +17,21 @@ public class MainAtmCli {
     private final static String url = "jdbc:mysql://localhost:3306/sitatm";
     private final static String user = "root";
     private final static String pass = "";
+    public static boolean accountExists(String accountNumber) {
+        boolean exists = false;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, user, pass);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM account WHERE account_number=" + accountNumber);
+            exists = resultSet.next();
+            connection.close();
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return exists;
+    }
 
     public static void CustomerMode() throws ClassNotFoundException, SQLException {
         Scanner sc = new Scanner(System.in);
@@ -246,26 +261,27 @@ public class MainAtmCli {
     public static void showTellerMenu() throws NoSuchAlgorithmException, SQLException, ClassNotFoundException {
         Scanner sc = new Scanner(System.in);
         while (true) {
-            System.out.println("What would you like to do today?");
-
-
-            System.out.println("[1] Create a new customer account");
-            System.out.println("[2] Close customer account");
-            System.out.println("[3] Change customer pin number");
-            System.out.println("[4] Exit");
+            System.out.println("""
+                What would you like to do today?
+                [1] Create a new customer account
+                [2] Close customer account
+                [3] Change customer pin number
+                [4] Exit
+                """);
             try {
                 int choice = sc.nextInt();
                 switch (choice) {
                     case 1:
-                        System.out.println("Create a new customer account");
+                        System.out.println("Option [1]: Create a new customer account");
                         CreateNewCustomerAccount();
                         break;
                     case 2:
-                        System.out.println("Option 2 selected");
+                        System.out.println("Option [2]: Close customer account");
                         closeAccount();
                         break;
                     case 3:
-                        System.out.println("Option 3 selected");
+                        System.out.println("Option [3]: Change customer's pin");
+                        changPin();
                         break;
                     case 4:
                         System.out.println("Good bye!");
@@ -329,10 +345,11 @@ public class MainAtmCli {
             Connection connection = DriverManager.getConnection(url, user, pass);
             Statement statement = connection.createStatement();
             ResultSet resultSet;
-            if (NRIC.equals(null)){
-                resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE passport_number='" + passportNumber + "'");
-            }else{
+            if (customerType == 1){
                 resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE nric='" + NRIC + "'");
+
+            } else{
+                resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE passport_number='" + passportNumber + "'");
             }
             if (resultSet.next()) {
                 System.out.println("This account already exist!");
@@ -369,10 +386,10 @@ public class MainAtmCli {
             if (rowsAffected > 0) {
                 System.out.println("Customer account has been created successfully!");
                 ResultSet resultSet;
-                if (NRIC.equals(null)){
-                    resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE passport_number='" + passportNumber + "'");
-                }else{
+                if (customerType == 1){
                     resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE nric='" + NRIC + "'");
+                }else{
+                    resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE passport_number='" + passportNumber + "'");
                 }
                 String userId = null;
                 if (resultSet.next()) {
@@ -382,18 +399,17 @@ public class MainAtmCli {
             }
             statement.close();
             connection.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
     public static void createAccount(String userId) throws NoSuchAlgorithmException {
         Scanner sc = new Scanner(System.in);
         System.out.println("\nAccount Creation Process");
-        System.out.println("Please select the Account type:" +
-                "\n[1] Savings Account" +
-                "\n[2] Current Account");
+        System.out.println("""
+                Please select the Account type:
+                [1] Savings Account
+                [2] Current Account""");
         String accountType = null;
         int selection = sc.nextInt();
         while (selection != 1 && selection != 2) {
@@ -402,7 +418,7 @@ public class MainAtmCli {
         }
         if (selection == 1){
             accountType = "Savings Account";
-        } else if (selection == 2) {
+        } else{
             accountType = "Current Account";
         }
         String bankAccountNumber = null;
@@ -438,7 +454,7 @@ public class MainAtmCli {
             if (pin.matches("\\d{6}")) {
                 break;
             } else {
-                System.out.print("Invalid input. Please enter a 6 digit pin: ");
+                System.out.print("Invalid pin. Please enter a 6 digit pin: ");
             }
         }
         //Hash customer's pin with Salt and Pepper
@@ -475,9 +491,7 @@ public class MainAtmCli {
             }
             statement.close();
             connection.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -563,9 +577,7 @@ public class MainAtmCli {
             }
             statement.close();
             connection.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -624,14 +636,51 @@ public class MainAtmCli {
             }else{
                 System.out.println("No such account was found!");
             }
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SQLException | RuntimeException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+        }
+    }
+    public static void changPin() throws NoSuchAlgorithmException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Please enter the customer's Account Number");
+        String accNo = sc.next();
+        if (accountExists(accNo)){
+            System.out.println("Please enter the new pin number: ");
+            String newPin = null;
+            while (true) {
+                newPin = sc.next();
+                if (newPin.matches("\\d{6}")) {
+                    break;
+                } else {
+                    System.out.print("Invalid pin. Please enter a 6 digit pin: ");
+                }
+            }
+            //Hash customer's pin with Salt and Pepper
+            String[] hashAlgo = PH.hashPin(newPin);
+            String hashedPin = hashAlgo[0];
+            String salt = hashAlgo[1];
+            //Debug
+            System.out.println("Random Salt: " + hashAlgo[0]);
+            System.out.println("Hashed Password: " + hashAlgo[1]);
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection connection = DriverManager.getConnection(url, user, pass);
+                Statement statement = connection.createStatement();
+                String query = "UPDATE account SET pin = ?, salt = ? WHERE account_number = ?";
+                PreparedStatement pStatement = connection.prepareStatement(query);
+                pStatement.setString(1, hashedPin);
+                pStatement.setString(2, salt);
+                pStatement.setString(3, accNo);
+                int rowsAffected = pStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Customer pin has been changed successfully!\n");
+                    showTellerMenu();
+                }
+                statement.close();
+                connection.close();
+            } catch (SQLException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
     public static void main(String[] args) throws Exception {
@@ -651,7 +700,11 @@ public class MainAtmCli {
                 "        |__|      \\______/     |_______/    |__|     |__|    /__/     \\__\\  |__|     |__|  |__| ");
         System.out.println("\n");
         Scanner sc = new Scanner(System.in);
-        System.out.println("Please select the following: \n[1] Teller Mode \n[2] Customer Mode");
+        System.out.println("""
+                Please select the following:
+                [1] Teller Mode
+                [2] Customer Mode
+                """);
         int mode = sc.nextInt();
         if (mode == 1) {
             TellerMode();

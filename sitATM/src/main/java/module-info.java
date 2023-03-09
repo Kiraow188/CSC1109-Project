@@ -11,6 +11,7 @@ module com.sitatm.sitatm {
     requires firebase.admin;
     requires com.google.auth;
     requires java.sql;
+    requires mysql.connector.java;
 
     opens com.sitatm.sitatm to javafx.fxml;
     exports com.sitatm.sitatm;

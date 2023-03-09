@@ -23,6 +23,8 @@ public class PinHash {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(string.getBytes());
         String encodedHash = Base64.getEncoder().encodeToString(hash);
+        encodedHash = encodedHash.replaceAll("/", "a");
+        encodedHash = encodedHash.replaceAll("\\\\", "b");
         return encodedHash;
     }
 
@@ -30,7 +32,12 @@ public class PinHash {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);
-        return Base64.getEncoder().encodeToString(salt);
+        //return Base64.getEncoder().encodeToString(salt);
+        String encodedSalt = Base64.getEncoder().encodeToString(salt);
+        // Replace any '/' and '\' characters with a valid replacement
+        encodedSalt = encodedSalt.replaceAll("/", "a");
+        encodedSalt = encodedSalt.replaceAll("\\\\", "b");
+        return encodedSalt;
     }
 
     private static void hashMatching(String pin, String salt, String hp) throws NoSuchAlgorithmException{
@@ -48,11 +55,11 @@ public class PinHash {
         }
     }
 
-    public static void main(String[] args) throws NoSuchAlgorithmException {
+/*    public static void main(String[] args) throws NoSuchAlgorithmException {
         String password = "650235";
         String[] pinNSalt = hashPin(password);
         System.out.println("Random Salt: " + pinNSalt[0]);
         System.out.println("Hashed Password: " + pinNSalt[1]);
-    }
+    }*/
 
 }

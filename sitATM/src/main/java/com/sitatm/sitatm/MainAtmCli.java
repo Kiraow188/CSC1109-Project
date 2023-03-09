@@ -32,6 +32,26 @@ public class MainAtmCli {
         }
         return exists;
     }
+    public static boolean accountDeactivated(String accountNumber){
+        boolean deactivated = false;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, user, pass);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT deactivation_date FROM account WHERE account_number=" + accountNumber);
+            if (resultSet.next()) {
+                String deactivationDate = resultSet.getString("deactivation_date");
+                if(deactivationDate != null) {
+                    deactivated = true;
+                }
+            }
+            connection.close();
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return deactivated;
+    }
 
     public static void CustomerMode() throws ClassNotFoundException, SQLException {
         Scanner sc = new Scanner(System.in);
@@ -298,6 +318,7 @@ public class MainAtmCli {
             }
         }
     }
+
     public static void CreateNewCustomerAccount() throws NoSuchAlgorithmException {
         Scanner sc = new Scanner(System.in);
         String NRIC = "";
@@ -403,6 +424,7 @@ public class MainAtmCli {
             throw new RuntimeException(e);
         }
     }
+
     public static void createAccount(String userId) throws NoSuchAlgorithmException {
         Scanner sc = new Scanner(System.in);
         System.out.println("\nAccount Creation Process");
@@ -495,6 +517,7 @@ public class MainAtmCli {
             throw new RuntimeException(e);
         }
     }
+
     public static void createCard(String accNum) throws NoSuchAlgorithmException {
         Scanner sc = new Scanner(System.in);
         System.out.println("\nCard Creation Process");
@@ -581,6 +604,7 @@ public class MainAtmCli {
             throw new RuntimeException(e);
         }
     }
+
     public static void closeAccount() throws ClassNotFoundException, SQLException {
         Scanner sc = new Scanner(System.in);
         System.out.println("\nClose Account Process");
@@ -590,16 +614,15 @@ public class MainAtmCli {
         java.util.Date dt = new java.util.Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String deactivationDate = sdf.format(dt);
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, user, pass);
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM account WHERE account_number=" + accountNumber);
-            if (resultSet.next()) {
-                System.out.println("Customer account exists!");
-                String userId = resultSet.getString("user_id");
-                String dDate = resultSet.getString("deactivation_date");
-                if (dDate == null) {
+        if (accountExists(accountNumber)){
+            if(!accountDeactivated(accountNumber)){
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection connection = DriverManager.getConnection(url, user, pass);
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM account WHERE account_number=" + accountNumber);
+                if (resultSet.next()) {
+                    System.out.println("Getting user ID");
+                    String userId = resultSet.getString("user_id");
                     System.out.println("Are you sure you want to close this account?\n[1] Yes [2] No");
                     int confirmation = sc.nextInt();
                     if (confirmation == 1) {
@@ -629,60 +652,66 @@ public class MainAtmCli {
                         } catch (SQLException e) {
                             throw new RuntimeException(e);
                         }
-                    } else {
-                        showTellerMenu();
                     }
                 }
             }else{
-                System.out.println("No such account was found!");
+                System.out.println("Error: Account is already closed!");
             }
-        } catch (ClassNotFoundException | SQLException | RuntimeException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+        }else {
+            System.out.println("Error: Account does not exist!");
         }
     }
+
     public static void changPin() throws NoSuchAlgorithmException {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter the customer's Account Number");
         String accNo = sc.next();
         if (accountExists(accNo)){
-            System.out.println("Please enter the new pin number: ");
-            String newPin = null;
-            while (true) {
-                newPin = sc.next();
-                if (newPin.matches("\\d{6}")) {
-                    break;
-                } else {
-                    System.out.print("Invalid pin. Please enter a 6 digit pin: ");
+            if (!accountDeactivated(accNo)){
+                System.out.println("Please enter the new pin number: ");
+                String newPin = null;
+                while (true) {
+                    newPin = sc.next();
+                    if (newPin.matches("\\d{6}")) {
+                        break;
+                    } else {
+                        System.out.print("Invalid pin. Please enter a 6 digit pin: ");
+                    }
                 }
-            }
-            //Hash customer's pin with Salt and Pepper
-            String[] hashAlgo = PH.hashPin(newPin);
-            String hashedPin = hashAlgo[0];
-            String salt = hashAlgo[1];
-            //Debug
-            System.out.println("Random Salt: " + hashAlgo[0]);
-            System.out.println("Hashed Password: " + hashAlgo[1]);
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection connection = DriverManager.getConnection(url, user, pass);
-                Statement statement = connection.createStatement();
-                String query = "UPDATE account SET pin = ?, salt = ? WHERE account_number = ?";
-                PreparedStatement pStatement = connection.prepareStatement(query);
-                pStatement.setString(1, hashedPin);
-                pStatement.setString(2, salt);
-                pStatement.setString(3, accNo);
-                int rowsAffected = pStatement.executeUpdate();
-                if (rowsAffected > 0) {
-                    System.out.println("Customer pin has been changed successfully!\n");
-                    showTellerMenu();
+                //Hash customer's pin with Salt and Pepper
+                String[] hashAlgo = PH.hashPin(newPin);
+                String hashedPin = hashAlgo[0];
+                String salt = hashAlgo[1];
+                //Debug
+                System.out.println("Random Salt: " + hashAlgo[0]);
+                System.out.println("Hashed Password: " + hashAlgo[1]);
+                try {
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    Connection connection = DriverManager.getConnection(url, user, pass);
+                    Statement statement = connection.createStatement();
+                    String query = "UPDATE account SET pin = ?, salt = ? WHERE account_number = ?";
+                    PreparedStatement pStatement = connection.prepareStatement(query);
+                    pStatement.setString(1, hashedPin);
+                    pStatement.setString(2, salt);
+                    pStatement.setString(3, accNo);
+                    int rowsAffected = pStatement.executeUpdate();
+                    if (rowsAffected > 0) {
+                        System.out.println("Customer pin has been changed successfully!\n");
+                        showTellerMenu();
+                    }
+                    statement.close();
+                    connection.close();
+                } catch (SQLException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
-                statement.close();
-                connection.close();
-            } catch (SQLException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+            }else{
+                System.out.println("Error: You cannot change pin for a deactivated account!");
             }
+        }else{
+            System.out.println("Error: Account does not exist!");
         }
     }
+
     public static void main(String[] args) throws Exception {
         System.out.println("\n" +
                 "           ____    __    ____  _______  __        ______   ______   .___  ___.  _______ \n" +

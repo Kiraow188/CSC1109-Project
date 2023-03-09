@@ -204,7 +204,7 @@ public class MainAtmCli {
         }
     }
 
-    public static void TellerMode() throws ClassNotFoundException, SQLException {
+    public static void TellerMode() throws Exception {
         Scanner sc = new Scanner(System.in);
         System.out.println("\n" +
                 "Please enter your username: ");
@@ -229,6 +229,7 @@ public class MainAtmCli {
             } else {
                 System.out.println("\n" +
                         "Invalid username or password!");
+                main(null);
             }
             resultSet.close();
             statement.close();
@@ -242,10 +243,12 @@ public class MainAtmCli {
         }
     }
 
-    public static void showTellerMenu() throws NoSuchAlgorithmException {
+    public static void showTellerMenu() throws NoSuchAlgorithmException, SQLException, ClassNotFoundException {
         Scanner sc = new Scanner(System.in);
         while (true) {
             System.out.println("What would you like to do today?");
+
+
             System.out.println("[1] Create a new customer account");
             System.out.println("[2] Close customer account");
             System.out.println("[3] Change customer pin number");
@@ -259,6 +262,7 @@ public class MainAtmCli {
                         break;
                     case 2:
                         System.out.println("Option 2 selected");
+                        closeAccount();
                         break;
                     case 3:
                         System.out.println("Option 3 selected");
@@ -324,7 +328,12 @@ public class MainAtmCli {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, pass);
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE nric='" + NRIC + "' OR passport_number='" + passportNumber + "'");
+            ResultSet resultSet;
+            if (NRIC.equals(null)){
+                resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE passport_number='" + passportNumber + "'");
+            }else{
+                resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE nric='" + NRIC + "'");
+            }
             if (resultSet.next()) {
                 System.out.println("This account already exist!");
                 showTellerMenu();
@@ -343,22 +352,28 @@ public class MainAtmCli {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, pass);
             Statement statement = connection.createStatement();
-            String query = "INSERT INTO customer(full_name, nric, passport_number, country, gender, dob, mobile_number, address, email, date_created) VALUES(?,?,?,?,?,?,?,?,?,?)";
+            String query = "INSERT INTO customer(full_name, nric, passport_number, country, gender, dob, mobile_number, address, email, created_date,deactivation_date) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement pStatement = connection.prepareStatement(query);
             pStatement.setString(1, fullName);
-            pStatement.setString(2, NRIC);
-            pStatement.setString(3, passportNumber);
-            pStatement.setString(4, country);
-            pStatement.setString(5, gender);
+            pStatement.setString(2, NRIC.toUpperCase());
+            pStatement.setString(3, passportNumber.toUpperCase());
+            pStatement.setString(4, country.toUpperCase());
+            pStatement.setString(5, gender.toUpperCase());
             pStatement.setString(6, dateOfBirth);
             pStatement.setString(7, mobileNumber);
             pStatement.setString(8, address);
-            pStatement.setString(9, email);
+            pStatement.setString(9, email.toLowerCase());
             pStatement.setString(10, creationDateTime);
+            pStatement.setNull(11,Types.DATE);
             int rowsAffected = pStatement.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Customer account has been created successfully!");
-                ResultSet resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE nric='" + NRIC + "' OR passport_number='" + passportNumber + "'");
+                ResultSet resultSet;
+                if (NRIC.equals(null)){
+                    resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE passport_number='" + passportNumber + "'");
+                }else{
+                    resultSet = statement.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE nric='" + NRIC + "'");
+                }
                 String userId = null;
                 if (resultSet.next()) {
                     userId = resultSet.getString("user_id");
@@ -466,7 +481,7 @@ public class MainAtmCli {
             throw new RuntimeException(e);
         }
     }
-    public static void createCard(String accNum){
+    public static void createCard(String accNum) throws NoSuchAlgorithmException {
         Scanner sc = new Scanner(System.in);
         System.out.println("\nCard Creation Process");
         System.out.println("PLease select the card type:" +
@@ -542,6 +557,7 @@ public class MainAtmCli {
             int rowsAffected = pStatement.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("The customer's card is successfully created!");
+                showTellerMenu();
             } else {
                 System.out.println("Sum ting wong!");
             }
@@ -550,6 +566,71 @@ public class MainAtmCli {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void closeAccount() throws ClassNotFoundException, SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\nClose Account Process");
+        System.out.println("Please enter customer's account number: ");
+        String accountNumber = sc.next();
+        //Generate timestamp for account creation
+        java.util.Date dt = new java.util.Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String deactivationDate = sdf.format(dt);
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, user, pass);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM account WHERE account_number=" + accountNumber);
+            if (resultSet.next()) {
+                System.out.println("Customer account exists!");
+                String userId = resultSet.getString("user_id");
+                String dDate = resultSet.getString("deactivation_date");
+                if (dDate == null) {
+                    System.out.println("Are you sure you want to close this account?\n[1] Yes [2] No");
+                    int confirmation = sc.nextInt();
+                    if (confirmation == 1) {
+                        try {
+                            String customerQuery = "UPDATE customer SET deactivation_date = ? WHERE user_id = ?";
+                            String accountQuery = "UPDATE account SET deactivation_date = ? WHERE account_number = ?";
+                            String cardQuery = "UPDATE card SET deactivation_date = ? WHERE account_number = ?";
+                            PreparedStatement pStatement1 = connection.prepareStatement(customerQuery);
+                            PreparedStatement pStatement2 = connection.prepareStatement(accountQuery);
+                            PreparedStatement pStatement3 = connection.prepareStatement(cardQuery);
+                            pStatement1.setString(1, deactivationDate);
+                            pStatement1.setString(2, userId);
+                            pStatement2.setString(1, deactivationDate);
+                            pStatement2.setString(2, accountNumber);
+                            pStatement3.setString(1, deactivationDate);
+                            pStatement3.setString(2, accountNumber);
+                            int rowsAffected1 = pStatement1.executeUpdate();
+                            int rowsAffected2 = pStatement2.executeUpdate();
+                            int rowsAffected3 = pStatement3.executeUpdate();
+                            if (rowsAffected1 > 0 && rowsAffected2 > 0 && rowsAffected3 > 0) {
+                                System.out.println("The customer's account has been deactivated.");
+                            } else {
+                                System.out.println("Sum ting wong!");
+                            }
+                            statement.close();
+                            connection.close();
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+                        showTellerMenu();
+                    }
+                }
+            }else{
+                System.out.println("No such account was found!");
+            }
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }

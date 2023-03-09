@@ -253,7 +253,7 @@ public class MainAtmCli {
                                     "\nEnter Account No. to transfer to: #");
                             accRrfNo = sc.next();
                             System.out.print("\nEnter amount to transfer: $");
-                            transfer_amount = sc.nextInt();
+                            transfer_amount = sc.nextDouble();
 
                             ResultSet TrfFrom = statement
                                     .executeQuery(
@@ -288,53 +288,71 @@ public class MainAtmCli {
                                         accRrfBalance = TrfTo.getDouble(25);
                                     }
                                     
-                                    // Transfer To::
-                                    accRrfBalance = accRrfBalance + transfer_amount;
-                                    String transferRrfAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
-                                    PreparedStatement transferRrfAmountBalance = connection
-                                            .prepareStatement(transferRrfAmountBalanceQuery);
+                                    // Transfer From::
+                                    accTrfBalance = accTrfBalance - transfer_amount;
+                                    String transferAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
+                                    PreparedStatement transferAmountBalance = connection
+                                            .prepareStatement(transferAmountBalanceQuery);
                                     // transferAmountBalance.setInt(1, 'null');
-                                    transferRrfAmountBalance.setString(1, accRrfNo);
-                                    transferRrfAmountBalance.setDate(2,
+                                    transferAmountBalance.setString(1, accTrfNo);
+                                    transferAmountBalance.setDate(2,
                                             java.sql.Date.valueOf(java.time.LocalDate.now()));
-                                    transferRrfAmountBalance.setString(3, "TRF FROM ACC " + accTrfNo);
-                                    transferRrfAmountBalance.setInt(4, 0);
-                                    transferRrfAmountBalance.setDouble(5, 0);
-                                    transferRrfAmountBalance.setDouble(6, transfer_amount);
-                                    transferRrfAmountBalance.setDouble(7, accRrfBalance);
-                                    int rowsRrfAffected = transferRrfAmountBalance.executeUpdate();
-                                    if (rowsRrfAffected <= 0) {
-                                        System.out.printf("\n%SQL Error. Please try again.%s\n\n",
-                                                ANSI_RED, ANSI_RESET);
-                                        break;
+                                    transferAmountBalance.setString(3, "TRF TO ACC " + accRrfNo);
+                                    transferAmountBalance.setInt(4, 0);
+                                    transferAmountBalance.setDouble(5, transfer_amount);
+                                    transferAmountBalance.setDouble(6, 0);
+                                    transferAmountBalance.setDouble(7, accTrfBalance);
+                                    int rowsTrfAffected = transferAmountBalance.executeUpdate();
+                                    if (rowsTrfAffected <= 0) {
+                                    System.out.printf("\n%sSQL Error. Please try again.%s\n\n",
+                                            ANSI_RED, ANSI_RESET);
+                                    break;
                                     } else {
-                                        // Transfer From::
-                                        accTrfBalance = accTrfBalance - transfer_amount;
-                                        String transferAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
-                                        PreparedStatement transferAmountBalance = connection
-                                                .prepareStatement(transferAmountBalanceQuery);
+                                        TrfTo = statement
+                                                .executeQuery(
+                                                        "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                                                + accRrfNo + " AND account.account_number = " + accRrfNo
+                                                                + " ORDER BY transaction_id DESC LIMIT 1;"); //
+                                        while (TrfTo.next()) {
+                                            RrfName = TrfTo.getString(8);
+                                            accRrfBalance = TrfTo.getDouble(25);
+                                        }
+                                        // Transfer To::
+                                        accRrfBalance = accRrfBalance + transfer_amount;
+                                        String transferRrfAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
+                                        PreparedStatement transferRrfAmountBalance = connection
+                                                .prepareStatement(transferRrfAmountBalanceQuery);
                                         // transferAmountBalance.setInt(1, 'null');
-                                        transferAmountBalance.setString(1, accTrfNo);
-                                        transferAmountBalance.setDate(2,
+                                        transferRrfAmountBalance.setString(1, accRrfNo);
+                                        transferRrfAmountBalance.setDate(2,
                                                 java.sql.Date.valueOf(java.time.LocalDate.now()));
-                                        transferAmountBalance.setString(3, "TRF TO ACC " + accRrfNo);
-                                        transferAmountBalance.setInt(4, 0);
-                                        transferAmountBalance.setDouble(5, transfer_amount);
-                                        transferAmountBalance.setDouble(6, 0);
-                                        transferAmountBalance.setDouble(7, accTrfBalance);
-                                        int rowsTrfAffected = transferAmountBalance.executeUpdate();
-                                        if (rowsTrfAffected > 0) {
-                                            System.out.printf(
-                                                    "\n%sYou have are successfully transferred $%.2f to Acc No. %s (%s) and your current %s Account Balance is $%.2f.%s\n\n",
-                                                    ANSI_CYAN, transfer_amount, accRrfNo, RrfName, accTrfTypeName,
-                                                    accTrfBalance, ANSI_RESET);
-                                                    TrfFrom.close();
-                                                    TrfTo.close();
-                                                    transferRrfAmountBalance.close();
-                                                    transferAmountBalance.close();
-                                                    break;
+                                        transferRrfAmountBalance.setString(3, "TRF FROM ACC " + accTrfNo);
+                                        transferRrfAmountBalance.setInt(4, 0);
+                                        transferRrfAmountBalance.setDouble(5, 0);
+                                        transferRrfAmountBalance.setDouble(6, transfer_amount);
+                                        transferRrfAmountBalance.setDouble(7, accRrfBalance);
+                                        int rowsRrfAffected = transferRrfAmountBalance.executeUpdate();
+                                        if (rowsRrfAffected > 0) {
+                                            TrfFrom = statement
+                                                    .executeQuery(
+                                                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                                                    + accTrfNo + " AND account.account_number = "
+                                                                    + accTrfNo
+                                                                    + " ORDER BY transaction_id DESC LIMIT 1;"); //
+                                            while (TrfFrom.next()) {
+                                                accTrfBalance = TrfFrom.getDouble(25);
+                                            }
+                                                System.out.printf(
+                                                        "\n%sYou have are successfully transferred $%.2f to Acc No. %s (%s) and your current %s Account Balance is $%.2f.%s\n\n",
+                                                        ANSI_CYAN, transfer_amount, accRrfNo, RrfName, accTrfTypeName,
+                                                        accTrfBalance, ANSI_RESET);
+                                                        TrfFrom.close();
+                                                        TrfTo.close();
+                                                        transferRrfAmountBalance.close();
+                                                        transferAmountBalance.close();
+                                                        break;
                                         } else {
-                                            System.out.printf("\n%SQL Error. Please try again.%s\n\n",
+                                            System.out.printf("\n%sSQL Error. Please try again.%s\n\n",
                                                     ANSI_RED, ANSI_RESET);
                                             double accRrdBalance = accTrfBalance + transfer_amount;
                                             PreparedStatement transferRfdAmountBalance = connection
@@ -351,7 +369,7 @@ public class MainAtmCli {
                                             int rowsRfdAffected = transferRfdAmountBalance.executeUpdate();
                                             if (rowsRfdAffected <= 0) {
                                                 System.out.printf(
-                                                        "\n%SQL Error. Please call the customer service hotline for assistance.%s\n\n",
+                                                        "\n%SsQL Error. Please call the customer service hotline for assistance.%s\n\n",
                                                         ANSI_RED, ANSI_RESET);
                                                 break;
                                             }

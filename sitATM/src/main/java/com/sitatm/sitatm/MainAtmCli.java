@@ -17,6 +17,18 @@ public class MainAtmCli {
     private final static String url = "jdbc:mysql://localhost:3306/sitatm";
     private final static String user = "root";
     private final static String pass = "";
+
+    // Color Codes
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+
     public static boolean accountExists(String accountNumber) {
         boolean exists = false;
         try {
@@ -55,56 +67,110 @@ public class MainAtmCli {
 
     public static void CustomerMode() throws ClassNotFoundException, SQLException {
         Scanner sc = new Scanner(System.in);
+        System.out.println("\nPlease Enter Your userID");
+        String userId = sc.next();
         System.out.println("Please Enter Your Pin");
         int pin = sc.nextInt();
+        System.out.println();
+
         // SQL Connection
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, user, pass);
             Statement statement = connection.createStatement();
+
             // Customer table
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM customer WHERE pinNumber=" + pin); //
+            String SAaccNo = null;
+            String CAaccNo = null;
+            String pinhash = null;
+            String salt = null;
+            ResultSet SAloginSet = statement
+                    .executeQuery("SELECT * FROM `account` WHERE `user_id` =" + userId + " AND `account_type` = 'Savings Account'"); // Need to check Pin 
+            while (SAloginSet.next()) {
+                SAaccNo = SAloginSet.getString(1);
+                pinhash = SAloginSet.getString(3);
+                salt = SAloginSet.getString(4);
+            }
+            ResultSet CAloginSet = statement
+                    .executeQuery("SELECT * FROM `account` WHERE `user_id` =" + userId + " AND `account_type` = 'Current Account'"); //  Need to check Pin
+            while (CAloginSet.next()) {
+                CAaccNo = CAloginSet.getString(1);
+                pinhash = CAloginSet.getString(3);
+                salt = CAloginSet.getString(4);
+            } 
+
             String firstName = null;
-            int checkingBalance = 0;
-            int savingsBalance = 0;
+            double checkingBalance = 0;
+            double savingsBalance = 0;
             int count = 0;
-            while (resultSet.next()) {
-                //System.out.println(resultSet.getString(2));
-                firstName = resultSet.getString(2);
+            ResultSet SAresultSet = statement
+                    .executeQuery(
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.user_id = "
+                                    + userId + " AND account.account_number = " + SAaccNo
+                                    + " ORDER BY transaction_id DESC LIMIT 1;"); //
+            while (SAresultSet.next()) {
+                // for (int i = 0; i < resultSet.getFetchSize(); i++) {
+                // System.out.println(resultSet.getString(i));
+                // }
+                // System.out.println(resultSet.getString(2));
+                firstName = SAresultSet.getString(8);
                 /// totalBalance = resultSet.getInt(5);
-                checkingBalance = resultSet.getInt(4);
-                savingsBalance = resultSet.getInt(5);
+                savingsBalance = SAresultSet.getInt(25);
+                count++;
+            }
+            ResultSet CAresultSet = statement
+                    .executeQuery(
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.user_id = "
+                                    + userId + " AND account.account_number = " + CAaccNo
+                                    + " ORDER BY transaction_id DESC LIMIT 1;"); //
+            while (CAresultSet.next()) {
+                // for (int i = 0; i < resultSet.getFetchSize(); i++) {
+                // System.out.println(resultSet.getString(i));
+                // }
+                // System.out.println(resultSet.getString(2));
+                firstName = CAresultSet.getString(8);
+                /// totalBalance = resultSet.getInt(5);
+                checkingBalance = CAresultSet.getInt(25);
                 count++;
             }
             int choice;
-            int totalBalance = checkingBalance + savingsBalance;
-            int deposit_amount;
-            int transfer_amount;
-            int withdrawal_amount; // Not sure if we should impose a min withdraw amount
+            double totalBalance = checkingBalance + savingsBalance;
+            double deposit_amount;
+            double transfer_amount;
+            double withdrawal_amount; // Not sure if we should impose a min withdraw amount
             if (count > 0) {
-                System.out.println("Hello " + firstName);
-                System.out.println("What would you like to do today? Please enter your choice");
+                System.out.println(ANSI_CYAN + "Hello " + firstName + ",");
+                System.out.println("As of " + new java.util.Date() + "," + ANSI_RESET);
+                System.out.println("  -----------------------------");
+                System.out.printf("  | Saving Balance: $%.2f    |\n", savingsBalance);
+                System.out.println("  -----------------------------");
+                System.out.printf("  | Checking Balance: $%.2f |\n", checkingBalance);
+                System.out.println("  -----------------------------");
+                System.out.printf("  | Total Balance: $%.2f    |\n", totalBalance);
+                System.out.println("  -----------------------------\n");
+                System.out.println(
+                        ANSI_YELLOW + "What would you like to do today? Please enter your choice" + ANSI_RESET);
                 while (true) {
                     System.out.println("-----------------------------\n" +
-                            "| press 1: Cash Withdraw   |\n" +
+                            "| [press 1]: Cash Withdraw   |\n" +
                             "-----------------------------");
                     System.out.println("-----------------------------\n" +
-                            "| press 2 : Fund Transfer   |\n" +
+                            "| [press 2] : Fund Transfer  |\n" +
                             "-----------------------------");
                     System.out.println("-----------------------------\n" +
-                            "| press 3 : Check Balance   |\n" +
+                            "| [press 3] : Check Balance  |\n" +
                             "-----------------------------");
                     System.out.println("-----------------------------\n" +
-                            "| press 4 : All Account      |\n" +
+                            "| [press 4] : All Account    |\n" +
                             "-----------------------------");
                     System.out.println("-----------------------------\n" +
-                            "| press 5 : Deposit Cash   |\n" +
+                            "| [press 5] : Deposit Cash   |\n" +
                             "-----------------------------");
                     System.out.println("-----------------------------\n" +
-                            "| press 6 : Other Services |\n" +
+                            "| [press 6] : Other Services |\n" +
                             "-----------------------------");
                     System.out.println("-----------------------------\n" +
-                            "| press 7 : Exit or Quit   |\n" +
+                            "| [press 7] : Exit or Quit   |\n" +
                             "-----------------------------");
                     System.out.println();
 
@@ -126,12 +192,12 @@ public class MainAtmCli {
                                         accType = savings;
                                         break;
                                     default:
-                                        System.out.print("Invalid option, please reenter");
+                                        System.out.print("Invalid option, please re-enter");
                                         accType = sc.nextInt();
                                         persist = true;
                                 }
                             }
-                            System.out.println("Enter amount to withdraw");
+                            System.out.println("Enter amount to withdraw: $");
                             withdrawal_amount = sc.nextInt();
                             if (accType == checking) {
                                 while (withdrawal_amount > checkingBalance) {
@@ -153,16 +219,152 @@ public class MainAtmCli {
                             }
                             break;
                         case 2:
-                            System.out.println("Enter amount to transfer");
-                            transfer_amount = sc.nextInt();
-                            if (transfer_amount > totalBalance) {
-                                System.out.println("Your balance is insufficient");
-                            } else {
-                                totalBalance = totalBalance - transfer_amount;
-                                int transferAmountBalance = statement.executeUpdate("UPDATE customer SET aCheckingBalance = " + totalBalance + " WHERE aPasscode =" + pin);
-                                System.out.println("You have are successfully withdraw $" + transfer_amount + " and your current balance is $" + totalBalance);
+                            boolean persistent = true;
+                            double accTrfBalance = 0;
+                            String accTrfTypeName = null;
+                            String accTrfNo = null;
+                            String accRrfNo = null;
+                            // loops until valid account type entered
+                            while (persistent) {
+                                persistent = false;
+                                System.out.println(
+                                        ANSI_CYAN + "\nPlease select the account to transfer from: " + ANSI_RESET
+                                                + "\n[1] for Checking\n[2] for Savings");
+                                accType = sc.nextInt();
+                                switch (accType) {
+                                    case 1:
+                                        accType = checking;
+                                        accTrfTypeName = "Checking";
+                                        accTrfBalance = checkingBalance;
+                                        accTrfNo = CAaccNo;
+                                        break;
+                                    case 2:
+                                        accType = savings;
+                                        accTrfTypeName = "Savings";
+                                        accTrfBalance = savingsBalance;
+                                        accTrfNo = SAaccNo;
+                                        break;
+                                    default:
+                                        System.out.println(ANSI_RED + "Invalid option, please re-enter." + ANSI_RESET);
+                                        persistent = true;
+                                }
                             }
-                            break;
+                            System.out.print(
+                                    "\nEnter Account No. to transfer to: #");
+                            accRrfNo = sc.next();
+                            System.out.print("\nEnter amount to transfer: $");
+                            transfer_amount = sc.nextInt();
+
+                            ResultSet TrfFrom = statement
+                                    .executeQuery(
+                                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                                    + accTrfNo + " AND account.account_number = " + accTrfNo
+                                                    + " ORDER BY transaction_id DESC LIMIT 1;"); //
+                            while (TrfFrom.next()) {
+                                accTrfBalance = TrfFrom.getDouble(25);
+                            }
+
+                            if (transfer_amount > accTrfBalance) {
+                                System.out.println(ANSI_RED + "\nYour balance is insufficient. Operation Cancelled.\n"
+                                        + ANSI_RESET);
+                                break;
+                            } else if (transfer_amount > 1000000) {
+                                System.out
+                                        .println(ANSI_RED + "Exceeded withdrawal amount of $1,000,000.\n" + ANSI_RESET);
+                                break;
+                            } else {
+                                try {
+                                    // Get Transfer To::
+                                    String RrfName = null;
+                                    double accRrfBalance = 0;
+
+                                    ResultSet TrfTo = statement
+                                            .executeQuery(
+                                                    "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                                            + accRrfNo + " AND account.account_number = " + accRrfNo
+                                                            + " ORDER BY transaction_id DESC LIMIT 1;"); //
+                                    while (TrfTo.next()) {
+                                        RrfName = TrfTo.getString(8);
+                                        accRrfBalance = TrfTo.getDouble(25);
+                                    }
+                                    
+                                    // Transfer To::
+                                    accRrfBalance = accRrfBalance + transfer_amount;
+                                    String transferRrfAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
+                                    PreparedStatement transferRrfAmountBalance = connection
+                                            .prepareStatement(transferRrfAmountBalanceQuery);
+                                    // transferAmountBalance.setInt(1, 'null');
+                                    transferRrfAmountBalance.setString(1, accRrfNo);
+                                    transferRrfAmountBalance.setDate(2,
+                                            java.sql.Date.valueOf(java.time.LocalDate.now()));
+                                    transferRrfAmountBalance.setString(3, "TRF FROM ACC " + accTrfNo);
+                                    transferRrfAmountBalance.setInt(4, 0);
+                                    transferRrfAmountBalance.setDouble(5, 0);
+                                    transferRrfAmountBalance.setDouble(6, transfer_amount);
+                                    transferRrfAmountBalance.setDouble(7, accRrfBalance);
+                                    int rowsRrfAffected = transferRrfAmountBalance.executeUpdate();
+                                    if (rowsRrfAffected <= 0) {
+                                        System.out.printf("\n%SQL Error. Please try again.%s\n\n",
+                                                ANSI_RED, ANSI_RESET);
+                                        break;
+                                    } else {
+                                        // Transfer From::
+                                        accTrfBalance = accTrfBalance - transfer_amount;
+                                        String transferAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
+                                        PreparedStatement transferAmountBalance = connection
+                                                .prepareStatement(transferAmountBalanceQuery);
+                                        // transferAmountBalance.setInt(1, 'null');
+                                        transferAmountBalance.setString(1, accTrfNo);
+                                        transferAmountBalance.setDate(2,
+                                                java.sql.Date.valueOf(java.time.LocalDate.now()));
+                                        transferAmountBalance.setString(3, "TRF TO ACC " + accRrfNo);
+                                        transferAmountBalance.setInt(4, 0);
+                                        transferAmountBalance.setDouble(5, transfer_amount);
+                                        transferAmountBalance.setDouble(6, 0);
+                                        transferAmountBalance.setDouble(7, accTrfBalance);
+                                        int rowsTrfAffected = transferAmountBalance.executeUpdate();
+                                        if (rowsTrfAffected > 0) {
+                                            System.out.printf(
+                                                    "\n%sYou have are successfully transferred $%.2f to Acc No. %s (%s) and your current %s Account Balance is $%.2f.%s\n\n",
+                                                    ANSI_CYAN, transfer_amount, accRrfNo, RrfName, accTrfTypeName,
+                                                    accTrfBalance, ANSI_RESET);
+                                                    TrfFrom.close();
+                                                    TrfTo.close();
+                                                    transferRrfAmountBalance.close();
+                                                    transferAmountBalance.close();
+                                                    break;
+                                        } else {
+                                            System.out.printf("\n%SQL Error. Please try again.%s\n\n",
+                                                    ANSI_RED, ANSI_RESET);
+                                            double accRrdBalance = accTrfBalance + transfer_amount;
+                                            PreparedStatement transferRfdAmountBalance = connection
+                                                    .prepareStatement(transferAmountBalanceQuery);
+                                            // transferAmountBalance.setInt(1, 'null');
+                                            transferRfdAmountBalance.setString(1, accRrfNo);
+                                            transferRfdAmountBalance.setDate(2,
+                                                    java.sql.Date.valueOf(java.time.LocalDate.now()));
+                                            transferRfdAmountBalance.setString(3, "RFD FROM TRF TO ACC " + accTrfNo);
+                                            transferRfdAmountBalance.setInt(4, 0);
+                                            transferRfdAmountBalance.setDouble(5, 0);
+                                            transferRfdAmountBalance.setDouble(6, transfer_amount);
+                                            transferRfdAmountBalance.setDouble(7, accRrdBalance);
+                                            int rowsRfdAffected = transferRfdAmountBalance.executeUpdate();
+                                            if (rowsRfdAffected <= 0) {
+                                                System.out.printf(
+                                                        "\n%SQL Error. Please call the customer service hotline for assistance.%s\n\n",
+                                                        ANSI_RED, ANSI_RESET);
+                                                break;
+                                            }
+                                            break; 
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    // TODO: handle exception
+                                    System.out.printf("\n%sAccount No. %s not found. Please try again.%s\n\n", ANSI_RED,
+                                            accRrfNo, ANSI_RESET);
+                                    break;
+                                }
+                            }
                         case 3:
                             System.out.println("Your current Balance is $" + totalBalance);
                             break;
@@ -172,7 +374,7 @@ public class MainAtmCli {
                             System.out.println("Your current Balance in your savings account is $" + savingsBalance);
                             break;
                         case 5:
-                            boolean persistent = true;
+                            persistent = true;
                             System.out.println("Please select the account: \nEnter 1 for Checking\nEnter 2 for Savings");
                             accType = sc.nextInt();
                             //loops until valid account type entered
@@ -186,7 +388,7 @@ public class MainAtmCli {
                                         accType = savings;
                                         break;
                                     default:
-                                        System.out.print("Invalid option, please reenter");
+                                        System.out.print("Invalid option, please re-enter");
                                         accType = sc.nextInt();
                                         persistent = true;
                                 }
@@ -205,19 +407,192 @@ public class MainAtmCli {
                             }
                             break;
                         case 6:
-                            System.out.println("Other Services");
-                            System.out.println("-----------------------------\n" +
-                                    "| press 1 : Change Pin Number |\n" +
-                                    "-----------------------------");
-                            System.out.println("-------------------------------------------\n" +
-                                    "| press 2 : Update Personal Particulars   |\n" +
-                                    "-------------------------------------------");
-                            System.out.println("-----------------------------\n" +
-                                    "| press 3 : Go back          |\n" +
-                                    "-----------------------------");
-                            System.out.println("-----------------------------\n" +
-                                    "| press 4 : Terminate / Quit  |\n" +
-                                    "-----------------------------");
+                            System.out.println("\n" + ANSI_YELLOW + "Other Services" + ANSI_RESET);
+                            System.out.println("--------------------------------\n" +
+                                    "| [press 1] : Change Pin Number |\n" +
+                                    "--------------------------------");
+                            System.out.println("--------------------------------------------\n" +
+                                    "| [press 2] : Update Personal Particulars   |\n" +
+                                    "--------------------------------------------");
+                            System.out.println("-------------------------------\n" +
+                                    "| [press 3] : Apply Bank Loan  |\n" +
+                                    "-------------------------------");
+                            System.out.println("-------------------------------\n" +
+                                    "| [press 4] : Go back          |\n" +
+                                    "-------------------------------");
+                            System.out.println("-------------------------------\n" +
+                                    "| [press 5] : Terminate / Quit |\n" +
+                                    "-------------------------------");
+                            choice = sc.nextInt();
+                            switch (choice) {
+                                case 1:
+                                    persistent = true;
+                                    while (persistent) {
+                                        persistent = false;
+                                        System.out.print("\nEnter new pin: ");
+                                        String newPin = sc.next();
+                                        if (newPin.matches("\\d{6}")) {
+                                            // Hash customer's pin with Salt and Pepper
+                                            String[] hashAlgo;
+                                            try {
+                                                hashAlgo = PH.hashPin(newPin);
+                                                String newHashedPin = hashAlgo[0];
+                                                String newSalt = hashAlgo[1];
+                                                // Debug
+                                                System.out.println("Random Salt: " + hashAlgo[0]);
+                                                System.out.println("Hashed Password: " + hashAlgo[1]);
+                                                persistent = true;
+                                                while (persistent) {
+                                                    System.out.println(
+                                                            ANSI_CYAN + "\nProceed with pin change? " + ANSI_RESET
+                                                                    + "\n[1] Yes\n[2] No"
+                                                                    + ANSI_RESET);
+                                                    int pinOp = sc.nextInt();
+                                                    persistent = false;
+                                                    switch (pinOp) {
+                                                        case 1:
+                                                            try {
+                                                                String npQuery = "UPDATE account SET pin = ?, salt = ? WHERE user_id = ?";
+                                                                PreparedStatement npStatement = connection
+                                                                        .prepareStatement(npQuery);
+                                                                npStatement.setString(1, newHashedPin);
+                                                                npStatement.setString(2, newSalt);
+                                                                npStatement.setInt(3, pin);
+                                                                npStatement.executeUpdate();
+                                                                System.out
+                                                                        .println(
+                                                                                ANSI_CYAN
+                                                                                        + "\nYou have successfully changed your pin.\n"
+                                                                                        + ANSI_RESET);
+                                                            } catch (Exception e) {
+                                                                // TODO: handle exception
+                                                                System.out.println(
+                                                                        ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                                                                                + ANSI_RESET);
+                                                            }
+                                                            break;
+                                                        case 2:
+                                                            System.out.println(ANSI_RED + "\nOperation cancelled.\n"
+                                                                    + ANSI_RESET);
+                                                            break;
+                                                        default:
+                                                            System.out.println(
+                                                                    ANSI_RED + "Invalid option, please re-enter.\n"
+                                                                            + ANSI_RESET);
+                                                            persistent = true;
+                                                    }
+                                                }
+                                            } catch (NoSuchAlgorithmException e) {
+                                                // TODO Auto-generated catch block
+                                                System.out.println(
+                                                        ANSI_RED + "\nAn error has occurred, please try again.\n"
+                                                                + ANSI_RESET);
+                                            }
+                                            break;
+                                        } else {
+                                            System.out.println(
+                                                    ANSI_RED + "\nInvalid input. " + ANSI_RESET
+                                                            + "Please enter a 6 digit pin: ");
+                                            persistent = true;
+                                        }
+                                    }
+                                    break;
+                                case 2:
+                                    System.out.print("Chose Option 2, WIP");
+                                    break;
+
+                                case 3:
+                                    double intRate = 3.88;
+                                    double proRate = 1.00;
+                                    System.out.printf("\nTotal Limit: " + "\n");
+                                    System.out.printf("Available Limit: " + "\n");
+                                    System.out.printf("Interst Rate: %.2f" + "%% p.a\n", intRate);
+                                    System.out.printf("Processing Fee : %.2f" + "%%\n\n", proRate);
+
+                                    persistent = true;
+                                    // loops until valid account type entered
+                                    while (persistent) {
+                                        persistent = false;
+                                        System.out.println(
+                                                ANSI_CYAN + "Please select the account: " + ANSI_RESET
+                                                        + "\n[1] for Checking\n[2] for Savings");
+                                        accType = sc.nextInt();
+                                        switch (accType) {
+                                            case 1:
+                                                accType = checking;
+                                                break;
+                                            case 2:
+                                                accType = savings;
+                                                break;
+                                            default:
+                                                System.out.println(ANSI_RED + "Invalid option, " + ANSI_RESET
+                                                        + "please re-enter.\n");
+                                                persistent = true;
+                                        }
+                                    }
+                                    System.out.print("\nRequested Loan Amount: $");
+                                    double loanAmt = sc.nextInt();
+                                    int loanType = 0;
+                                    persistent = true;
+                                    while (persistent) {
+                                        persistent = false;
+                                        System.out.println(
+                                                ANSI_CYAN + "\nPlease select Loan Tenor: " + ANSI_RESET
+                                                        + "\n[1] for 3 Months\n[2] for 12 Months\n[3] for 24 Months");
+                                        loanType = sc.nextInt();
+                                        switch (loanType) {
+                                            case 1:
+                                                loanType = 3;
+                                                break;
+                                            case 2:
+                                                loanType = 12;
+                                                break;
+                                            case 3:
+                                                loanType = 24;
+                                                break;
+                                            default:
+                                                System.out.print(ANSI_RED + "Invalid option, " + ANSI_RESET
+                                                        + "please re-enter.\n");
+                                                accType = sc.nextInt();
+                                                persistent = true;
+                                        }
+                                    }
+                                    System.out.printf("\nInstallment Per Month for Loan $%.2f/%d Months: $%.2f\n\n",
+                                            loanAmt, loanType, (loanAmt / ((Math.pow(1 + (0.0388 / 12), loanType) - 1)
+                                                    / ((0.0388 / 12) * (Math.pow(1 + (0.0388 / 12), loanType))))));
+
+                                    persistent = true;
+                                    while (persistent) {
+                                        System.out.println(
+                                                ANSI_CYAN + "Proceed with loan request?  " + ANSI_RESET
+                                                        + "\n[1] Yes\n[2] No");
+                                        int loanOp = sc.nextInt();
+                                        persistent = false;
+                                        switch (loanOp) {
+                                            case 1:
+                                                // Send to db !!!!!!!!!
+                                                System.out.println(ANSI_CYAN + "\nLoan request has been processed.\n"
+                                                        + ANSI_RESET);
+                                                break;
+                                            case 2:
+                                                System.out.println(ANSI_RED + "\nLoan request cancelled.\n"
+                                                        + ANSI_RESET);
+                                                break;
+                                            default:
+                                                System.out.println(ANSI_RED + "Invalid option, " + ANSI_RESET
+                                                        + "please re-enter.\n");
+                                                persistent = true;
+                                        }
+                                    }
+                                    break;
+
+                                case 4:
+                                    break;
+
+                                case 5:
+                                    System.out.println("Thank you for banking with SIT ATM");
+                                    return;
+                            }
                             break;
                     }
                     if (choice == 7) {
@@ -229,7 +604,10 @@ public class MainAtmCli {
             } else {
                 System.out.println("Wrong Pin !");
             }
-            resultSet.close();
+            SAresultSet.close();
+            CAresultSet.close();
+            SAloginSet.close();
+            CAloginSet.close();
             statement.close();
             connection.close();
         } catch (ClassNotFoundException e) {

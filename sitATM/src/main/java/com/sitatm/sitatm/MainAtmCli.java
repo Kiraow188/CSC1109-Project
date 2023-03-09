@@ -268,9 +268,15 @@ public class MainAtmCli {
                                 System.out.println(ANSI_RED + "\nYour balance is insufficient. Operation Cancelled.\n"
                                         + ANSI_RESET);
                                 break;
-                            } else if (transfer_amount > 1000000) {
+                            } 
+                            else if (transfer_amount <= 0) {
                                 System.out
-                                        .println(ANSI_RED + "Exceeded withdrawal amount of $1,000,000.\n" + ANSI_RESET);
+                                        .println(ANSI_RED + "\nTransfer amount have to be bigger than $0.\n" + ANSI_RESET);
+                                break;
+                            } 
+                            else if (transfer_amount > 1000000) {
+                                System.out
+                                        .println(ANSI_RED + "\nExceeded transfer amount of $1,000,000.\n" + ANSI_RESET);
                                 break;
                             } else {
                                 try {
@@ -289,7 +295,7 @@ public class MainAtmCli {
                                         accRrfBalance = TrfTo.getDouble(25);
                                         TrfRetrieve++;
                                     }
-                                    if (TrfRetrieve < 0){
+                                    if (TrfRetrieve <= 0){
                                     System.out.printf("\n%sAccount No. %s not found. Please try again.%s\n\n", ANSI_RED,
                                             accRrfNo, ANSI_RESET);
                                     break;

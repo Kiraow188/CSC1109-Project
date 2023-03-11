@@ -726,7 +726,7 @@ public class MainAtmCli {
         Database db = new Database();
 
         System.out.println("Please enter customer's full name: ");
-        cust.setfName(sc.nextLine());
+        cust.setfName(sc.nextLine().toUpperCase());
         System.out.println("Is the customer \n[1] Singaporean/PR or \n[2] Foreigner?");
         int customerType = sc.nextInt();
         while (customerType != 1 && customerType != 2) {
@@ -768,9 +768,9 @@ public class MainAtmCli {
         //consume the end of line at the end of sc.next()
         sc.nextLine();
         System.out.println("Please enter the customer's country: ");
-        cust.setCountry(sc.nextLine());
+        cust.setCountry(sc.nextLine().toUpperCase());
         System.out.println("Please enter the customer's gender: ");
-        cust.setGender(sc.next());
+        cust.setGender(sc.next().toUpperCase());
         //consume the end of line at the end of sc.next()
         sc.nextLine();
         System.out.println("Please enter the customer's date of birth (YYYY-MM-DD): ");
@@ -968,11 +968,21 @@ public class MainAtmCli {
         } else{
             card.setCardType("Credit Card");
         }
+        System.out.println("""
+                Please select the card network:
+                [1] Mastercard
+                [2] Visa
+                """);
+        int cardNetworkSelection = sc.nextInt();
+        while (cardNetworkSelection != 1 && cardNetworkSelection != 2) {
+            System.out.println("Invalid selection. Please try again.");
+            cardNetworkSelection = sc.nextInt();
+        }
         //Generate Card Number
         String cardNumber = null;
         while (cardNumber == null) {
             //Generate 16 digit card number depending on Visa or Masters
-            cardNumber = CardGenerator.generateCardNumber(selection);
+            cardNumber = CardGenerator.generateCardNumber(cardNetworkSelection);
             //Debug
             System.out.println("ATM Card Number Generated: " + cardNumber);
             try {

@@ -1,5 +1,7 @@
 package com.sitatm.sitatm;
 
+import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
+
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -685,30 +687,40 @@ public class MainAtmCli {
             System.out.println("""
                 What would you like to do today?
                 [1] Create a new customer account
-                [2] Close customer account
-                [3] Change customer pin number
-                [4] Exit
+                [2] Add account to an existing customer
+                [3] Add card to an existing customer
+                [4] Close customer account
+                [5] Change customer pin number
+                [0] Quit
                 """);
             try {
                 int choice = sc.nextInt();
                 switch (choice) {
-                    case 1:
+                    case 1 -> {
                         System.out.println("Option [1]: Create a new customer account");
                         CreateNewCustomerAccount();
-                        break;
-                    case 2:
-                        System.out.println("Option [2]: Close customer account");
+                    }
+                    case 2 -> {
+                        System.out.println("Option [2]: Add account to an existing customer");
+                        addAccount();
+                    }
+                    case 3 -> {
+                        System.out.println("Option [3]: Add card to an existing customer");
+                        addCard();
+                    }
+                    case 4 -> {
+                        System.out.println("Option [4]: Close customer account");
                         closeAccount();
-                        break;
-                    case 3:
-                        System.out.println("Option [3]: Change customer's pin");
+                    }
+                    case 5 -> {
+                        System.out.println("Option [5]: Change customer's pin");
                         changPin();
-                        break;
-                    case 4:
+                    }
+                    case 0 -> {
                         System.out.println("Good bye!");
                         System.exit(0);
-                    default:
-                        System.out.println("Invalid choice, please try again.");
+                    }
+                    default -> System.out.println("Invalid choice, please try again.");
                 }
                 if (choice >= 1 && choice <= 3) {
                     break;
@@ -936,12 +948,27 @@ public class MainAtmCli {
             int rowsAffected = pStatement.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Customer account has been created successfully!");
-                //TODO: Create a card flow
-                createCard(bankAccountNumber);
+                System.out.println("""
+                        Do you want to proceed to card creation?
+                        [1] Yes
+                        [2] No
+                        """);
+                int choice = sc.nextInt();
+                while (choice != 1 && choice != 2){
+                    System.out.println("Invalid selection, please enter your choice: ");
+                    choice = sc.nextInt();
+                }
+                if (choice == 1){
+                    createCard(bankAccountNumber);
+                }else{
+                    showTellerMenu();
+                }
             }
             db.closeConnection();
         } catch (SQLException e) {
             System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
+        } catch (ClassNotFoundException e){
+            System.out.println("Class error: " + e.getMessage());
         }
     }
 
@@ -1034,6 +1061,97 @@ public class MainAtmCli {
             db.closeConnection();
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static void addAccount(){
+        Scanner sc = new Scanner(System.in);
+        Database db = new Database();
+        System.out.println("Please enter customer's current account number: ");
+        String accNo = sc.next();
+        String userId = null;
+        try{
+            ResultSet resultSet;
+            resultSet = db.executeQuery("SELECT * FROM account where account_number = "+accNo);
+            if (resultSet.next()){
+                userId = resultSet.getString("user_id");
+                createAccount(userId);
+            }else{
+                System.out.println("""
+                        No customer account found!
+                        Do you want to create one now?
+                        [1] Yes
+                        [2] No""");
+                int selection = sc.nextInt();
+                while (selection != 1 && selection != 2){
+                    System.out.println("Invalid selection, please enter your choice: ");
+                    selection = sc.nextInt();
+                }
+                if (selection == 1){
+                    CreateNewCustomerAccount();
+                }else{
+                    showTellerMenu();
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Algorithmic Error: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.out.println("Class Error: "+ e.getMessage());
+        }
+    }
+
+    public static void addCard(){
+        Scanner sc = new Scanner(System.in);
+        Database db = new Database();
+        System.out.println("\n[Notice] The account number entered will be the account tied to the card!");
+        System.out.println("Please enter customer's current account number: ");
+        String accNo;
+        while (true) {
+            accNo = sc.next();
+            if (accNo.matches("(?=^(250|360)\\d{6}$)\\d{9}")) { // Check if input is a 9-digit number
+                break; // Valid input, exit loop
+            } else {
+                System.out.println("Invalid input. Please enter customer's current account number: ");
+            }
+        }
+        try{
+            ResultSet resultSet;
+            resultSet = db.executeQuery("SELECT * FROM account where account_number = "+accNo);
+            if (resultSet.next()){
+                resultSet = db.executeQuery("SELECT account_number FROM card where account_number = "+accNo);
+                if (resultSet.next()){
+                    System.out.println("[Error] Customer cannot have 2 cards tied to the same account number.");
+                    addCard();
+                }else{
+                    createCard(accNo);
+                }
+            }else{
+                System.out.println("""
+                        No customer account found!
+                        Do you want to create one now?
+                        [1] Yes
+                        [2] No""");
+                int selection = sc.nextInt();
+                while (selection != 1 && selection != 2){
+                    System.out.println("Invalid selection, please enter your choice: ");
+                    selection = sc.nextInt();
+                }
+                if (selection == 1){
+                    CreateNewCustomerAccount();
+                }else{
+                    showTellerMenu();
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Algorithmic Error: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.out.println("Class Error: "+ e.getMessage());
         }
     }
 

@@ -158,7 +158,7 @@ public class MainAtmCli {
                             "| [press 3] : Check Balance  |\n" +
                             "-----------------------------");
                     System.out.println("-----------------------------\n" +
-                            "| [press 4] : All Account    |\n" +
+                            "| [press 4] : All Accounts    |\n" +
                             "-----------------------------");
                     System.out.println("-----------------------------\n" +
                             "| [press 5] : Deposit Cash   |\n" +

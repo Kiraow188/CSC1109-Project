@@ -11,8 +11,10 @@ public class Customer {
     private String gender;
     private String dob;
     private String mNumber;
+    private static final Pattern MNUMBER_PATTERN = Pattern.compile("[6|8-9]\\d{7}");
     private String address;
     private String email;
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("[A-Z0-9._%+]+@[A-Z0-9.]+\\.[A-Z]{2,6}", Pattern.CASE_INSENSITIVE);
 
     public Customer() {
 
@@ -124,5 +126,11 @@ public class Customer {
     }
     public static boolean isValidPassport(String passportNumber) {
         return PASSPORT_PATTERN.matcher(passportNumber).matches();
+    }
+    public static boolean isValidMobileNumber(String mnum){
+        return MNUMBER_PATTERN.matcher(mnum).matches();
+    }
+    public static boolean isValidEmail(String email){
+        return EMAIL_PATTERN.matcher(email).matches();
     }
 }

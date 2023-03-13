@@ -1,7 +1,5 @@
 package com.sitatm.sitatm;
 
-import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
-
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -29,38 +27,32 @@ public class MainAtmCli {
 
     public static boolean accountExists(String accountNumber) {
         boolean exists = false;
+        Database db = new Database();
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, user, pass);
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM account WHERE account_number=" + accountNumber);
+            ResultSet resultSet = db.executeQuery("SELECT * FROM account WHERE account_number=" + accountNumber);
             exists = resultSet.next();
-            connection.close();
-            statement.close();
+            db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return exists;
     }
     public static boolean accountDeactivated(String accountNumber){
-        boolean deactivated = false;
+        boolean deactivated = true;
+        Database db = new Database();
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, user, pass);
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT deactivation_date FROM account WHERE account_number=" + accountNumber);
+            ResultSet resultSet = db.executeQuery("SELECT deactivation_date FROM account WHERE account_number=" + accountNumber);
             if (resultSet.next()) {
                 String deactivationDate = resultSet.getString("deactivation_date");
-                if(deactivationDate != null) {
-                    deactivated = true;
+                if(deactivationDate == null) {
+                    deactivated = false;
                 }
             }
-            connection.close();
-            statement.close();
+            db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return deactivated;
+        return !deactivated;
     }
 
     public static void CustomerMode() throws ClassNotFoundException, SQLException {
@@ -1042,6 +1034,7 @@ public class MainAtmCli {
                         System.out.println("Option [3]: Add card to an existing customer");
                         addCard();
                     }
+
                     case 4 -> {
                         System.out.println("Option [4]: Close customer account");
                         closeAccount();
@@ -1121,10 +1114,33 @@ public class MainAtmCli {
         sc.nextLine();
         System.out.println("Please enter the customer's date of birth (YYYY-MM-DD): ");
         cust.setDob(sc.next());
-        System.out.println("Please enter the customer's mobile number: ");
-        cust.setmNumber(sc.next());
-        System.out.println("Please enter the customer's email: ");
-        cust.setEmail(sc.next());
+        //System.out.println("Please enter the customer's mobile number: ");
+        //cust.setmNumber(sc.next());
+        //String mNum = sc.next();
+        boolean isValid = false;
+        while (!isValid){
+            System.out.println("Please enter the customer's mobile number: ");
+            cust.setmNumber(sc.next());
+            if (Customer.isValidMobileNumber(cust.getmNumber())){
+                System.out.println("Valid mobile number");
+                isValid = true;
+            }else{
+                System.out.println("Invalid mobile number, please enter a valid mobile number.");
+            }
+        }
+        //System.out.println("Please enter the customer's email: ");
+        //cust.setEmail(sc.next());
+        isValid = false;
+        while (!isValid){
+            System.out.println("Please enter the customer's email: ");
+            cust.setEmail(sc.next());
+            if (Customer.isValidEmail(cust.getEmail())){
+                System.out.println("Valid email");
+                isValid = true;
+            }else{
+                System.out.println("Invalid email address, please enter a valid email address.");
+            }
+        }
         //consume the end of line at the end of sc.next()
         sc.nextLine();
         System.out.println("Please enter the customer's address: ");
@@ -1499,7 +1515,7 @@ public class MainAtmCli {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String deactivationDate = sdf.format(dt);
         if (accountExists(accountNumber)){
-            if(!accountDeactivated(accountNumber)){
+            if(accountDeactivated(accountNumber)){
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 Connection connection = DriverManager.getConnection(url, user, pass);
                 Statement statement = connection.createStatement();
@@ -1551,7 +1567,7 @@ public class MainAtmCli {
         System.out.println("Please enter the customer's Account Number");
         String accNo = sc.next();
         if (accountExists(accNo)){
-            if (!accountDeactivated(accNo)){
+            if (accountDeactivated(accNo)){
                 System.out.println("Please enter the new pin number: ");
                 String newPin = null;
                 while (true) {

@@ -83,7 +83,7 @@ public class MainAtmCli {
             String pinhash = null;
             String salt = null;
             ResultSet SAloginSet = statement
-                    .executeQuery("SELECT * FROM `account` WHERE `user_id` =" + userId
+                    .executeQuery("SELECT * FROM `account` WHERE `account_number` =" + accNum
                             + " AND `account_type` = 'Savings Account'");
             while (SAloginSet.next()) {
                 SAaccNo = SAloginSet.getString(1);
@@ -91,7 +91,7 @@ public class MainAtmCli {
                 salt = SAloginSet.getString(4);
             }
             ResultSet CAloginSet = statement
-                    .executeQuery("SELECT * FROM `account` WHERE `user_id` =" + userId + " AND `account_type` = 'Current Account'"); //
+                    .executeQuery("SELECT * FROM `account` WHERE `account_number` =" + accNum + " AND `account_type` = 'Current Account'"); //
             while (CAloginSet.next()) {
                 CAaccNo = CAloginSet.getString(1);
                 pinhash = CAloginSet.getString(3);
@@ -106,8 +106,8 @@ public class MainAtmCli {
             int CAcount = 0;
             ResultSet SAresultSet = statement
                     .executeQuery(
-                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.user_id = "
-                                    + userId + " AND account.account_number = " + SAaccNo
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                    + accNum + " AND account.account_number = " + SAaccNo
                                     + " ORDER BY transaction_id DESC LIMIT 1;"); //
             while (SAresultSet.next()) {
                 firstName = SAresultSet.getString(8);
@@ -116,8 +116,8 @@ public class MainAtmCli {
             }
             ResultSet CAresultSet = statement
                     .executeQuery(
-                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.user_id = "
-                                    + userId + " AND account.account_number = " + CAaccNo
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                    + accNum + " AND account.account_number = " + CAaccNo
                                     + " ORDER BY transaction_id DESC LIMIT 1;"); //
             while (CAresultSet.next()) {
                 firstName = CAresultSet.getString(8);
@@ -538,8 +538,8 @@ public class MainAtmCli {
                             CAcount = 0;
                             SAresultSet = statement
                                     .executeQuery(
-                                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.user_id = "
-                                                    + userId + " AND account.account_number = " + SAaccNo
+                                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                                    + accNum + " AND account.account_number = " + SAaccNo
                                                     + " ORDER BY transaction_id DESC LIMIT 1;"); //
                             while (SAresultSet.next()) {
                                 savingsBalance = SAresultSet.getInt(25);
@@ -547,8 +547,8 @@ public class MainAtmCli {
                             }
                             CAresultSet = statement
                                     .executeQuery(
-                                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.user_id = "
-                                                    + userId + " AND account.account_number = " + CAaccNo
+                                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                                    + accNum + " AND account.account_number = " + CAaccNo
                                                     + " ORDER BY transaction_id DESC LIMIT 1;"); //
                             while (CAresultSet.next()) {
                                 checkingBalance = CAresultSet.getInt(25);
@@ -569,8 +569,8 @@ public class MainAtmCli {
                             CAcount = 0;
                             SAresultSet = statement
                                     .executeQuery(
-                                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.user_id = "
-                                                    + userId + " AND account.account_number = " + SAaccNo
+                                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                                    + accNum + " AND account.account_number = " + SAaccNo
                                                     + " ORDER BY transaction_id DESC LIMIT 1;"); //
                             while (SAresultSet.next()) {
                                 firstName = SAresultSet.getString(8);
@@ -579,8 +579,8 @@ public class MainAtmCli {
                             }
                             CAresultSet = statement
                                     .executeQuery(
-                                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.user_id = "
-                                                    + userId + " AND account.account_number = " + CAaccNo
+                                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                                    + accNum + " AND account.account_number = " + CAaccNo
                                                     + " ORDER BY transaction_id DESC LIMIT 1;"); //
                             while (CAresultSet.next()) {
                                 firstName = CAresultSet.getString(8);
@@ -774,7 +774,7 @@ public class MainAtmCli {
                                                                         .prepareStatement(npQuery);
                                                                 npStatement.setString(1, newHashedPin);
                                                                 npStatement.setString(2, newSalt);
-                                                                npStatement.setInt(3, pin);
+                                                                npStatement.setString(3, pin);
                                                                 npStatement.executeUpdate();
                                                                 System.out
                                                                         .println(

@@ -73,10 +73,10 @@ public class MainAtmCli {
         // error that quits u when int input has alphabets/decimals (int/double)
         // Comments for each functions
         Scanner sc = new Scanner(System.in);
-        System.out.println("\nPlease Enter Your userID");
-        String userId = sc.next();
-        System.out.println("Please Enter Your Pin");
-        int pin = sc.nextInt();
+        System.out.println("Please Enter Your Account Number: ");
+        String accNum = sc.next();
+        System.out.println("Please Enter Your Pin: ");
+        String pin = sc.next();
         System.out.println();
 
         // SQL Connection

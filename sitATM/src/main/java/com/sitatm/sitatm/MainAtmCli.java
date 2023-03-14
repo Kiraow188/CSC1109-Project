@@ -1017,6 +1017,7 @@ public class MainAtmCli {
                 [3] Add card to an existing customer
                 [4] Close customer account
                 [5] Change customer pin number
+                [6] [TEST FUNCTION] Send Welcome Email
                 [0] Quit
                 """);
             try {
@@ -1042,6 +1043,11 @@ public class MainAtmCli {
                     case 5 -> {
                         System.out.println("Option [5]: Change customer's pin");
                         changPin();
+                    }
+                    case 6 -> {
+                        System.out.println("Option [6]: Send Welcome Email\n[NOTICE] THIS IS A EXPERIMENTAL FEATURE!");
+                        //Email.sendEmailPrep("250404701",1);
+                        Email.sendEmailPrep("250404701",2);
                     }
                     case 0 -> {
                         System.out.println("Good bye!");
@@ -1298,6 +1304,7 @@ public class MainAtmCli {
             int rowsAffected = pStatement.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Customer account has been created successfully!");
+                Email.sendEmailPrep(acc.getAccountNo(),1);
                 System.out.println("""
                         Do you want to proceed to card creation?
                         [1] Yes
@@ -1404,6 +1411,7 @@ public class MainAtmCli {
             int rowsAffected = pStatement.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("The customer's card is successfully created!");
+                Email.sendEmailPrep(accNum,2);
                 showTellerMenu();
             } else {
                 System.out.println("Sum ting wong!");
@@ -1473,9 +1481,6 @@ public class MainAtmCli {
             if (resultSet.next()){
                 resultSet = db.executeQuery("SELECT account_number FROM card where account_number = "+accNo);
                 if (resultSet.next()){
-                    System.out.println("[Error] Customer cannot have 2 cards tied to the same account number.");
-                    addCard();
-                }else{
                     createCard(accNo);
                 }
             }else{

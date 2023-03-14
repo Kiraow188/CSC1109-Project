@@ -12,6 +12,8 @@ module com.sitatm.sitatm {
     requires com.google.auth;
     requires java.sql;
     requires mysql.connector.java;
+    requires activation;
+    requires javax.mail;
 
     opens com.sitatm.sitatm to javafx.fxml;
     exports com.sitatm.sitatm;

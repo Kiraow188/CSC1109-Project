@@ -1,5 +1,7 @@
 package com.sitatm.sitatm;
 
+import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
+
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -999,7 +1001,8 @@ public class MainAtmCli {
                 [3] Add card to an existing customer
                 [4] Close customer account
                 [5] Change customer pin number
-                [6] [TEST FUNCTION] Send Welcome Email
+                [6] Loan Approval
+                [7] [TEST FUNCTION] Send Welcome Email
                 [0] Quit
                 """);
             try {
@@ -1027,7 +1030,11 @@ public class MainAtmCli {
                         changPin();
                     }
                     case 6 -> {
-                        System.out.println("Option [6]: Send Welcome Email\n[NOTICE] THIS IS A EXPERIMENTAL FEATURE!");
+                        System.out.println("Option [6]: Loan approval");
+                        loanApproval();
+                    }
+                    case 7 -> {
+                        System.out.println("Option [7]: Send Welcome Email\n[NOTICE] THIS IS A EXPERIMENTAL FEATURE!");
                         //Email.sendEmailPrep("250404701",1);
                         Email.sendEmailPrep("250404701",2);
                     }
@@ -1721,6 +1728,41 @@ public class MainAtmCli {
             System.out.println("Error: MySQL class not found. Details: \n" + e.getMessage());
         } catch (SQLException e) {
             System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
+        }
+    }
+    public static void loanApproval() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        Database db = new Database();
+        try {
+            ResultSet resultSet = db.executeQuery("SELECT * FROM loan WHERE status = 'PENDING'");
+            double requestedAmount;
+            if (resultSet.next()){
+                System.out.println("Please select the account you want to approve: ");
+                String accNum = sc.next();
+                resultSet = db.executeQuery("SELECT * FROM loan WHERE status = 'PENDING' and account_number = '"+accNum+"'");
+                requestedAmount = resultSet.getDouble("principle");
+                String status;
+                if (!loan.approveLoan(requestedAmount)){
+                    System.out.println("Sorry, the loan application is declined.");
+                    status = "DECLINED";
+                }
+                else{
+                    System.out.println("The loan is approved.");
+                    status = "APPROVED";
+                    try {
+                        String query = "UPDATE loan SET status = ? WHERE account_number = ?";
+                        PreparedStatement pStatement = db.getConnection().prepareStatement(query);
+                        pStatement.setString(1,status);
+                        pStatement.setString(2,accNum);
+                    }catch (SQLException e){
+                        System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
+                    }
+                }
+            }else {
+                System.out.println("\nNo loans to be approved, Looks like it's a quite day huh...\n");
+            }
+        }catch (SQLException e){
+                System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
         }
     }
 

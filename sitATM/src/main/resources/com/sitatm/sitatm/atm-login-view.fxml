@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.ATMController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.ATMController">
    <children>
-      <Label layoutX="213.0" layoutY="143.0" text="Welcome to SIT Bank">
+      <Label layoutX="213.0" layoutY="143.0" text="Welcome to SIT Bank" textFill="#4361ee">
          <font>
             <Font size="64.0" />
          </font>
@@ -17,6 +17,6 @@
             <Font size="32.0" />
          </font>
       </Label>
-      <ImageView fx:id="cardReader" fitHeight="191.0" fitWidth="428.0" layoutX="298.0" layoutY="328.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="cardReader" fitHeight="191.0" fitWidth="428.0" layoutX="298.0" layoutY="361.0" pickOnBounds="true" preserveRatio="true" />
    </children>
 </AnchorPane>

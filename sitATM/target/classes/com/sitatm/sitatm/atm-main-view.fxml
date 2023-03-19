@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Line?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.MainViewController">
+<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.MainViewController">
    <children>
       <AnchorPane prefHeight="83.0" prefWidth="1024.0">
          <children>
@@ -38,15 +36,33 @@
       </AnchorPane>
       <AnchorPane layoutY="85.0" prefHeight="684.0" prefWidth="1024.0">
          <children>
-            <Button fx:id="btnWithdrawl" layoutX="77.0" layoutY="96.0" mnemonicParsing="false" onAction="#cashWithdrawalAction" prefHeight="180.0" prefWidth="180.0" text="Cash Withdrawal" />
-            <Button layoutX="307.0" layoutY="96.0" mnemonicParsing="false" onAction="#fundTransferAction" prefHeight="180.0" prefWidth="180.0" text="Fund Transfer" />
-            <Button fx:id="chkBalBtn" layoutX="77.0" layoutY="326.0" mnemonicParsing="false" onAction="#chkBalAction" prefHeight="180.0" prefWidth="180.0" text="Check Balance" />
-            <Button layoutX="307.0" layoutY="326.0" mnemonicParsing="false" onAction="#AllAccountAction" prefHeight="180.0" prefWidth="180.0" text="All Account" />
-            <Button layoutX="77.0" layoutY="556.0" mnemonicParsing="false" onAction="#MoreServicesAction" prefHeight="60.0" prefWidth="410.0" text="More Services" />
-            <Button layoutX="537.0" layoutY="96.0" mnemonicParsing="false" onAction="#CashDepositAction" prefHeight="180.0" prefWidth="410.0" text="Cash Deposit" />
+            <Button fx:id="btnWithdrawl" layoutX="77.0" layoutY="96.0" mnemonicParsing="false" onAction="#cashWithdrawalAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #4361ee;" styleClass="main_function_buttons" text="Cash Withdrawal" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Button>
+            <Button layoutX="307.0" layoutY="96.0" mnemonicParsing="false" onAction="#fundTransferAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #4361ee; -fx-font-weight: bold;" text="Fund Transfer" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font></Button>
+            <Button fx:id="chkBalBtn" layoutX="77.0" layoutY="326.0" mnemonicParsing="false" onAction="#chkBalAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #4361ee;" text="Check Balance" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Button>
+            <Button layoutX="307.0" layoutY="326.0" mnemonicParsing="false" onAction="#AllAccountAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #4361ee;" text="All Account" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Button>
+            <Button layoutX="77.0" layoutY="556.0" mnemonicParsing="false" onAction="#MoreServicesAction" prefHeight="60.0" prefWidth="410.0" style="-fx-background-color: #4361ee;" text="More Services" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Button>
+            <Button layoutX="537.0" layoutY="96.0" mnemonicParsing="false" onAction="#CashDepositAction" prefHeight="180.0" prefWidth="410.0" style="-fx-background-color: #4361ee;" text="Cash Deposit" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Button>
             <Label layoutX="77.0" layoutY="26.0" text="What would you like to do today">
                <font>
-                  <Font size="24.0" />
+                  <Font name="System Bold" size="24.0" />
                </font>
             </Label>
             <Button layoutX="537.0" layoutY="326.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="190.0" text="\$50" />
@@ -57,7 +73,7 @@
             <Button layoutX="757.0" layoutY="451.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="190.0" text="\$300" />
             <Label layoutX="537.0" layoutY="283.0" text="Fast Cash">
                <font>
-                  <Font size="24.0" />
+                  <Font name="System Bold" size="24.0" />
                </font>
             </Label>
             <Button layoutX="537.0" layoutY="556.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="410.0" text="Choose other Fast Cash Amount" />

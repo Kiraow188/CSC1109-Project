@@ -44,7 +44,7 @@
             <Button layoutX="307.0" layoutY="326.0" mnemonicParsing="false" onAction="#AllAccountAction" prefHeight="180.0" prefWidth="180.0" text="All Account" />
             <Button layoutX="77.0" layoutY="556.0" mnemonicParsing="false" onAction="#MoreServicesAction" prefHeight="60.0" prefWidth="410.0" text="More Services" />
             <Button layoutX="537.0" layoutY="96.0" mnemonicParsing="false" onAction="#CashDepositAction" prefHeight="180.0" prefWidth="410.0" text="Cash Deposit" />
-            <Label layoutX="77.0" layoutY="26.0" text="What would you like to do today">
+            <Label fx:id="welcomeMsg" layoutX="77.0" layoutY="26.0" text="What would you like to do today">
                <font>
                   <Font size="24.0" />
                </font>

@@ -1,17 +1,20 @@
 package com.sitatm.sitatm;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ATMController {
     ATM atm = new ATM();
@@ -62,28 +65,64 @@ public class ATMController {
             setImageSize(cardReader, 428, 369);
             //Image cardReaderWCardImg = updateImage("/img/card_reader_w_card.png");
             cardReader.setImage(cardReaderWCardImg);
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setGraphic(null);
-            dialog.setTitle("Card Details");
-            dialog.setHeaderText("Please enter your card number");
-            dialog.setContentText("Card Number: ");
-            Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-            Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
-            cancelButton.setOnAction(e ->{
-                setImageSize(cardReader, 428, 191);
-                cardReader.setImage(cardReaderImg);
-            });
-            Optional<String> pinCode = dialog.showAndWait();
-            if (pinCode.isPresent()) {
-                String input = pinCode.get();
-                System.out.println(input);
-                try {
-                    atm.changeScene("atm-pin-view.fxml");
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+
+            AtomicBoolean validAccountNumber = new AtomicBoolean(false);
+            while (!validAccountNumber.get()) {
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setGraphic(null);
+                dialog.setTitle("Card Details");
+                dialog.setHeaderText("Please enter your account number");
+                dialog.setContentText("Account Number: ");
+                Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+                Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+                cancelButton.setOnAction(e ->{
+                    validAccountNumber.set(true);
+                    setImageSize(cardReader, 428, 191);
+                    cardReader.setImage(cardReaderImg);
+                });
+                Optional<String> accNum = dialog.showAndWait();
+                if (accNum.isPresent()) {
+                    String input = accNum.get();
+                    Database db = new Database();
+                    try {
+                        ResultSet resultSet = db.executeQuery("SELECT * FROM account where account_number='"+input+"'");
+                        if (resultSet.next()){
+                            Account user = new Account();
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-pin-view.fxml"));
+                            Parent root = loader.load();
+                            PinViewController controller = loader.getController();
+                            String userID = resultSet.getString("user_id");
+                            String pin = resultSet.getString("pin");
+                            String salt = resultSet.getString("salt");
+                            user.setAccountNo(input);
+                            user.setUserId(userID);
+                            user.setPin(pin);
+                            user.setSalt(salt);
+                            controller.setUser(user);
+                            validAccountNumber.set(true);
+                            Scene scene = new Scene(root);
+                            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                            stage.setScene(scene);
+                            stage.show();
+                            //atm.changeScene("atm-pin-view.fxml");
+                        }else{
+                            System.out.println("Incorrect Account number, please try again.");
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setHeaderText("Invalid Account Number");
+                            alert.setContentText("The account number you entered is incorrect. Please try again.");
+                            alert.showAndWait();
+                        }
+                    } catch (IOException e) {
+                        System.out.println("IO Exception Caught: " + e);
+                    } catch (SQLException e ){
+                        System.out.println("SQL Exception caught: " + e);
+                    }
+                } else {
+                    validAccountNumber.set(true);
                 }
-                // TODO: connect to database and check if card exist, if yes, load the next scene, else alert user
             }
         });
+
     }
 }

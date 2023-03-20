@@ -1286,8 +1286,8 @@ public class MainAtmCli {
 
         //Hash customer's pin with Salt and Pepper
         String[] hashAlgo = PinHash.hashPin(pin);
-        acc.setPin(hashAlgo[0]);
-        acc.setSalt(hashAlgo[1]);
+        acc.setPin(hashAlgo[1]);
+        acc.setSalt(hashAlgo[0]);
         //String hashedPin = hashAlgo[0];
         //String salt = hashAlgo[1];
 

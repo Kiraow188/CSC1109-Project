@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Line?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-
-<AnchorPane prefHeight="768" prefWidth="1024.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.FundTransferController">
+<AnchorPane prefHeight="768" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.FundTransferController">
    <children>
       <AnchorPane prefHeight="83.0" prefWidth="1024.0">
          <children>
@@ -42,19 +37,19 @@
       </AnchorPane>
       <AnchorPane layoutY="83.0" prefHeight="685.0" prefWidth="1024.0">
          <children>
-            <Label layoutX="28.0" layoutY="51.0" text="From:">
+            <Label layoutX="28.0" layoutY="51.0" text="%From">
                <font>
                   <Font size="36.0" />
                </font>
             </Label>
             <ChoiceBox layoutX="28.0" layoutY="104.0" prefHeight="53.0" prefWidth="560.0" />
-            <Label layoutX="28.0" layoutY="216.0" text="To:">
+            <Label layoutX="28.0" layoutY="216.0" text="%To">
                <font>
                   <Font size="36.0" />
                </font>
             </Label>
             <ChoiceBox layoutX="28.0" layoutY="269.0" prefHeight="53.0" prefWidth="560.0" />
-            <Label layoutX="28.0" layoutY="382.0" text="Transfer Amount:">
+            <Label layoutX="28.0" layoutY="382.0" text="%TransferAmount">
                <font>
                   <Font size="36.0" />
                </font>
@@ -69,7 +64,7 @@
                   <Font size="36.0" />
                </font>
             </Label>
-            <Button layoutX="828.0" layoutY="608.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="169.0" text="Transfer">
+            <Button layoutX="733.0" layoutY="608.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="265.0" style="-fx-background-color: #2196f3;" text="%Transfer" textFill="WHITE">
                <font>
                   <Font size="24.0" />
                </font>

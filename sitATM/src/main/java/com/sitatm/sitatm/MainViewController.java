@@ -5,6 +5,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class MainViewController {
     ATM atm = new ATM();
@@ -12,22 +14,25 @@ public class MainViewController {
     private Button btnExit;
     @FXML
     private Button chkBalBtn;
+
     @FXML
-    private void cashWithdrawalAction(ActionEvent event){
+    private void cashWithdrawalAction(ActionEvent event) {
         try {
             atm.changeScene("atm-cash-withdrawal-view.fxml");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
     @FXML
-    private void fundTransferAction(ActionEvent event){
+    private void fundTransferAction(ActionEvent event) {
         try {
             atm.changeScene("atm-fund-transfer-view.fxml");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
     @FXML
     private void AllAccountAction(ActionEvent event) {
         try {
@@ -36,21 +41,21 @@ public class MainViewController {
             throw new RuntimeException();
         }
     }
+
     @FXML
-    private void CashDepositAction(ActionEvent event){
+    private void CashDepositAction(ActionEvent event) {
         try {
             atm.changeScene("atm-cash-deposit-view.fxml");
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             throw new RuntimeException();
         }
     }
+
     @FXML
-    private void MoreServicesAction(ActionEvent event){
-        try{
+    private void MoreServicesAction(ActionEvent event) {
+        try {
             atm.changeScene("atm-more-services-view.fxml");
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             throw new RuntimeException();
         }
     }
@@ -68,4 +73,6 @@ public class MainViewController {
     private void chkBalAction(ActionEvent event) {
         chkBalBtn.setText("Balance: $dummy");
     }
+
+
 }

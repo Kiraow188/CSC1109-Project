@@ -13,7 +13,8 @@ import java.io.IOException;
 
 // MySQL
 import java.sql.*;
-
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 
 public class ATM extends Application {
@@ -24,6 +25,18 @@ public class ATM extends Application {
         String url="jdbc:mysql://localhost:3306/sitatm";
         String user="root";
         String pass="";
+
+        // Translation stuff
+        Locale currentLocale = Locale.getDefault();
+
+        Locale locale = new Locale("zh");
+        ResourceBundle bundle = ResourceBundle.getBundle("labelText",currentLocale);
+        FXMLLoader fxmlLoader = new FXMLLoader();
+
+        // Temporary change to load this page first
+        Parent root = FXMLLoader.load(getClass().getResource("atm-main-view.fxml"),bundle);
+
+
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -44,7 +57,7 @@ public class ATM extends Application {
         }
 
         stg = primaryStage;
-        Parent root = FXMLLoader.load(getClass().getResource("atm-login-view.fxml"));
+        //Parent root = FXMLLoader.load(getClass().getResource("atm-login-view.fxml"));
         primaryStage.setTitle("SIT ATM");
         primaryStage.getIcons().add(new Image(ATM.class.getResourceAsStream("/icon.png")));
         primaryStage.setResizable(false);

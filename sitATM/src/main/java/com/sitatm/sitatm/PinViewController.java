@@ -49,7 +49,6 @@ public class PinViewController {
         // TODO: either close this stage or close the program
         try {
             atm.changeScene("atm-login-view.fxml");
-            //((Stage)(((Button)event.getSource()).getScene().getWindow())).close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -58,7 +57,6 @@ public class PinViewController {
 
     @FXML
     private void confirmButtonAction(ActionEvent event) throws NoSuchAlgorithmException, IOException, SQLException {
-        // TODO: check pin then move to the next stage if not, clear textbox and prompt for retry
         Database db = new Database();
         PinHash pinHash = new PinHash();
         Customer customer = new Customer();
@@ -68,12 +66,15 @@ public class PinViewController {
             System.out.println(user.getUserId());
             ResultSet resultSet = db.executeQuery("SELECT * from customer where user_id = '"+user.getUserId()+"'");
             if (resultSet.next()){
+                UserHolder holder = UserHolder.getInstance();
                 String custName = resultSet.getString("full_name");
                 customer.setfName(custName);
+                holder.setUser(customer);
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-main-view.fxml"));
                 Parent root = loader.load();
                 MainViewController controller = loader.getController();
-                controller.setWelcomeMsg(custName);
+                controller.setWelcomeMsg();
+                //controller.setCustomer(customer);
                 Scene scene = new Scene(root);
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(scene);

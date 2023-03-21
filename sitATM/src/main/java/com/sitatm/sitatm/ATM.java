@@ -21,25 +21,16 @@ public class ATM extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         //MySQL Connection
-        String url="jdbc:mysql://localhost:3306/sitatm";
-        String user="root";
-        String pass="";
+        Database db = new Database();
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, user, pass);
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM transaction");
+            ResultSet resultSet = db.executeQuery("SELECT COUNT(*) FROM transaction");
             while (resultSet.next()) {
                 //System.out.println(resultSet.getString(1) + " " + resultSet.getString(2));
                 System.out.println(resultSet.getString(1));
             }
-            resultSet.close();
-            statement.close();
-            connection.close();
-        } catch (ClassNotFoundException e) {
-            System.err.println("Error: MySQL driver not found. Details: " + e.getMessage());
-        } catch (SQLException e) {
+            db.closeConnection();
+        }catch (SQLException e) {
             System.err.println("Error executing SQL query. Details: " + e.getMessage());
         }
 

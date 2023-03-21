@@ -1,5 +1,6 @@
 package com.sitatm.sitatm;
 
+import javafx.scene.chart.PieChart;
 import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
 
 import java.security.NoSuchAlgorithmException;
@@ -62,27 +63,31 @@ public class MainAtmCli {
 
     public static String validator(String accNum, String pin) throws Exception {
         String userId = null;
+        String hashedPin;
+        String salt;
+        System.out.println("Account Number: "+accNum+"\nPin: "+pin);
+        Database db = new Database();
         // SQL Connection
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, user, pass);
-            Statement statement = connection.createStatement();
-
             // Customer table
-            ResultSet loginSet = statement
-                    .executeQuery("SELECT * FROM `account` WHERE `account_number` =" + accNum + " AND 'pin' =" + pin);
+            ResultSet loginSet = db.executeQuery("SELECT * FROM `account` WHERE `account_number` =" + accNum);
             if (loginSet.next()) {
-                userId = loginSet.getString(2);
-                showCustomerMenu(accNum, pin, userId);
-            }else{
-                System.out.println(ANSI_RED +
-                        "Invalid username or password!\n" + ANSI_RESET);
-                CustomerMode();
+                hashedPin = loginSet.getString("pin");
+                salt = loginSet.getString("salt");
+                boolean correctPin = PinHash.hashMatching(pin, salt,hashedPin);
+                if (correctPin){
+                    userId = loginSet.getString(2);
+                    showCustomerMenu(accNum, pin, userId);
+                }else{
+                    System.out.println(ANSI_RED +
+                            "Invalid username or password!\n" + ANSI_RESET);
+                    CustomerMode();
+                }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // System.out.println("Error: " + e.getMessage());
             System.out.println(ANSI_RED +
-                    "Invalid username or password!\n" + ANSI_RESET);
+                    "Exception: Invalid username or password!\n" + ANSI_RESET);
             CustomerMode();
         }
         return userId;
@@ -101,7 +106,7 @@ public class MainAtmCli {
                             "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id WHERE account.user_id ="
                                     + userId); //
             while (ProfileSet.next()) {
-                name = ProfileSet.getString(8);
+                name = ProfileSet.getString("full_name");
                 count++;
             }
         } catch (Exception e) {
@@ -721,7 +726,6 @@ public class MainAtmCli {
         
     public static void showCustomerMenu(String accNum, String pin, String userId) throws Exception {
         Scanner sc = new Scanner(System.in);
-
         // SQL Connection
         Class.forName("com.mysql.cj.jdbc.Driver");
         Connection connection = DriverManager.getConnection(url, user, pass);

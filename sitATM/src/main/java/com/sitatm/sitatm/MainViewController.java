@@ -90,9 +90,12 @@ public class MainViewController {
         chkBalBtn.setText("Balance: $dummy");
     }
 
-    public void setWelcomeMsg(String name){
+    public void setWelcomeMsg(){
         LocalTime currentTime = LocalTime.now();
         String greeting = getGreetingMessage(currentTime);
+        UserHolder holder = UserHolder.getInstance();
+        Customer c = holder.getUser();
+        String name = c.getfName();
         welcomeMsg.setText(greeting+", "+name);
     }
 }

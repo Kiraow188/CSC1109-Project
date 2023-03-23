@@ -76,7 +76,7 @@ public class MainAtmCli {
                 salt = loginSet.getString("salt");
                 boolean correctPin = PinHash.hashMatching(pin, salt,hashedPin);
                 if (correctPin){
-                    userId = loginSet.getString(2);
+                    userId = loginSet.getString("user_id");
                     showCustomerMenu(accNum, pin, userId);
                 }else{
                     System.out.println(ANSI_RED +
@@ -134,7 +134,7 @@ public class MainAtmCli {
                     .executeQuery("SELECT * FROM `account` WHERE `user_id` =" + userId
                             + " AND `account_type` = '" + accType + "'");
             while (accSet.next()) {
-                accNo = accSet.getString(1);
+                accNo = accSet.getString("account_number");
             }
         } catch (Exception e) {
             // System.out.println("Error: " + e.getMessage());
@@ -160,7 +160,7 @@ public class MainAtmCli {
                                     + accNo + " AND account.account_number = " + accNo
                                     + " ORDER BY transaction_id DESC LIMIT 1;"); //
             while (balanceSet.next()) {
-                balance = balanceSet.getInt(25);
+                balance = balanceSet.getDouble("balance_amt");
                 count++;
                 return balance;
             }
@@ -228,8 +228,8 @@ public class MainAtmCli {
                                     + accNo + " AND account.account_number = " + accNo
                                     + " ORDER BY transaction_id DESC LIMIT 1;"); //
             while (AccRetreival.next()) {
-                accReBalance = AccRetreival.getDouble(25);
-                trfName = AccRetreival.getString(8);
+                accReBalance = AccRetreival.getDouble("balance_amt");
+                trfName = AccRetreival.getString("full_name");
                 count++;
             }
             if (count <= 0) {
@@ -544,10 +544,10 @@ public class MainAtmCli {
                     "+----------------------------------------------+--------------+--------------+--------------+%n");
 
             while (StatRetreival.next()) {
-                accStat = StatRetreival.getString(21);
-                accStatD = StatRetreival.getDouble(24);
-                accStatW = StatRetreival.getDouble(23);
-                accStatBalance = StatRetreival.getDouble(25);
+                accStat = StatRetreival.getString("transaction_details");
+                accStatD = StatRetreival.getDouble("deposit_amt");
+                accStatW = StatRetreival.getDouble("withdrawal_amt");
+                accStatBalance = StatRetreival.getDouble("balance_amt");
                 count++;
                 System.out.format(leftAlignFormat, accStat, accStatD,
                         accStatW,
@@ -1067,14 +1067,14 @@ public class MainAtmCli {
                                 "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN loan ON account.account_number = loan.account_number WHERE account.account_number = "
                                         + accReNo + " AND loan.status = 'APPROVED'"); //
                 while (checkLoanIP.next()) {
-                    loan_id = checkLoanIP.getInt(18);
-                    principleAmt = checkLoanIP.getDouble(20);
-                    interestRate = checkLoanIP.getDouble(21);
-                    duration = checkLoanIP.getInt(22);
-                    debt = checkLoanIP.getDouble(23);
-                    date_created = checkLoanIP.getDate(24);
-                    repayment_date = checkLoanIP.getDate(25);
-                    status = checkLoanIP.getString(26);
+                    loan_id = checkLoanIP.getInt("loan_id");
+                    principleAmt = checkLoanIP.getDouble("principle_amt");
+                    interestRate = checkLoanIP.getDouble("interest_rate");
+                    duration = checkLoanIP.getInt("duration");
+                    debt = checkLoanIP.getDouble("debt");
+                    date_created = checkLoanIP.getDate("date_created");
+                    repayment_date = checkLoanIP.getDate("repayment_date");
+                    status = checkLoanIP.getString("status");
                     count++;
                 }
                 if (count <= 0) {
@@ -1122,7 +1122,7 @@ public class MainAtmCli {
                         String trfName = (String) payList.get(2);
                         // Get current avaliable balance
                         double currentBalanceToWithdraw = getBalanceFromAccount(accReNo, pin);
-                        System.out.printf("\nAmount to repay: $$%.2f", currentMonthDebt);
+                        System.out.printf("\nAmount to repay: $%.2f", currentMonthDebt);
                         if (currentMonthDebt > currentBalanceToWithdraw) {
                             System.out.println(
                                     ANSI_RED + "Your balance is insufficient, operation cancelled.\n"
@@ -1947,7 +1947,7 @@ public class MainAtmCli {
             double balance = 0;
             ResultSet resultSet = statement.executeQuery("SELECT * FROM customer c JOIN account a ON c.user_id = a.user_id JOIN ( SELECT * FROM transaction WHERE account_number = " + accNum + " ORDER BY date DESC LIMIT 1) t ON a.account_number = t.account_number WHERE a.account_number = " + accNum + " AND a.pin = " + pin);
             while (resultSet.next()) {
-                balance = resultSet.getDouble(25);
+                balance = resultSet.getDouble("balance_amt");
                 System.out.printf("Your current Balance is $%.2f\n", balance);
                 return balance;
             }

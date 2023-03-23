@@ -72,7 +72,9 @@ public class PinViewController {
             if (resultSet.next()){
                 UserHolder holder = UserHolder.getInstance();
                 String custName = resultSet.getString("full_name");
+                String custID = resultSet.getString("user_id");
                 customer.setfName(custName);
+                customer.setUserID(custID);
                 holder.setUser(customer);
                 holder.setLocalization(localization);
                 ResourceBundle bundle = localization.getLocale();
@@ -80,7 +82,7 @@ public class PinViewController {
                 Parent root = loader.load();
                 MainViewController controller = loader.getController();
                 controller.setWelcomeMsg();
-                controller.setEN();
+                //controller.setEN();
                 //controller.setCustomer(customer);
                 Scene scene = new Scene(root);
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

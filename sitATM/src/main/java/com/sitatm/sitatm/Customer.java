@@ -3,6 +3,7 @@ package com.sitatm.sitatm;
 import java.util.regex.Pattern;
 
 public class Customer {
+    private String userID;
     private String fName;
     private String nric;
     private String pnumber;
@@ -19,7 +20,8 @@ public class Customer {
     public Customer() {
 
     }
-
+    public String getUserID() { return userID; }
+    public void setUserID(String id) { this.userID = userID; }
     public String getfName() {
         return fName;
     }

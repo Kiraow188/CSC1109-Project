@@ -10,13 +10,12 @@ public class Localization {
     ATM atm = new ATM();
     public ResourceBundle bundle;
     public Localization(){
-        Locale locale = new Locale("en");
+        Locale locale = Locale.getDefault();
         ResourceBundle bundle = ResourceBundle.getBundle("labelText",locale);
     }
     public void setLocale(String fxmlFile,String lang) throws IOException {
         Locale locale = new Locale(lang);
         bundle = ResourceBundle.getBundle("labelText", locale);
-        //FXMLLoader fxmlLoader = new FXMLLoader();
         atm.changeScene(fxmlFile, bundle);
     }
     public ResourceBundle getLocale() {

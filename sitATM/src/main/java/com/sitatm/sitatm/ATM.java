@@ -24,7 +24,6 @@ public class ATM extends Application {
         //MySQL Connection
         Database db = new Database();
 
-
         try {
             ResultSet resultSet = db.executeQuery("SELECT COUNT(*) FROM transaction");
             while (resultSet.next()) {

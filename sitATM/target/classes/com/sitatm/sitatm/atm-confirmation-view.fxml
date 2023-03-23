@@ -13,7 +13,7 @@
    <children>
       <AnchorPane prefHeight="83.0" prefWidth="1024.0">
          <children>
-            <Button layoutX="472.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="中文">
+            <Button layoutX="472.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="中文" onAction="#setZN">
                <font>
                   <Font size="24.0" />
                </font>
@@ -25,12 +25,12 @@
                </image>
             </ImageView>
             <Button fx:id="btnExit" layoutX="975.0" layoutY="29.0" mnemonicParsing="false" onAction="#exitAction" text="Exit" />
-            <Button layoutX="552.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="Melayu">
+            <Button layoutX="552.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="Melayu" onAction="#setMS">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button layoutX="364.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="English">
+            <Button layoutX="364.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="English" onAction="#setEN">
                <font>
                   <Font size="24.0" />
                </font>

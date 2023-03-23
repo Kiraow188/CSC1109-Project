@@ -16,6 +16,9 @@ import java.io.IOException;
 
 public class ConfirmationViewController {
     ATM atm = new ATM();
+    private UserHolder holder = UserHolder.getInstance();
+    private Localization l = holder.getLocalization();
+    private final String fxmlFile = "atm-confirmation-view.fxml";
     @FXML
     private Button btnExit;
     @FXML
@@ -52,5 +55,17 @@ public class ConfirmationViewController {
     @FXML
     private void initialize(){
 
+    }
+    public void setZN() throws IOException{
+        l.setLocale(fxmlFile,"zh");
+        holder.setLocalization(l);
+    }
+    public void setEN() throws IOException{
+        l.setLocale(fxmlFile,"en");
+        holder.setLocalization(l);
+    }
+    public void setMS() throws IOException{
+        l.setLocale(fxmlFile, "ms");
+        holder.setLocalization(l);
     }
 }

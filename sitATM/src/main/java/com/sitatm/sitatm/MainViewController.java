@@ -46,7 +46,11 @@ public class MainViewController {
     @FXML
     private void cashWithdrawalAction(ActionEvent event){
         try {
-            atm.changeScene("atm-cash-withdrawal-view.fxml");
+            UserHolder holder = UserHolder.getInstance();
+            Localization l = holder.getLocalization();
+            ResourceBundle rb = l.bundle;
+            System.out.println(rb);
+            atm.changeScene("atm-cash-withdrawal-view.fxml",rb);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -54,7 +58,11 @@ public class MainViewController {
     @FXML
     private void fundTransferAction(ActionEvent event){
         try {
-            atm.changeScene("atm-fund-transfer-view.fxml");
+            UserHolder holder = UserHolder.getInstance();
+            Localization l = holder.getLocalization();
+            ResourceBundle rb = l.bundle;
+            System.out.println(rb);
+            atm.changeScene("atm-fund-transfer-view.fxml",rb);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -62,7 +70,11 @@ public class MainViewController {
     @FXML
     private void AllAccountAction(ActionEvent event) {
         try {
-            atm.changeScene("atm-all-account-view.fxml");
+            UserHolder holder = UserHolder.getInstance();
+            Localization l = holder.getLocalization();
+            ResourceBundle rb = l.bundle;
+            System.out.println(rb);
+            atm.changeScene("atm-all-account-view.fxml",rb);
         } catch (IOException e) {
             throw new RuntimeException();
         }
@@ -70,7 +82,11 @@ public class MainViewController {
     @FXML
     private void CashDepositAction(ActionEvent event){
         try {
-            atm.changeScene("atm-cash-deposit-view.fxml");
+            UserHolder holder = UserHolder.getInstance();
+            Localization l = holder.getLocalization();
+            ResourceBundle rb = l.bundle;
+            System.out.println(rb);
+            atm.changeScene("atm-cash-deposit-view.fxml",rb);
         }
         catch(IOException e){
             throw new RuntimeException();
@@ -79,7 +95,11 @@ public class MainViewController {
     @FXML
     private void MoreServicesAction(ActionEvent event){
         try{
-            atm.changeScene("atm-more-services-view.fxml");
+            UserHolder holder = UserHolder.getInstance();
+            Localization l = holder.getLocalization();
+            ResourceBundle rb = l.bundle;
+            System.out.println(rb);
+            atm.changeScene("atm-more-services-view.fxml",rb);
         }
         catch(IOException e){
             throw new RuntimeException();

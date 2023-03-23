@@ -27,7 +27,9 @@ public class MainViewController {
 
     //public Locale locale = new Locale("en");
     //public ResourceBundle bundle = ResourceBundle.getBundle("labelText",locale);
-    private String fxmlFile = "atm-main-view.fxml";
+    private final String fxmlFile = "atm-main-view.fxml";
+    private UserHolder holder = UserHolder.getInstance();
+    private Localization l = holder.getLocalization();
 
     public static String getGreetingMessage(LocalTime time) {
         int hour = time.getHour();
@@ -47,11 +49,7 @@ public class MainViewController {
     @FXML
     private void cashWithdrawalAction(ActionEvent event){
         try {
-            UserHolder holder = UserHolder.getInstance();
-            Localization l = holder.getLocalization();
-            ResourceBundle rb = l.bundle;
-            System.out.println(rb);
-            atm.changeScene("atm-cash-withdrawal-view.fxml",rb);
+            atm.changeScene("atm-cash-withdrawal-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -59,11 +57,7 @@ public class MainViewController {
     @FXML
     private void fundTransferAction(ActionEvent event){
         try {
-            UserHolder holder = UserHolder.getInstance();
-            Localization l = holder.getLocalization();
-            ResourceBundle rb = l.bundle;
-            System.out.println(rb);
-            atm.changeScene("atm-fund-transfer-view.fxml",rb);
+            atm.changeScene("atm-fund-transfer-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -71,11 +65,7 @@ public class MainViewController {
     @FXML
     private void AllAccountAction(ActionEvent event) {
         try {
-            UserHolder holder = UserHolder.getInstance();
-            Localization l = holder.getLocalization();
-            ResourceBundle rb = l.bundle;
-            System.out.println(rb);
-            atm.changeScene("atm-all-account-view.fxml",rb);
+            atm.changeScene("atm-all-account-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException();
         }
@@ -83,11 +73,7 @@ public class MainViewController {
     @FXML
     private void CashDepositAction(ActionEvent event){
         try {
-            UserHolder holder = UserHolder.getInstance();
-            Localization l = holder.getLocalization();
-            ResourceBundle rb = l.bundle;
-            System.out.println(rb);
-            atm.changeScene("atm-cash-deposit-view.fxml",rb);
+            atm.changeScene("atm-cash-deposit-view.fxml",l.getLocale());
         }
         catch(IOException e){
             throw new RuntimeException();
@@ -96,11 +82,7 @@ public class MainViewController {
     @FXML
     private void MoreServicesAction(ActionEvent event){
         try{
-            UserHolder holder = UserHolder.getInstance();
-            Localization l = holder.getLocalization();
-            ResourceBundle rb = l.bundle;
-            System.out.println(rb);
-            atm.changeScene("atm-more-services-view.fxml",rb);
+            atm.changeScene("atm-more-services-view.fxml",l.getLocale());
         }
         catch(IOException e){
             throw new RuntimeException();
@@ -141,20 +123,19 @@ public class MainViewController {
         FXMLLoader fxmlLoader = new FXMLLoader();
         atm.changeScene("atm-main-view.fxml", bundle);
          **/
-        UserHolder holder = UserHolder.getInstance();
-        Localization localization = new Localization();
-        holder.setLocalization(localization);
-        localization.setLocale(fxmlFile,"zh");
+        l.setLocale(fxmlFile,"zh");
+        holder.setLocalization(l);
     }
     public void setEN() throws IOException{
-        UserHolder holder = UserHolder.getInstance();
-        Localization localization = new Localization();
-        holder.setLocalization(localization);
-        localization.setLocale(fxmlFile,"en");
+        l.setLocale(fxmlFile,"en");
+        holder.setLocalization(l);
+    }
+    public void setMS() throws IOException{
+        l.setLocale(fxmlFile, "ms");
+        holder.setLocalization(l);
     }
     @FXML
     public void initialize() throws IOException {
         setWelcomeMsg();
-        System.out.println("Debug: Hi im here");
     }
 }

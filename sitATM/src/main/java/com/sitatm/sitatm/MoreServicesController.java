@@ -7,10 +7,13 @@ import java.io.IOException;
 
 public class MoreServicesController {
     ATM atm = new ATM();
+    private UserHolder holder = UserHolder.getInstance();
+    private Localization l = holder.getLocalization();
+    private final String fxmlFile = "atm-more-services-view.fxml";
     @FXML
     private void backAction(ActionEvent event){
         try {
-            atm.changeScene("atm-main-view.fxml");
+            atm.changeScene("atm-main-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -27,9 +30,21 @@ public class MoreServicesController {
     @FXML
     private void changePinAction(ActionEvent event){
         try {
-            atm.changeScene("atm-change-pin-view.fxml");
+            atm.changeScene("atm-change-pin-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    public void setZN() throws IOException{
+        l.setLocale(fxmlFile,"zh");
+        holder.setLocalization(l);
+    }
+    public void setEN() throws IOException{
+        l.setLocale(fxmlFile,"en");
+        holder.setLocalization(l);
+    }
+    public void setMS() throws IOException{
+        l.setLocale(fxmlFile, "ms");
+        holder.setLocalization(l);
     }
 }

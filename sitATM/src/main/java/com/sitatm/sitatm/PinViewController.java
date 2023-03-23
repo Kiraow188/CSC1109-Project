@@ -27,6 +27,7 @@ public class PinViewController {
     @FXML
     private Button cancelButton;
     Account user = new Account();
+    UserHolder holder = UserHolder.getInstance();
 
     public void setUser(Account user) {
         this.user = user;
@@ -61,7 +62,6 @@ public class PinViewController {
     @FXML
     private void confirmButtonAction(ActionEvent event) throws NoSuchAlgorithmException, IOException, SQLException {
         Database db = new Database();
-        PinHash pinHash = new PinHash();
         Customer customer = new Customer();
         Localization localization = new Localization();
         System.out.println(pinTextBox.getText()+"\n"+user.getSalt()+"\n"+user.getPin());
@@ -70,7 +70,6 @@ public class PinViewController {
             System.out.println(user.getUserId());
             ResultSet resultSet = db.executeQuery("SELECT * from customer where user_id = '"+user.getUserId()+"'");
             if (resultSet.next()){
-                UserHolder holder = UserHolder.getInstance();
                 String custName = resultSet.getString("full_name");
                 String custID = resultSet.getString("user_id");
                 customer.setfName(custName);
@@ -80,10 +79,6 @@ public class PinViewController {
                 ResourceBundle bundle = localization.getLocale();
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-main-view.fxml"),bundle);
                 Parent root = loader.load();
-                MainViewController controller = loader.getController();
-                controller.setWelcomeMsg();
-                //controller.setEN();
-                //controller.setCustomer(customer);
                 Scene scene = new Scene(root);
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(scene);

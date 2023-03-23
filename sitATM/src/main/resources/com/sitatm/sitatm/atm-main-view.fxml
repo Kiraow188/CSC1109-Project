@@ -22,7 +22,7 @@
                </image>
             </ImageView>
             <Button fx:id="btnExit" layoutX="975.0" layoutY="29.0" mnemonicParsing="false" onAction="#exitAction" text="Exit" />
-            <Button layoutX="552.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="Melayu">
+            <Button layoutX="552.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="Melayu" onAction="#setMS">
                <font>
                   <Font size="24.0" />
                </font>

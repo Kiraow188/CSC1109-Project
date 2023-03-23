@@ -19,6 +19,7 @@ import java.util.ResourceBundle;
 
 public class ATM extends Application {
     private static Stage stg;
+
     @Override
     public void start(Stage primaryStage) throws IOException {
         //MySQL Connection
@@ -64,12 +65,12 @@ public class ATM extends Application {
         Scene newScene = new Scene(pane);
         stg.setScene(newScene);
     }
+
     public void changeScene(String fxml, ResourceBundle bundle) throws IOException{
         Parent pane = FXMLLoader.load(getClass().getResource(fxml), bundle);
         Scene newScene = new Scene(pane);
         stg.setScene(newScene);
     }
-
     /**
     The main entry point for the JavaFX application.
     This method launches the application and starts the JavaFX runtime.

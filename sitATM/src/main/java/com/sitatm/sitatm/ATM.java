@@ -13,7 +13,8 @@ import java.io.IOException;
 
 // MySQL
 import java.sql.*;
-
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 
 public class ATM extends Application {
@@ -22,6 +23,7 @@ public class ATM extends Application {
     public void start(Stage primaryStage) throws IOException {
         //MySQL Connection
         Database db = new Database();
+
 
         try {
             ResultSet resultSet = db.executeQuery("SELECT COUNT(*) FROM transaction");
@@ -60,6 +62,11 @@ public class ATM extends Application {
     }
     public void changeScene(String fxml) throws IOException{
         Parent pane = FXMLLoader.load(getClass().getResource(fxml));
+        Scene newScene = new Scene(pane);
+        stg.setScene(newScene);
+    }
+    public void changeScene(String fxml, ResourceBundle bundle) throws IOException{
+        Parent pane = FXMLLoader.load(getClass().getResource(fxml), bundle);
         Scene newScene = new Scene(pane);
         stg.setScene(newScene);
     }

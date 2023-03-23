@@ -2,11 +2,17 @@ package com.sitatm.sitatm;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 import java.time.LocalTime;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class MainViewController {
     ATM atm = new ATM();
@@ -17,6 +23,9 @@ public class MainViewController {
     private Button chkBalBtn;
     @FXML
     private Label welcomeMsg;
+
+    public Locale locale = new Locale("en");
+    public ResourceBundle bundle = ResourceBundle.getBundle("labelText",locale);
 
     public static String getGreetingMessage(LocalTime time) {
         int hour = time.getHour();
@@ -91,11 +100,25 @@ public class MainViewController {
     }
 
     public void setWelcomeMsg(){
+        // Get the current time and run it through the getGreetingMessage function
         LocalTime currentTime = LocalTime.now();
         String greeting = getGreetingMessage(currentTime);
+
+        // Call the UserHolder class to retrieve the Global Customer Object
         UserHolder holder = UserHolder.getInstance();
         Customer c = holder.getUser();
         String name = c.getfName();
         welcomeMsg.setText(greeting+", "+name);
+    }
+
+    public void setZN() throws IOException{
+        //Locale locale1 = new Locale("zn");
+        locale = new Locale("zh");
+        ResourceBundle bundle = ResourceBundle.getBundle("labelText", locale);
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        atm.changeScene("atm-main-view.fxml", bundle);
+    }
+    public void initialize(){
+        setWelcomeMsg();
     }
 }

@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class PinViewController {
     ATM atm = new ATM();
@@ -70,7 +72,13 @@ public class PinViewController {
                 String custName = resultSet.getString("full_name");
                 customer.setfName(custName);
                 holder.setUser(customer);
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-main-view.fxml"));
+                // Translation stuff
+                Locale currentLocale = Locale.getDefault();
+
+                Locale locale = new Locale("en");
+                ResourceBundle bundle = ResourceBundle.getBundle("labelText",locale);
+                FXMLLoader fxmlLoader = new FXMLLoader();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-main-view.fxml"),bundle);
                 Parent root = loader.load();
                 MainViewController controller = loader.getController();
                 controller.setWelcomeMsg();

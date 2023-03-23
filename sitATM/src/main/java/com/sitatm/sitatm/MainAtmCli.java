@@ -296,6 +296,8 @@ public class MainAtmCli {
                                 askReceipt(sc, accReNo, action, actionStatement,
                                         deposit_amount, accTypeName,
                                         accReBalance);
+                                receiptPrinter receipt = new receiptPrinter("test", String.valueOf(java.sql.Date.valueOf(LocalDate.now())), userId, 50, deposit_amount, accReBalance, 0);
+                                receipt.printReceipt();
                             } else if (action == "transfer") {
                                 System.out.printf(
                                         "\n%sYou have successfully transferred $%.2f to Acc No. %s (%s) ",

@@ -14,6 +14,7 @@ module com.sitatm.sitatm {
     requires mysql.connector.java;
     requires activation;
     requires javax.mail;
+    requires itextpdf;
 
     opens com.sitatm.sitatm to javafx.fxml;
     exports com.sitatm.sitatm;

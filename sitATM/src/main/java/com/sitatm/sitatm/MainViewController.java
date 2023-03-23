@@ -151,7 +151,8 @@ public class MainViewController {
         holder.setLocalization(localization);
         localization.setLocale(fxmlFile,"en");
     }
-    public void initialize(){
+    @FXML
+    public void initialize() throws IOException {
         setWelcomeMsg();
         System.out.println("Debug: Hi im here");
     }

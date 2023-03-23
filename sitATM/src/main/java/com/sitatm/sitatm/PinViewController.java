@@ -1,5 +1,6 @@
 package com.sitatm.sitatm;
 
+import com.itextpdf.text.pdf.fonts.otf.Language;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -62,6 +63,7 @@ public class PinViewController {
         Database db = new Database();
         PinHash pinHash = new PinHash();
         Customer customer = new Customer();
+        Localization localization = new Localization();
         System.out.println(pinTextBox.getText()+"\n"+user.getSalt()+"\n"+user.getPin());
         boolean doesPinMatch = PinHash.hashMatching(pinTextBox.getText(),user.getSalt(),user.getPin());
         if (doesPinMatch){
@@ -72,16 +74,13 @@ public class PinViewController {
                 String custName = resultSet.getString("full_name");
                 customer.setfName(custName);
                 holder.setUser(customer);
-                // Translation stuff
-                Locale currentLocale = Locale.getDefault();
-
-                Locale locale = new Locale("en");
-                ResourceBundle bundle = ResourceBundle.getBundle("labelText",locale);
-                FXMLLoader fxmlLoader = new FXMLLoader();
+                holder.setLocalization(localization);
+                ResourceBundle bundle = localization.getLocale();
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-main-view.fxml"),bundle);
                 Parent root = loader.load();
                 MainViewController controller = loader.getController();
                 controller.setWelcomeMsg();
+                controller.setEN();
                 //controller.setCustomer(customer);
                 Scene scene = new Scene(root);
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

@@ -19,8 +19,8 @@ public class Localization {
         //FXMLLoader fxmlLoader = new FXMLLoader();
         atm.changeScene(fxmlFile, bundle);
     }
-
-    public ResourceBundle getBundle(){
-        return bundle;
+    public ResourceBundle getLocale() {
+        Locale locale = new Locale("en");
+        return ResourceBundle.getBundle("labelText", locale);
     }
 }

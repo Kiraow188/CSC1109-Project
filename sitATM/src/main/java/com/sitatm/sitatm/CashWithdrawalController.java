@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class CashWithdrawalController {
     ATM atm = new ATM();
@@ -29,7 +30,11 @@ public class CashWithdrawalController {
     @FXML
     private void backAction(ActionEvent event){
         try {
-            atm.changeScene("atm-main-view.fxml");
+            UserHolder holder = UserHolder.getInstance();
+            Localization l = holder.getLocalization();
+            ResourceBundle rb = l.bundle;
+            System.out.println(rb);
+            atm.changeScene("atm-main-view.fxml",rb);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

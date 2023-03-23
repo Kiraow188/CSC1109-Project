@@ -4,7 +4,7 @@ package com.sitatm.sitatm;
 public class UserHolder {
     // Initialize Customer Object
     private Customer customer;
-    private Database database;
+    private Localization localization;
     // Initialize Singleton instance
     private final static UserHolder INSTANCE = new UserHolder();
 
@@ -20,6 +20,6 @@ public class UserHolder {
         return this.customer;
     }
 
-    public void setDatabase(Database d) { this.database = d; }
-    public Database  getDatabase() { return this.database; }
+    public void setLocalization(Localization l){ this.localization = l; }
+    public Localization getLocalization() { return this.localization; }
 }

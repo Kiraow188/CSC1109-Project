@@ -24,8 +24,9 @@ public class MainViewController {
     @FXML
     private Label welcomeMsg;
 
-    public Locale locale = new Locale("en");
-    public ResourceBundle bundle = ResourceBundle.getBundle("labelText",locale);
+    //public Locale locale = new Locale("en");
+    //public ResourceBundle bundle = ResourceBundle.getBundle("labelText",locale);
+    private String fxmlFile = "atm-main-view.fxml";
 
     public static String getGreetingMessage(LocalTime time) {
         int hour = time.getHour();
@@ -113,12 +114,25 @@ public class MainViewController {
 
     public void setZN() throws IOException{
         //Locale locale1 = new Locale("zn");
+        /**
         locale = new Locale("zh");
         ResourceBundle bundle = ResourceBundle.getBundle("labelText", locale);
         FXMLLoader fxmlLoader = new FXMLLoader();
         atm.changeScene("atm-main-view.fxml", bundle);
+         **/
+        UserHolder holder = UserHolder.getInstance();
+        Localization localization = new Localization();
+        holder.setLocalization(localization);
+        localization.setLocale(fxmlFile,"zh");
+    }
+    public void setEN() throws IOException{
+        UserHolder holder = UserHolder.getInstance();
+        Localization localization = new Localization();
+        holder.setLocalization(localization);
+        localization.setLocale(fxmlFile,"en");
     }
     public void initialize(){
         setWelcomeMsg();
+        System.out.println("Debug: Hi im here");
     }
 }

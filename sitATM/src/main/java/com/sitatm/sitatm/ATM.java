@@ -19,12 +19,12 @@ import java.util.ResourceBundle;
 
 public class ATM extends Application {
     private static Stage stg;
-
+    UserHolder holder = UserHolder.getInstance();
     @Override
     public void start(Stage primaryStage) throws IOException {
         //MySQL Connection
         Database db = new Database();
-
+        holder.setDatabase(db);
         try {
             ResultSet resultSet = db.executeQuery("SELECT COUNT(*) FROM transaction");
             while (resultSet.next()) {

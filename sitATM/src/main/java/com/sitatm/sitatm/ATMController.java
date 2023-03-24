@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ATMController {
     ATM atm = new ATM();
+    UserHolder holder = UserHolder.getInstance();
     private Stage stage;
     private Scene scene;
     private Parent root;
@@ -99,6 +100,7 @@ public class ATMController {
                             user.setPin(pin);
                             user.setSalt(salt);
                             controller.setUser(user);
+                            holder.setAccount(user);
                             validAccountNumber.set(true);
                             Scene scene = new Scene(root);
                             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

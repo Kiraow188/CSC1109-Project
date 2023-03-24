@@ -11,13 +11,14 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalTime;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class MainViewController {
     ATM atm = new ATM();
-    Customer customer = new Customer();
     @FXML
     private Button btnExit;
     @FXML
@@ -30,6 +31,8 @@ public class MainViewController {
     private final String fxmlFile = "atm-main-view.fxml";
     private UserHolder holder = UserHolder.getInstance();
     private Localization l = holder.getLocalization();
+    private Customer c = holder.getUser();
+    private Account a = holder.getAccount();
 
     public static String getGreetingMessage(LocalTime time) {
         int hour = time.getHour();
@@ -41,10 +44,6 @@ public class MainViewController {
         } else {
             return "Good Evening";
         }
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
     }
     @FXML
     private void cashWithdrawalAction(ActionEvent event){
@@ -100,29 +99,32 @@ public class MainViewController {
 
     @FXML
     private void chkBalAction(ActionEvent event) {
-        chkBalBtn.setText("Balance: $dummy");
+        try{
+            Database db = holder.getDatabase();
+            String accNum = a.getAccountNo();
+            ResultSet resultSet = db.executeQuery("SELECT * FROM customer c JOIN account a ON c.user_id = a.user_id JOIN ( SELECT * FROM transaction WHERE account_number = "+accNum+" ORDER BY date DESC LIMIT 1) t ON a.account_number = t.account_number WHERE a.account_number = "+accNum);
+            if (resultSet.next()){
+                String latestBal = resultSet.getString("balance_amt");
+                //chkBalBtn.setText("Balance: "+latestBal);
+                chkBalBtn.setText(l.getLocale().getString("BalanceText") +": "+ latestBal);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        //chkBalBtn.setText("Balance: $dummy");
     }
 
     public void setWelcomeMsg(){
         // Get the current time and run it through the getGreetingMessage function
         LocalTime currentTime = LocalTime.now();
         String greeting = getGreetingMessage(currentTime);
-
-        // Call the UserHolder class to retrieve the Global Customer Object
-        UserHolder holder = UserHolder.getInstance();
-        Customer c = holder.getUser();
+        // Retrieve customer data using UserHolder
+        //Customer c = holder.getUser();
         String name = c.getfName();
         welcomeMsg.setText(greeting+", "+name);
     }
 
     public void setZN() throws IOException{
-        //Locale locale1 = new Locale("zn");
-        /**
-        locale = new Locale("zh");
-        ResourceBundle bundle = ResourceBundle.getBundle("labelText", locale);
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        atm.changeScene("atm-main-view.fxml", bundle);
-         **/
         l.setLocale(fxmlFile,"zh");
         holder.setLocalization(l);
     }

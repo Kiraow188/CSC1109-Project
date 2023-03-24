@@ -146,10 +146,10 @@ public class CashWithdrawalController {
                         depositAmountBalance.setDouble(7, accReBalance);
                         if (db.executeUpdate(depositAmountBalance) > 0) {
                             Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
-                            alert.setTitle("Success!");
-                            alert.setHeaderText(null);
-                            alert.setContentText("You have successfully withdrawn $"+withdraw_amount);
-                            alert.showAndWait();
+                            succAlert.setTitle("Success!");
+                            succAlert.setHeaderText(null);
+                            succAlert.setContentText("You have successfully withdrawn $"+withdraw_amount);
+                            succAlert.showAndWait();
                             try {
                                 atm.changeScene("atm-main-view.fxml",l.getLocale());
                             } catch (IOException e) {

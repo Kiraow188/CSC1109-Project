@@ -14,7 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.List;
-
+import java.io.Console;
 
 public class MainAtmCli {
     private final static int checking = 1;
@@ -716,11 +716,14 @@ public class MainAtmCli {
         // limit to withdrawal/deposit
         // error that quits u when int input has alphabets/decimals (int/double)
         // Comments for each functions
+        Console console = System.console();
         Scanner sc = new Scanner(System.in);
         System.out.println("Please Enter Your Account Number: ");
         String accNum = sc.next();
         System.out.println("Please Enter Your Pin: ");
-        String pin = sc.next();
+        String pin = sc.nextLine();
+        char[] enteredPin = console.readPassword();
+        pin = String.valueOf(enteredPin);
         System.out.println();
 
         validator(accNum, pin);

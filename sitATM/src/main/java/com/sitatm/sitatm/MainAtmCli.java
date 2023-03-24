@@ -1239,9 +1239,9 @@ public class MainAtmCli {
         System.out.println("\n" +
                 "Please enter your username: ");
         String username = sc.next();
-        System.out.println("\n" +
-                "Please enter your password: ");
-        String password = sc.next();
+        Console console = System.console();
+        char[] passwordArray = console.readPassword("Enter your  password: ");
+        String password = String.valueOf(passwordArray);
         try {
             Database db = new Database();
             String query = "SELECT * FROM teller WHERE username=? AND password=?";

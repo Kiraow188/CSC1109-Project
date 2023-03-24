@@ -633,21 +633,25 @@ public class MainAtmCli {
     }
 
     public static void changePin(Scanner sc, String userId) {
+        Console console = System.console();
         boolean persistent = true;
         while (persistent) {
             persistent = false;
             System.out.print("\nEnter new 6 Digit Pin: ");
-            String newPin = sc.next();
+            String newPin = sc.nextLine();
+            char[] enteredPin = console.readPassword();
+            newPin = String.valueOf(enteredPin);
+
             if (newPin.matches("\\d{6}")) {
                 // Hash customer's pin with Salt and Pepper
                 String[] hashAlgo;
                 try {
                     hashAlgo = PinHash.hashPin(newPin);
-                    String newHashedPin = hashAlgo[0];
-                    String newSalt = hashAlgo[1];
+                    String newHashedPin = hashAlgo[1];
+                    String newSalt = hashAlgo[0];
                     // Debug
-                    System.out.println("Random Salt: " + hashAlgo[0]);
-                    System.out.println("Hashed Password: " + hashAlgo[1]);
+                    System.out.println("Random Salt: " + hashAlgo[1]);
+                    System.out.println("Hashed Password: " + hashAlgo[0]);
                     persistent = true;
                     while (persistent) {
                         System.out.println(

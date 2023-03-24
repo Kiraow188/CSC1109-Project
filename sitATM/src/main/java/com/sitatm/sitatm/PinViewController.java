@@ -64,6 +64,7 @@ public class PinViewController {
         Database db = new Database();
         Customer customer = new Customer();
         Localization localization = new Localization();
+
         System.out.println(pinTextBox.getText()+"\n"+user.getSalt()+"\n"+user.getPin());
         boolean doesPinMatch = PinHash.hashMatching(pinTextBox.getText(),user.getSalt(),user.getPin());
         if (doesPinMatch){
@@ -71,11 +72,11 @@ public class PinViewController {
             ResultSet resultSet = db.executeQuery("SELECT * from customer where user_id = '"+user.getUserId()+"'");
             if (resultSet.next()){
                 String custName = resultSet.getString("full_name");
-                String custID = resultSet.getString("user_id");
+                String userID = resultSet.getString("user_id");
                 customer.setfName(custName);
-                customer.setUserID(custID);
                 holder.setUser(customer);
                 holder.setLocalization(localization);
+                holder.setAccount(user);
                 ResourceBundle bundle = localization.getLocale();
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-main-view.fxml"),bundle);
                 Parent root = loader.load();

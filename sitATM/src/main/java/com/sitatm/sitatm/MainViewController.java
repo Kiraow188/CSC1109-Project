@@ -102,7 +102,7 @@ public class MainViewController {
         try{
             Database db = holder.getDatabase();
             String accNum = a.getAccountNo();
-            ResultSet resultSet = db.executeQuery("SELECT * FROM customer c JOIN account a ON c.user_id = a.user_id JOIN ( SELECT * FROM transaction WHERE account_number = "+accNum+" ORDER BY date DESC LIMIT 1) t ON a.account_number = t.account_number WHERE a.account_number = "+accNum);
+            ResultSet resultSet = db.executeQuery("SELECT * FROM customer c JOIN account a ON c.user_id = a.user_id JOIN ( SELECT * FROM transaction WHERE account_number = "+accNum+" ORDER BY transaction_id DESC LIMIT 1) t ON a.account_number = t.account_number WHERE a.account_number = "+accNum);
             if (resultSet.next()){
                 String latestBal = resultSet.getString("balance_amt");
                 //chkBalBtn.setText("Balance: "+latestBal);
@@ -122,6 +122,7 @@ public class MainViewController {
         //Customer c = holder.getUser();
         String name = c.getfName();
         welcomeMsg.setText(greeting+", "+name);
+        System.out.println("Debuggy{125}: Current user ID - "+a.getUserId());
     }
 
     public void setZN() throws IOException{

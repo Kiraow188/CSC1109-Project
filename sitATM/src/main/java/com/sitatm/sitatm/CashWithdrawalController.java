@@ -10,6 +10,9 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -26,13 +29,13 @@ public class CashWithdrawalController {
     private TextField txtFieldAmt;
     @FXML
     private Button btnBackspace;
+    @FXML
+    private ChoiceBox<String> accDrpDwn;
     private UserHolder holder = UserHolder.getInstance();
     private Localization l = holder.getLocalization();
+    private Database db = holder.getDatabase();
+    private Account a = holder.getAccount();
     private final String fxmlFile = "atm-cash-withdrawal-view.fxml";
-    //UserHolder holder = UserHolder.getInstance();
-    //Localization l = holder.getLocalization();
-    //ResourceBundle rb = l.getLocale();
-
     @FXML
     private void backAction(ActionEvent event){
         try {
@@ -97,17 +100,68 @@ public class CashWithdrawalController {
             withdrawConfirmation.setHeaderText("Minimum withdrawal amount is $20!");
             withdrawConfirmation.showAndWait();
         }
+        else if (accDrpDwn.getValue() == null){
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
+            withdrawConfirmation.setTitle("SIT ATM: Withdrawal Confirmation");
+            withdrawConfirmation.setGraphic(null);
+            withdrawConfirmation.setHeaderText("Please select an account number to withdraw from!");
+            withdrawConfirmation.showAndWait();
+        }
         else {
-            try {
-                String amount = txtFieldAmt.getText();
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-confirmation-view.fxml"));
-                Parent root = loader.load();
-                ConfirmationViewController cvc = loader.getController();
-                cvc.cwConfirmation(amount);
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                stage.setScene(new Scene(root));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation Dialog");
+            alert.setHeaderText("Are you sure you want to perform this action?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK){
+                try {
+                    String accNo = accDrpDwn.getValue();
+                    int withdraw_amount = Integer.parseInt(txtFieldAmt.getText());
+                    double accReBalance = 0;
+                    String actionStatement = "ATM WITHDRAWAL";
+                    ResultSet AccRetrieval = db.executeQuery(
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                    + accNo + " AND account.account_number = " + accNo
+                                    + " ORDER BY transaction_id DESC LIMIT 1;");
+                    while (AccRetrieval.next()) {
+                        accReBalance = AccRetrieval.getDouble("balance_amt");
+                    }
+                    accReBalance = accReBalance - withdraw_amount;
+                    if (accReBalance < withdraw_amount){
+                        Alert withdrawalError = new Alert(Alert.AlertType.ERROR);
+                        withdrawalError.setTitle("SIT ATM: Withdrawal Error");
+                        withdrawalError.setGraphic(null);
+                        withdrawalError.setHeaderText("You do not have sufficient funds to perform this action.");
+                        withdrawalError.showAndWait();
+                    }else {
+                        String depositAmountBalanceQuery = "INSERT INTO transaction(account_number, date, transaction_details, chq_no, withdrawal_amt, deposit_amt, balance_amt) VALUES (?,?,?,?,?,?,?)";
+                        PreparedStatement depositAmountBalance = db.getConnection().prepareStatement(depositAmountBalanceQuery);
+                        depositAmountBalance.setString(1, accNo);
+                        depositAmountBalance.setDate(2,
+                                java.sql.Date.valueOf(java.time.LocalDate.now()));
+                        depositAmountBalance.setString(3, actionStatement);
+                        depositAmountBalance.setInt(4, 0);
+                        depositAmountBalance.setDouble(5, withdraw_amount);
+                        depositAmountBalance.setDouble(6, 0);
+                        depositAmountBalance.setDouble(7, accReBalance);
+                        if (db.executeUpdate(depositAmountBalance) > 0) {
+                            Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Success!");
+                            alert.setHeaderText(null);
+                            alert.setContentText("You have successfully withdrawn $"+withdraw_amount);
+                            alert.showAndWait();
+                            try {
+                                atm.changeScene("atm-main-view.fxml",l.getLocale());
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("An exception has occured: " + e);
+                }
+            } else {
+                System.out.println("Debuggy{149}: walao waste my time!");
             }
         }
     }
@@ -122,5 +176,22 @@ public class CashWithdrawalController {
     public void setMS() throws IOException{
         l.setLocale(fxmlFile, "ms");
         holder.setLocalization(l);
+    }
+    @FXML
+    public void initialize() throws SQLException {
+        System.out.println("Hi it's me debuggy!");
+        String userID = a.getUserId();
+        System.out.println("Debuggy{134}: Current UserID is - "+userID);
+        try{
+            ResultSet resultSet = db.executeQuery("SELECT account_number FROM account where user_id = "+userID);
+            List<String> accountNumbers = new ArrayList<>();
+            while (resultSet.next()) {
+                String acc = resultSet.getString("account_number");
+                accountNumbers.add(acc);
+            }
+            accDrpDwn.getItems().addAll(accountNumbers);
+        } catch (SQLException e ){
+            System.out.println("SQL Exception caught: " + e);
+        }
     }
 }

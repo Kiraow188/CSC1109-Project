@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.UnaryOperator;
 
 public class ATMController {
     ATM atm = new ATM();
@@ -74,6 +75,17 @@ public class ATMController {
                 dialog.setTitle("Card Details");
                 dialog.setHeaderText("Please enter your account number");
                 dialog.setContentText("Account Number: ");
+
+                // Apply a filter to accept digits only
+                UnaryOperator<TextFormatter.Change> filter = change -> {
+                    String text = change.getControlNewText();
+                    if (text.matches("\\d{0,9}")) {
+                        return change;
+                    }
+                    return null;
+                };
+                dialog.getEditor().setTextFormatter(new TextFormatter<>(filter));
+
                 Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
                 Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
                 cancelButton.setOnAction(e ->{

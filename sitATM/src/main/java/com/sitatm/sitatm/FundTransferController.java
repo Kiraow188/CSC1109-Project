@@ -6,6 +6,7 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -13,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 public class FundTransferController {
     ATM atm = new ATM();
@@ -62,6 +64,13 @@ public class FundTransferController {
             withdrawConfirmation.setHeaderText("Please enter account number!");
             withdrawConfirmation.showAndWait();
         }
+        else if (!ToAccTxtBox.getText().matches("\\d{9}")){
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
+            withdrawConfirmation.setTitle("SIT ATM: Fund Transfer Confirmation");
+            withdrawConfirmation.setGraphic(null);
+            withdrawConfirmation.setHeaderText("Account number must only contain digits!");
+            withdrawConfirmation.showAndWait();
+        }
         else if (TransfAmtTxtbox.getText().equals("")){
             Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
             withdrawConfirmation.setTitle("SIT ATM: Fund Transfer Confirmation");
@@ -73,7 +82,7 @@ public class FundTransferController {
             // First Check if the destination account exist in the database and is not deactivated.
             ResultSet resultSet = db.executeQuery("SELECT * from account where account_number = "+ToAccTxtBox.getText()+" AND deactivation_date IS NULL");
             if (resultSet.next()){
-                System.out.println("Debuggy{70}: All good, account exist & is not deactivated");
+                System.out.println("Debuggy{85}: All good, account exist & is not deactivated");
                 // Next is to check if customer has sufficient funds to transfer.
                 //String fromAccNo = FromAccDrpDwn.getValue();
                 int transfer_amount = Integer.parseInt(TransfAmtTxtbox.getText());
@@ -164,6 +173,16 @@ public class FundTransferController {
     }
     @FXML
     public void initialize() throws SQLException {
+        // Limit ToAccTxtBox to 9 characters
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String text = change.getControlNewText();
+            if (text.matches("\\d{0,9}")) {
+                return change;
+            }
+            return null;
+        };
+        ToAccTxtBox.setTextFormatter(new TextFormatter<String>(filter));
+
         System.out.println("Hi it's me debuggy!");
         String userID = a.getUserId();
         System.out.println("Debuggy{167}: Current UserID is - "+userID);

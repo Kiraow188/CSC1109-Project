@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
@@ -17,8 +18,11 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.function.UnaryOperator;
 
 public class PinViewController {
     ATM atm = new ATM();
@@ -26,8 +30,8 @@ public class PinViewController {
     private PasswordField pinTextBox;
     @FXML
     private Button cancelButton;
-    Account user = new Account();
     UserHolder holder = UserHolder.getInstance();
+    Account user = holder.getAccount();
 
     public void setUser(Account user) {
         this.user = user;
@@ -44,12 +48,12 @@ public class PinViewController {
     }
 
     @FXML
-    private void clearButtonAction(ActionEvent event){
+    private void clearButtonAction(ActionEvent event) {
         pinTextBox.clear();
     }
 
     @FXML
-    private void cancelButtonAction(ActionEvent event){
+    private void cancelButtonAction(ActionEvent event) {
         // TODO: either close this stage or close the program
         try {
             atm.changeScene("atm-login-view.fxml");
@@ -65,12 +69,12 @@ public class PinViewController {
         Customer customer = new Customer();
         Localization localization = new Localization();
 
-        System.out.println(pinTextBox.getText()+"\n"+user.getSalt()+"\n"+user.getPin());
-        boolean doesPinMatch = PinHash.hashMatching(pinTextBox.getText(),user.getSalt(),user.getPin());
-        if (doesPinMatch){
+        System.out.println(pinTextBox.getText() + "\n" + user.getSalt() + "\n" + user.getPin());
+        boolean doesPinMatch = PinHash.hashMatching(pinTextBox.getText(), user.getSalt(), user.getPin());
+        if (doesPinMatch) {
             System.out.println(user.getUserId());
-            ResultSet resultSet = db.executeQuery("SELECT * from customer where user_id = '"+user.getUserId()+"'");
-            if (resultSet.next()){
+            ResultSet resultSet = db.executeQuery("SELECT * from customer where user_id = '" + user.getUserId() + "'");
+            if (resultSet.next()) {
                 String custName = resultSet.getString("full_name");
                 String userID = resultSet.getString("user_id");
                 customer.setfName(custName);
@@ -78,7 +82,7 @@ public class PinViewController {
                 holder.setLocalization(localization);
                 holder.setAccount(user);
                 ResourceBundle bundle = localization.getLocale();
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-main-view.fxml"),bundle);
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-main-view.fxml"), bundle);
                 Parent root = loader.load();
                 Scene scene = new Scene(root);
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -86,7 +90,7 @@ public class PinViewController {
                 stage.show();
             }
             //atm.changeScene("atm-main-view.fxml");
-        }else{
+        } else {
             System.out.println("Incorrect pin number, please try again.");
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
@@ -95,5 +99,18 @@ public class PinViewController {
             alert.showAndWait();
             pinTextBox.clear();
         }
+    }
+
+    @FXML
+    public void initialize(){
+        // Limit ToAccTxtBox to 9 characters
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String text = change.getControlNewText();
+            if (text.matches("\\d{0,6}")) {
+                return change;
+            }
+            return null;
+        };
+        pinTextBox.setTextFormatter(new TextFormatter<String>(filter));
     }
 }

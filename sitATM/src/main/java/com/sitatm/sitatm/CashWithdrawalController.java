@@ -109,8 +109,8 @@ public class CashWithdrawalController {
         }
         else {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirmation Dialog");
-            alert.setHeaderText("Are you sure you want to perform this action?");
+            alert.setTitle("SIT ATM: Cash Withdrawal");
+            alert.setHeaderText("Please confirm the following action: \n\nWithdraw: $"+txtFieldAmt.getText()+"\nFrom Account Number: "+accDrpDwn.getValue());
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK){
@@ -148,7 +148,9 @@ public class CashWithdrawalController {
                             Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
                             succAlert.setTitle("Success!");
                             succAlert.setHeaderText(null);
-                            succAlert.setContentText("You have successfully withdrawn $"+withdraw_amount);
+                            succAlert.setContentText("$"+withdraw_amount+" has been withdrawn successfully!" +
+                                    "\nCurrent Available Balance: $"+accReBalance+
+                                    "\n\nThank you for banking with us!");
                             succAlert.showAndWait();
                             try {
                                 atm.changeScene("atm-main-view.fxml",l.getLocale());

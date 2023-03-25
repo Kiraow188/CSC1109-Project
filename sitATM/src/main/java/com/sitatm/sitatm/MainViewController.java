@@ -111,7 +111,7 @@ public class MainViewController {
             if (resultSet.next()){
                 String latestBal = resultSet.getString("balance_amt");
                 //chkBalBtn.setText("Balance: "+latestBal);
-                chkBalBtn.setText(l.getLocale().getString("BalanceText") +": "+ latestBal);
+                chkBalBtn.setText(l.getLocale().getString("BalanceText") +": $"+ latestBal);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

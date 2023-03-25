@@ -6,10 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -25,6 +22,8 @@ public class CashDepositController {
     ATM atm = new ATM();
     @FXML
     private TextField txtFieldAmt;
+    @FXML
+    private Button btnConfirm;
     @FXML
     private ChoiceBox<String> accDrpDwn;
     private UserHolder holder = UserHolder.getInstance();
@@ -43,7 +42,7 @@ public class CashDepositController {
     @FXML
     private void exitAction(ActionEvent event){
         try {
-            atm.changeScene("atm-exit-view.fxml");
+            atm.changeScene("atm-exit-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -130,6 +129,11 @@ public class CashDepositController {
     }
     @FXML
     public void initialize() throws SQLException {
+        // Set the style of the button when the mouse is over it
+        btnConfirm.setOnMouseEntered(e -> btnConfirm.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 24px;"));
+        // Set the style of the button when the mouse leaves it
+        btnConfirm.setOnMouseExited(e -> btnConfirm.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 24px;"));
+
         System.out.println("Hi it's me debuggy!");
         String userID = a.getUserId();
         System.out.println("Debuggy{139}: Current UserID is - "+userID);

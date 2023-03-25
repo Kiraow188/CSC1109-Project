@@ -12,6 +12,9 @@ public class ExitViewController {
     ATMController atmc = new ATMController();
     @FXML
     private ImageView cardReader;
+    private UserHolder holder = UserHolder.getInstance();
+    private Localization l = holder.getLocalization();
+    private final String fxmlFile = "atm-exit-view.fxml";
     @FXML
     private Image collectCardImage = atmc.updateImage("/img/card_reader_collect_card.png");
     @FXML
@@ -28,6 +31,18 @@ public class ExitViewController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    public void setZN() throws IOException{
+        l.setLocale(fxmlFile,"zh");
+        holder.setLocalization(l);
+    }
+    public void setEN() throws IOException{
+        l.setLocale(fxmlFile,"en");
+        holder.setLocalization(l);
+    }
+    public void setMS() throws IOException{
+        l.setLocale(fxmlFile, "ms");
+        holder.setLocalization(l);
     }
 
     @FXML

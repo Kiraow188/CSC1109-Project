@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Line?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.MainViewController">
+<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.MainViewController">
    <children>
       <AnchorPane prefHeight="83.0" prefWidth="1024.0">
          <children>
-            <Button layoutX="472.0" layoutY="15.0" mnemonicParsing="false" onAction="#setZN" prefHeight="53.0" text="中文">
+            <Button layoutX="466.0" layoutY="15.0" mnemonicParsing="false" onAction="#setZN" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="中文">
                <font>
                   <Font size="24.0" />
                </font>
@@ -24,12 +22,12 @@
                </image>
             </ImageView>
             <Button fx:id="btnExit" layoutX="975.0" layoutY="29.0" mnemonicParsing="false" onAction="#exitAction" text="Exit" />
-            <Button layoutX="552.0" layoutY="15.0" mnemonicParsing="false" onAction="#setMS" prefHeight="53.0" text="Melayu">
+            <Button layoutX="562.0" layoutY="15.0" mnemonicParsing="false" onAction="#setMS" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="Melayu">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button layoutX="364.0" layoutY="15.0" mnemonicParsing="false" onAction="#setEN" prefHeight="53.0" text="English">
+            <Button layoutX="370.0" layoutY="15.0" mnemonicParsing="false" onAction="#setEN" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="English">
                <font>
                   <Font size="24.0" />
                </font>
@@ -38,58 +36,58 @@
       </AnchorPane>
       <AnchorPane layoutY="85.0" prefHeight="684.0" prefWidth="1024.0">
          <children>
-            <Button fx:id="btnWithdrawl" layoutX="77.0" layoutY="96.0" mnemonicParsing="false" onAction="#cashWithdrawalAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #F2CD60;" text="%CashWithdraw">
+            <Button fx:id="btnWithdrawl" layoutX="77.0" layoutY="96.0" mnemonicParsing="false" onAction="#cashWithdrawalAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%CashWithdraw">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
-            <Button layoutX="307.0" layoutY="96.0" mnemonicParsing="false" onAction="#fundTransferAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #F2CD60;" text="%FundTransfer">
+            <Button fx:id="btnFundTransfer" layoutX="307.0" layoutY="96.0" mnemonicParsing="false" onAction="#fundTransferAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%FundTransfer">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
-            <Button fx:id="chkBalBtn" layoutX="77.0" layoutY="326.0" mnemonicParsing="false" onAction="#chkBalAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #F2CD60;" text="%CheckBalance">
+            <Button fx:id="chkBalBtn" layoutX="77.0" layoutY="326.0" mnemonicParsing="false" onAction="#chkBalAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%CheckBalance">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
-            <Button layoutX="307.0" layoutY="326.0" mnemonicParsing="false" onAction="#AllAccountAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #F2CD60;" text="%AllAccount">
+            <Button fx:id="btnAllAcc" layoutX="307.0" layoutY="326.0" mnemonicParsing="false" onAction="#AllAccountAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%AllAccount">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
-            <Button layoutX="77.0" layoutY="556.0" mnemonicParsing="false" onAction="#MoreServicesAction" prefHeight="60.0" prefWidth="871.0" style="-fx-background-color: #F2CD60;" text="%MoreServices">
+            <Button fx:id="btnMreSvc" layoutX="77.0" layoutY="556.0" mnemonicParsing="false" onAction="#MoreServicesAction" prefHeight="60.0" prefWidth="871.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%MoreServices">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
-            <Button layoutX="537.0" layoutY="96.0" mnemonicParsing="false" onAction="#CashDepositAction" prefHeight="180.0" prefWidth="410.0" style="-fx-background-color: #F2CD60;" text="%CashDeposit">
+            <Button fx:id="btnCashDeposit" layoutX="537.0" layoutY="96.0" mnemonicParsing="false" onAction="#CashDepositAction" prefHeight="180.0" prefWidth="410.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%CashDeposit">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
             <Label fx:id="welcomeMsg" layoutX="77.0" layoutY="26.0" text="%Welcome">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <Button layoutX="537.0" layoutY="326.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;" text="\$50" onAction="#fastCashWithdrawal">
+            <Button fx:id="btn50" layoutX="537.0" layoutY="326.0" mnemonicParsing="false" onAction="#fastCashWithdrawal" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="\$50">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
-            <Button layoutX="537.0" layoutY="389.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;" text="\$100" onAction="#fastCashWithdrawal">
+            <Button fx:id="btn100" layoutX="537.0" layoutY="389.0" mnemonicParsing="false" onAction="#fastCashWithdrawal" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="\$100">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
-            <Button layoutX="537.0" layoutY="451.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;" text="\$200" onAction="#fastCashWithdrawal">
+            <Button fx:id="btn200" layoutX="537.0" layoutY="451.0" mnemonicParsing="false" onAction="#fastCashWithdrawal" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="\$200">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
-            <Button layoutX="757.0" layoutY="326.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;" text="\$80" onAction="#fastCashWithdrawal">
+            <Button fx:id="btn80" layoutX="757.0" layoutY="326.0" mnemonicParsing="false" onAction="#fastCashWithdrawal" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="\$80">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
-            <Button layoutX="757.0" layoutY="389.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;" text="\$150" onAction="#fastCashWithdrawal">
+            <Button fx:id="btn150" layoutX="757.0" layoutY="389.0" mnemonicParsing="false" onAction="#fastCashWithdrawal" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="\$150">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
-            <Button layoutX="757.0" layoutY="451.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;" text="\$300" onAction="#fastCashWithdrawal">
+            <Button fx:id="btn300" layoutX="757.0" layoutY="451.0" mnemonicParsing="false" onAction="#fastCashWithdrawal" prefHeight="55.0" prefWidth="190.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="\$300">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="16.0" />
                </font></Button>
             <Label layoutX="537.0" layoutY="283.0" text="%FastCash">
                <font>

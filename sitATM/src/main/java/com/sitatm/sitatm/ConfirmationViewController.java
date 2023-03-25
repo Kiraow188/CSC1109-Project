@@ -33,7 +33,7 @@ public class ConfirmationViewController {
     @FXML
     private void exitAction(ActionEvent event){
         try {
-            atm.changeScene("atm-exit-view.fxml");
+            atm.changeScene("atm-exit-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

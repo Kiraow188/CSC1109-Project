@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.PinViewController">
+<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.PinViewController">
    <children>
-      <PasswordField fx:id="pinTextBox" layoutX="267.0" layoutY="224.0" prefHeight="53.0" prefWidth="491.0">
+      <PasswordField fx:id="pinTextBox" alignment="CENTER" layoutX="267.0" layoutY="224.0" prefHeight="53.0" prefWidth="491.0">
          <font>
             <Font size="24.0" />
          </font>
       </PasswordField>
-      <Button fx:id="button1" layoutX="343.0" layoutY="290.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="1">
+      <Button fx:id="button1" layoutX="343.0" layoutY="290.0" mnemonicParsing="false" onAction="#keypadButtonAction" style="-fx-background-radius: 50%;-fx-background-color: #DDDDDD;" text="1">
          <padding>
             <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
          </padding>
@@ -22,7 +20,7 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="button2" layoutX="416.0" layoutY="290.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="2">
+      <Button fx:id="button2" layoutX="416.0" layoutY="290.0" mnemonicParsing="false" onAction="#keypadButtonAction" style="-fx-background-radius: 50%;-fx-background-color: #DDDDDD;" text="2">
          <padding>
             <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
          </padding>
@@ -30,7 +28,7 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="button3" layoutX="489.0" layoutY="290.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="3">
+      <Button fx:id="button3" layoutX="489.0" layoutY="290.0" mnemonicParsing="false" onAction="#keypadButtonAction" style="-fx-background-radius: 50%;-fx-background-color: #DDDDDD;" text="3">
          <padding>
             <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
          </padding>
@@ -38,7 +36,7 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="button4" layoutX="343.0" layoutY="365.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="4">
+      <Button fx:id="button4" layoutX="343.0" layoutY="365.0" mnemonicParsing="false" onAction="#keypadButtonAction" style="-fx-background-radius: 50%;-fx-background-color: #DDDDDD;" text="4">
          <padding>
             <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
          </padding>
@@ -46,7 +44,7 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="button5" layoutX="416.0" layoutY="365.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="5">
+      <Button fx:id="button5" layoutX="416.0" layoutY="365.0" mnemonicParsing="false" onAction="#keypadButtonAction" style="-fx-background-radius: 50%;-fx-background-color: #DDDDDD;" text="5">
          <padding>
             <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
          </padding>
@@ -54,7 +52,7 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="button6" layoutX="489.0" layoutY="365.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="6">
+      <Button fx:id="button6" layoutX="489.0" layoutY="365.0" mnemonicParsing="false" onAction="#keypadButtonAction" style="-fx-background-radius: 50%;-fx-background-color: #DDDDDD;" text="6">
          <padding>
             <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
          </padding>
@@ -62,7 +60,7 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="button7" layoutX="343.0" layoutY="440.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="7">
+      <Button fx:id="button7" layoutX="343.0" layoutY="440.0" mnemonicParsing="false" onAction="#keypadButtonAction" style="-fx-background-radius: 50%;-fx-background-color: #DDDDDD;" text="7">
          <padding>
             <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
          </padding>
@@ -70,7 +68,7 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="button8" layoutX="416.0" layoutY="440.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="8">
+      <Button fx:id="button8" layoutX="416.0" layoutY="440.0" mnemonicParsing="false" onAction="#keypadButtonAction" style="-fx-background-radius: 50%;-fx-background-color: #DDDDDD;" text="8">
          <padding>
             <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
          </padding>
@@ -78,7 +76,7 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="button9" layoutX="489.0" layoutY="440.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="9">
+      <Button fx:id="button9" layoutX="489.0" layoutY="440.0" mnemonicParsing="false" onAction="#keypadButtonAction" style="-fx-background-radius: 50%;-fx-background-color: #DDDDDD;" text="9">
          <padding>
             <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
          </padding>
@@ -86,7 +84,7 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="button0" layoutX="416.0" layoutY="515.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="0">
+      <Button fx:id="button0" layoutX="416.0" layoutY="515.0" mnemonicParsing="false" onAction="#keypadButtonAction" style="-fx-background-radius: 50%;-fx-background-color: #DDDDDD;" text="0">
          <padding>
             <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
          </padding>
@@ -94,17 +92,17 @@
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="cancelButton" layoutX="566.0" layoutY="290.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="65.0" prefWidth="117.0" text="Cancel">
+      <Button fx:id="cancelButton" layoutX="566.0" layoutY="290.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="65.0" prefWidth="117.0" style="-fx-background-color: #E96479;-fx-text-fill: white;-fx-background-radius: 16px;-fx-font-size: 26px; -fx-font-weight: bold;" text="Cancel">
          <font>
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="clearButton" layoutX="566.0" layoutY="365.0" mnemonicParsing="false" onAction="#clearButtonAction" prefHeight="65.0" prefWidth="117.0" text="Clear">
+      <Button fx:id="clearButton" layoutX="566.0" layoutY="365.0" mnemonicParsing="false" onAction="#clearButtonAction" prefHeight="65.0" prefWidth="117.0" style="-fx-background-color: #FFB84C;-fx-text-fill: white;-fx-background-radius: 16px;-fx-font-size: 26px; -fx-font-weight: bold;" text="Clear">
          <font>
             <Font size="24.0" />
          </font>
       </Button>
-      <Button fx:id="confirmButton" layoutX="566.0" layoutY="440.0" mnemonicParsing="false" onAction="#confirmButtonAction" prefHeight="65.0" prefWidth="117.0" text="Confirm">
+      <Button fx:id="confirmButton" layoutX="566.0" layoutY="440.0" mnemonicParsing="false" onAction="#confirmButtonAction" prefHeight="65.0" prefWidth="117.0" style="-fx-background-color: #9DC08B;-fx-text-fill: white;-fx-background-radius: 16px;-fx-font-size: 26px; -fx-font-weight: bold;" text="Enter">
          <font>
             <Font size="24.0" />
          </font>

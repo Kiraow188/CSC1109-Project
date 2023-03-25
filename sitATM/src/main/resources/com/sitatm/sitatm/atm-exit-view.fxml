@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Line?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-
-<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.ExitViewController">
+<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.ExitViewController">
    <children>
       <AnchorPane prefHeight="83.0" prefWidth="1024.0">
          <children>
-            <Button layoutX="472.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="中文">
+            <Button layoutX="466.0" layoutY="15.0" mnemonicParsing="false" onAction="#setZN" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="中文">
                <font>
                   <Font size="24.0" />
                </font>
@@ -24,12 +21,12 @@
                   <Image url="@../../../img/bank_logo.png" />
                </image>
             </ImageView>
-            <Button layoutX="552.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="Melayu">
+            <Button layoutX="562.0" layoutY="15.0" mnemonicParsing="false" onAction="#setMS" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="Melayu">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button layoutX="364.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="English">
+            <Button layoutX="370.0" layoutY="15.0" mnemonicParsing="false" onAction="#setEN" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="English">
                <font>
                   <Font size="24.0" />
                </font>
@@ -38,12 +35,12 @@
       </AnchorPane>
       <AnchorPane layoutY="83.0" prefHeight="685.0" prefWidth="1024.0">
          <children>
-            <Label alignment="CENTER" layoutX="286.0" layoutY="24.0" prefHeight="116.0" prefWidth="452.0" text="Thank you for banking with&#10;SIT ATM !" textAlignment="CENTER">
+            <Label alignment="CENTER" layoutX="112.0" layoutY="22.0" prefHeight="116.0" prefWidth="800.0" text="%ExitMsg" textAlignment="CENTER">
                <font>
                   <Font size="36.0" />
                </font>
             </Label>
-            <Label layoutX="326.0" layoutY="133.0" text="Please collect your card">
+            <Label alignment="CENTER" layoutX="286.0" layoutY="132.0" prefWidth="452.0" text="%CollectCard" textAlignment="CENTER">
                <font>
                   <Font size="36.0" />
                </font>

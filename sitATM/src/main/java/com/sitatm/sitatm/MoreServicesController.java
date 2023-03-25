@@ -2,11 +2,14 @@ package com.sitatm.sitatm;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 
 import java.io.IOException;
 
 public class MoreServicesController {
     ATM atm = new ATM();
+    @FXML
+    private Button btnHome;
     private UserHolder holder = UserHolder.getInstance();
     private Localization l = holder.getLocalization();
     private final String fxmlFile = "atm-more-services-view.fxml";
@@ -21,7 +24,7 @@ public class MoreServicesController {
     @FXML
     private void exitAction(ActionEvent event){
         try {
-            atm.changeScene("atm-exit-view.fxml");
+            atm.changeScene("atm-exit-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -34,6 +37,13 @@ public class MoreServicesController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    @FXML
+    private void initialize(){
+        // Set the style of the button when the mouse is over it
+        btnHome.setOnMouseEntered(e -> btnHome.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 24px;"));
+        // Set the style of the button when the mouse leaves it
+        btnHome.setOnMouseExited(e -> btnHome.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 24px;"));
     }
     public void setZN() throws IOException{
         l.setLocale(fxmlFile,"zh");

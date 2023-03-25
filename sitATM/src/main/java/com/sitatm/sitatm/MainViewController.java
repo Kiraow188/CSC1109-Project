@@ -29,6 +29,28 @@ public class MainViewController {
     private Button chkBalBtn;
     @FXML
     private Label welcomeMsg;
+    @FXML
+    private Button btnWithdrawl;
+    @FXML
+    private Button btnFundTransfer;
+    @FXML
+    private Button btnCashDeposit;
+    @FXML
+    private Button btnAllAcc;
+    @FXML
+    private Button btn50;
+    @FXML
+    private Button btn80;
+    @FXML
+    private Button btn100;
+    @FXML
+    private Button btn150;
+    @FXML
+    private Button btn200;
+    @FXML
+    private Button btn300;
+    @FXML
+    private Button btnMreSvc;
 
     //public Locale locale = new Locale("en");
     //public ResourceBundle bundle = ResourceBundle.getBundle("labelText",locale);
@@ -96,7 +118,7 @@ public class MainViewController {
     @FXML
     private void exitAction(ActionEvent event) {
         try {
-            atm.changeScene("atm-exit-view.fxml");
+            atm.changeScene("atm-exit-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -204,5 +226,31 @@ public class MainViewController {
     @FXML
     public void initialize() throws IOException {
         setWelcomeMsg();
+        // Set the style of the button when the mouse is over it
+        btnWithdrawl.setOnMouseEntered(e -> btnWithdrawl.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btnCashDeposit.setOnMouseEntered(e -> btnCashDeposit.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btnFundTransfer.setOnMouseEntered(e -> btnFundTransfer.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        chkBalBtn.setOnMouseEntered(e -> chkBalBtn.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn50.setOnMouseEntered(e -> btn50.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn80.setOnMouseEntered(e -> btn80.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn100.setOnMouseEntered(e -> btn100.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn150.setOnMouseEntered(e -> btn150.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn200.setOnMouseEntered(e -> btn200.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn300.setOnMouseEntered(e -> btn300.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btnAllAcc.setOnMouseEntered(e -> btnAllAcc.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btnMreSvc.setOnMouseEntered(e -> btnMreSvc.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        // Set the style of the button when the mouse leaves it
+        btnWithdrawl.setOnMouseExited(e -> btnWithdrawl.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btnCashDeposit.setOnMouseExited(e -> btnCashDeposit.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btnFundTransfer.setOnMouseExited(e -> btnFundTransfer.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        chkBalBtn.setOnMouseExited(e -> chkBalBtn.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn50.setOnMouseExited(e -> btn50.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn80.setOnMouseExited(e -> btn80.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn100.setOnMouseExited(e -> btn100.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn150.setOnMouseExited(e -> btn150.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn200.setOnMouseExited(e -> btn200.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btn300.setOnMouseExited(e -> btn300.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btnAllAcc.setOnMouseExited(e -> btnAllAcc.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+        btnMreSvc.setOnMouseExited(e -> btnMreSvc.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
     }
 }

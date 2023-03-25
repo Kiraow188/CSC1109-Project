@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.MoreServicesController">
+<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.MoreServicesController">
    <children>
       <AnchorPane prefHeight="83.0" prefWidth="1024.0">
          <children>
-            <Button layoutX="472.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="中文" onAction="#setZN">
+            <Button layoutX="466.0" layoutY="15.0" mnemonicParsing="false" onAction="#setZN" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="中文">
                <font>
                   <Font size="24.0" />
                </font>
@@ -22,13 +23,13 @@
                </image>
             </ImageView>
             <Button fx:id="btnExit" layoutX="975.0" layoutY="29.0" mnemonicParsing="false" onAction="#exitAction" text="Exit" />
-            <Button layoutX="552.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="Melayu" onAction="#setMS">
+            <Button layoutX="562.0" layoutY="15.0" mnemonicParsing="false" onAction="#setMS" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="Melayu">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
             <Button fx:id="btnBack" layoutX="934.0" layoutY="29.0" mnemonicParsing="false" onAction="#backAction" text="Back" />
-            <Button layoutX="364.0" layoutY="15.0" mnemonicParsing="false" prefHeight="53.0" text="English" onAction="#setEN">
+            <Button layoutX="370.0" layoutY="15.0" mnemonicParsing="false" onAction="#setEN" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="English">
                <font>
                   <Font size="24.0" />
                </font>
@@ -37,16 +38,25 @@
       </AnchorPane>
       <AnchorPane layoutY="83.0" prefHeight="685.0" prefWidth="1024.0">
          <children>
-            <Button layoutX="40.0" layoutY="84.0" mnemonicParsing="false" onAction="#changePinAction" prefHeight="517.0" prefWidth="285.0" style="-fx-background-color: #F2CD60;" text="%ChangePin">
+            <Button layoutX="40.0" layoutY="84.0" mnemonicParsing="false" onAction="#changePinAction" prefHeight="150.0" prefWidth="285.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%ChangePin">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="24.0" />
                </font>
             </Button>
-            <Button layoutX="375.0" layoutY="84.0" mnemonicParsing="false" prefHeight="517.0" prefWidth="285.0" style="-fx-background-color: #F2CD60;" text="%ApplyLoans">
+            <Button layoutX="335.0" layoutY="84.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="285.0" style="-fx-background-color: #F2CD60; -fx-text-fill: white;" text="%ApplyLoans">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="System Bold" size="24.0" />
                </font></Button>
-            <Button layoutX="700.0" layoutY="84.0" mnemonicParsing="false" prefHeight="517.0" prefWidth="285.0" text="Button" />
+            <ImageView fitHeight="384.0" fitWidth="384.0" layoutX="630.0" layoutY="99.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../img/GUI_More_Services.png" />
+               </image>
+            </ImageView>
+            <Button layoutX="828.0" layoutY="608.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="169.0" text="%Back" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" fx:id="btnHome" onAction="#backAction">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Button>
          </children>
       </AnchorPane>
    </children>

@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.CashWithdrawalController">
+<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.CashWithdrawalController">
    <children>
       <AnchorPane prefHeight="83.0" prefWidth="1024.0">
          <children>
-            <Button layoutX="472.0" layoutY="15.0" mnemonicParsing="false" onAction="#setZN" prefHeight="53.0" text="中文">
+            <Button layoutX="466.0" layoutY="15.0" mnemonicParsing="false" onAction="#setZN" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="中文">
                <font>
                   <Font size="24.0" />
                </font>
@@ -22,13 +26,13 @@
                </image>
             </ImageView>
             <Button fx:id="btnExit" layoutX="975.0" layoutY="29.0" mnemonicParsing="false" onAction="#exitAction" text="Exit" />
-            <Button layoutX="552.0" layoutY="15.0" mnemonicParsing="false" onAction="#setMS" prefHeight="53.0" text="Melayu">
+            <Button layoutX="562.0" layoutY="15.0" mnemonicParsing="false" onAction="#setMS" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="Melayu">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
             <Button fx:id="btnBack" layoutX="934.0" layoutY="29.0" mnemonicParsing="false" onAction="#backAction" text="Back" />
-            <Button layoutX="364.0" layoutY="15.0" mnemonicParsing="false" onAction="#setEN" prefHeight="53.0" text="English">
+            <Button layoutX="370.0" layoutY="15.0" mnemonicParsing="false" onAction="#setEN" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="English">
                <font>
                   <Font size="24.0" />
                </font>
@@ -37,105 +41,42 @@
       </AnchorPane>
       <AnchorPane layoutX="-4.0" layoutY="80.0" prefHeight="684.0" prefWidth="1024.0">
          <children>
-            <Label layoutX="275.0" layoutY="14.0" text="%EnterAmount">
+            <Label layoutX="28.0" layoutY="126.0" text="%EnterAmount">
                <font>
                   <Font size="36.0" />
                </font>
             </Label>
-            <TextField fx:id="txtFieldAmt" alignment="CENTER" layoutX="254.0" layoutY="67.0" prefHeight="60.0" prefWidth="517.0">
+            <TextField fx:id="txtFieldAmt" alignment="CENTER" layoutX="28.0" layoutY="179.0" prefHeight="60.0" prefWidth="517.0">
                <font>
                   <Font size="36.0" />
                </font>
             </TextField>
-            <AnchorPane layoutX="555.0" layoutY="170.0" prefHeight="500.0" prefWidth="433.0">
-               <children>
-                  <Button alignment="CENTER" layoutX="90.0" layoutY="15.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="1" textAlignment="CENTER">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" layoutX="183.0" layoutY="15.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="2" textAlignment="CENTER">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" layoutX="275.0" layoutY="15.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="3" textAlignment="CENTER">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" layoutX="90.0" layoutY="117.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="4" textAlignment="CENTER">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" layoutX="183.0" layoutY="117.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="5" textAlignment="CENTER">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" layoutX="275.0" layoutY="117.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="6" textAlignment="CENTER">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" layoutX="90.0" layoutY="219.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="7" textAlignment="CENTER">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" layoutX="183.0" layoutY="219.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="8" textAlignment="CENTER">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" layoutX="275.0" layoutY="219.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="9" textAlignment="CENTER">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="btnBackspace" alignment="CENTER" layoutX="90.0" layoutY="321.0" mnemonicParsing="false" onAction="#handleBackspaceButton" prefHeight="77.0" prefWidth="68.0" text="←" textAlignment="CENTER">
-                     <font>
-                        <Font size="30.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" layoutX="183.0" layoutY="321.0" mnemonicParsing="false" onAction="#keypadButtonAction" text="0" textAlignment="CENTER">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Button>
-                  <Button alignment="CENTER" layoutX="275.0" layoutY="321.0" mnemonicParsing="false" onAction="#keypadButtonAction" prefHeight="77.0" prefWidth="68.0" text="." textAlignment="CENTER">
-                     <font>
-                        <Font size="30.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="btnConfirm" alignment="CENTER" layoutX="90.0" layoutY="423.0" mnemonicParsing="false" onAction="#withdraw" prefHeight="77.0" prefWidth="254.0" text="%Confirm" textAlignment="CENTER">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Button>
-               </children>
-            </AnchorPane>
-            <AnchorPane layoutX="38.0" layoutY="170.0" prefHeight="500.0" prefWidth="433.0">
-               <children>
-                  <Label layoutX="14.0" layoutY="25.0" text="%From">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Label>
-                  <ChoiceBox fx:id="accDrpDwn" layoutX="14.0" layoutY="78.0" prefHeight="53.0" prefWidth="404.0" />
-               </children>
-            </AnchorPane>
-            <Label layoutX="265.0" layoutY="79.0" text="\$">
+            <Label layoutX="33.0" layoutY="191.0" text="\$">
                <font>
                   <Font size="36.0" />
                </font>
             </Label>
-            <Label layoutX="322.0" layoutY="144.0" text="%MinAmount" textFill="#ff2323">
+            <Label layoutX="28.0" layoutY="256.0" text="%MinAmount" textFill="#ff2323">
                <font>
                   <Font size="24.0" />
                </font>
             </Label>
+            <Button fx:id="btnConfirm" alignment="CENTER" layoutX="828.0" layoutY="608.0" mnemonicParsing="false" onAction="#withdraw" prefHeight="51.0" prefWidth="169.0" text="%Confirm" style="-fx-background-color: #F2CD60;-fx-text-fill: white;-fx-font-weight: bold" textAlignment="CENTER">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Button>
+            <Label layoutX="28.0" layoutY="291.0" text="%From">
+               <font>
+                  <Font size="36.0" />
+               </font>
+            </Label>
+            <ChoiceBox fx:id="accDrpDwn" layoutX="28.0" layoutY="344.0" prefHeight="53.0" prefWidth="404.0" style="-fx-font-size: 24px;-fx-background-color: #F2CD60;"/>
+            <ImageView fitHeight="384.0" fitWidth="384.0" layoutX="630.0" layoutY="99.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../img/GUI_Cash_Withdrawal.png" />
+               </image>
+            </ImageView>
          </children>
       </AnchorPane>
    </children>

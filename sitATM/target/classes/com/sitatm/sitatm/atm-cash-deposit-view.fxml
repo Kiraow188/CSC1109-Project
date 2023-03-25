@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Line?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.CashDepositController">
+<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.CashDepositController">
    <children>
       <AnchorPane prefHeight="83.0" prefWidth="1024.0">
          <children>
-            <Button layoutX="472.0" layoutY="15.0" mnemonicParsing="false" onAction="#setZN" prefHeight="53.0" text="中文">
+            <Button layoutX="466.0" layoutY="15.0" mnemonicParsing="false" onAction="#setZN" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="中文">
                <font>
                   <Font size="24.0" />
                </font>
@@ -26,13 +22,13 @@
                </image>
             </ImageView>
             <Button fx:id="btnExit" layoutX="975.0" layoutY="29.0" mnemonicParsing="false" onAction="#exitAction" text="Exit" />
-            <Button layoutX="552.0" layoutY="15.0" mnemonicParsing="false" onAction="#setMS" prefHeight="53.0" text="Melayu">
+            <Button layoutX="562.0" layoutY="15.0" mnemonicParsing="false" onAction="#setMS" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="Melayu">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
             <Button fx:id="btnBack" layoutX="934.0" layoutY="29.0" mnemonicParsing="false" onAction="#backAction" text="Back" />
-            <Button layoutX="364.0" layoutY="15.0" mnemonicParsing="false" onAction="#setEN" prefHeight="53.0" text="English">
+            <Button layoutX="370.0" layoutY="15.0" mnemonicParsing="false" onAction="#setEN" prefHeight="53.0" prefWidth="91.0" style="-fx-font-size: 18px; -fx-background-color: transparent; -fx-border-color: #F2CD60; -fx-border-radius: 40px;" text="English">
                <font>
                   <Font size="24.0" />
                </font>
@@ -46,30 +42,30 @@
                   <Font size="36.0" />
                </font>
             </Label>
-            <ChoiceBox fx:id="accDrpDwn" layoutX="28.0" layoutY="179.0" prefHeight="53.0" prefWidth="560.0" />
+            <ChoiceBox fx:id="accDrpDwn" layoutX="28.0" layoutY="179.0" prefHeight="53.0" prefWidth="560.0" style="-fx-font-size: 24px;-fx-background-color: #F2CD60;"/>
             <Label layoutX="28.0" layoutY="291.0" text="%DepositAmount">
                <font>
                   <Font size="36.0" />
                </font>
             </Label>
-            <TextField fx:id="txtFieldAmt" alignment="CENTER_RIGHT" layoutX="28.0" layoutY="344.0" prefHeight="53.0" prefWidth="560.0">
+            <TextField fx:id="txtFieldAmt" alignment="CENTER" layoutX="28.0" layoutY="344.0" prefHeight="53.0" prefWidth="560.0">
                <font>
                   <Font size="24.0" />
                </font>
             </TextField>
-            <Label layoutX="28.0" layoutY="344.0" text="\$">
+            <Label layoutX="33.0" layoutY="344.0" text="\$">
                <font>
                   <Font size="36.0" />
                </font>
             </Label>
-            <Button layoutX="828.0" layoutY="608.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="169.0" style="-fx-background-color: #F2CD60;" text="%Deposit" onAction="#deposit">
+            <Button layoutX="828.0" layoutY="608.0" mnemonicParsing="false" onAction="#deposit" prefHeight="51.0" prefWidth="169.0" fx:id="btnConfirm" style="-fx-background-color: #F2CD60;-fx-text-fill: white;-fx-font-weight: bold" text="%Deposit">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
-            <ImageView fitHeight="256.0" fitWidth="256.0" layoutX="678.0" layoutY="168.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="384.0" fitWidth="384.0" layoutX="630.0" layoutY="99.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../img/cash_deposit.png" />
+                  <Image url="@../../../img/GUI_Cash_Deposit.png" />
                </image>
             </ImageView>
          </children>

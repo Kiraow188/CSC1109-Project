@@ -7,7 +7,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.ATMController">
    <children>
-      <Label layoutX="213.0" layoutY="143.0" text="Welcome to SIT Bank">
+      <Label layoutX="213.0" layoutY="143.0" text="Welcome to SIT Bank" style="-fx-text-fill: #F2CD60;-fx-font-weight: bold">
          <font>
             <Font size="64.0" />
          </font>

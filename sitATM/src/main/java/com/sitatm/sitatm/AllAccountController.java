@@ -14,6 +14,8 @@ import java.sql.SQLException;
 
 public class AllAccountController {
     ATM atm = new ATM();
+    @FXML
+    private Button btnHome;
     private UserHolder holder = UserHolder.getInstance();
     private Localization l = holder.getLocalization();
     private Database db = holder.getDatabase();
@@ -32,13 +34,18 @@ public class AllAccountController {
     @FXML
     private void exitAction(ActionEvent event){
         try {
-            atm.changeScene("atm-exit-view.fxml");
+            atm.changeScene("atm-exit-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
     @FXML
     private void initialize() throws SQLException {
+        // Set the style of the button when the mouse is over it
+        btnHome.setOnMouseEntered(e -> btnHome.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 24px;"));
+        // Set the style of the button when the mouse leaves it
+        btnHome.setOnMouseExited(e -> btnHome.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 24px;"));
+
         String userID = account.getUserId();
         ResultSet accountSet = db.executeQuery("SELECT account_number from account where user_id = "+userID);
         ObservableList<String> accountNumbers = FXCollections.observableArrayList();
@@ -60,7 +67,7 @@ public class AllAccountController {
                 button.setPrefWidth(490);
                 button.setPrefHeight(130);
                 button.setAlignment(Pos.CENTER_LEFT);
-                button.setStyle("-fx-font-size: 24;-fx-background-color: #F2CD60;");
+                button.setStyle("-fx-font-size: 24;-fx-background-color: #F2CD60;-fx-text-fill: white;");
                 //button.setStyle("-fx-background-color: #F2CD60;");
                 // Add the button to the vbox
                 accountVBox.getChildren().add(button);

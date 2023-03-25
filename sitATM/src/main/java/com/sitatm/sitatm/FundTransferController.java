@@ -3,10 +3,7 @@ package com.sitatm.sitatm;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -24,6 +21,8 @@ public class FundTransferController {
     private TextField ToAccTxtBox;
     @FXML
     private TextField TransfAmtTxtbox;
+    @FXML
+    private Button btnConfirm;
     private UserHolder holder = UserHolder.getInstance();
     private Localization l = holder.getLocalization();
     private Account a = holder.getAccount();
@@ -41,7 +40,7 @@ public class FundTransferController {
     @FXML
     private void exitAction(ActionEvent event){
         try {
-            atm.changeScene("atm-exit-view.fxml");
+            atm.changeScene("atm-exit-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -173,6 +172,11 @@ public class FundTransferController {
     }
     @FXML
     public void initialize() throws SQLException {
+        // Set the style of the button when the mouse is over it
+        btnConfirm.setOnMouseEntered(e -> btnConfirm.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 24px;"));
+        // Set the style of the button when the mouse leaves it
+        btnConfirm.setOnMouseExited(e -> btnConfirm.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 24px;"));
+
         // Limit ToAccTxtBox to 9 characters
         UnaryOperator<TextFormatter.Change> filter = change -> {
             String text = change.getControlNewText();

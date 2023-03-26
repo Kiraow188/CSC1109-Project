@@ -17,6 +17,10 @@ public class MoreServicesController {
     private Button btnExit;
     @FXML
     private Button btnBack;
+    @FXML
+    private Button btnPinCng;
+    @FXML
+    private Button btnAppLoan;
     private UserHolder holder = UserHolder.getInstance();
     private Localization l = holder.getLocalization();
     private final String fxmlFile = "atm-more-services-view.fxml";
@@ -46,11 +50,22 @@ public class MoreServicesController {
         }
     }
     @FXML
+    private void applyLoanAction(ActionEvent event){
+        try{
+            atm.changeScene("atm-apply-loan-view.fxml",l.getLocale());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @FXML
     private void initialize(){
         // Set the style of the button when the mouse is over it
         btnHome.setOnMouseEntered(e -> btnHome.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 24px;"));
-        // Set the style of the button when the mouse leaves it
         btnHome.setOnMouseExited(e -> btnHome.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 24px;"));
+        btnPinCng.setOnMouseEntered(e -> btnPinCng.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 24px;"));
+        btnPinCng.setOnMouseExited(e -> btnPinCng.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 24px;"));
+        btnAppLoan.setOnMouseEntered(e -> btnAppLoan.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 24px;"));
+        btnAppLoan.setOnMouseExited(e -> btnAppLoan.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 24px;"));
 
         URL imageUrlExit = getClass().getResource("/img/exit.png");
         Image exitImage = new Image(imageUrlExit.toString());

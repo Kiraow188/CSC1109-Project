@@ -37,12 +37,12 @@
       </AnchorPane>
       <AnchorPane layoutY="83.0" prefHeight="685.0" prefWidth="1024.0">
          <children>
-            <Button layoutX="40.0" layoutY="84.0" mnemonicParsing="false" onAction="#changePinAction" prefHeight="150.0" prefWidth="285.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%ChangePin">
+            <Button fx:id="btnPinCng" layoutX="40.0" layoutY="84.0" mnemonicParsing="false" onAction="#changePinAction" prefHeight="150.0" prefWidth="285.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%ChangePin">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
             </Button>
-            <Button layoutX="335.0" layoutY="84.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="285.0" style="-fx-background-color: #F2CD60; -fx-text-fill: white;" text="%ApplyLoans">
+            <Button fx:id="btnAppLoan" layoutX="335.0" layoutY="84.0" mnemonicParsing="false" onAction="#applyLoanAction" prefHeight="150.0" prefWidth="285.0" style="-fx-background-color: #F2CD60; -fx-text-fill: white;" text="%ApplyLoans">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font></Button>
@@ -51,7 +51,7 @@
                   <Image url="@../../../img/GUI_More_Services.png" />
                </image>
             </ImageView>
-            <Button fx:id="btnHome" layoutX="828.0" layoutY="608.0" mnemonicParsing="false" onAction="#backAction" prefHeight="51.0" prefWidth="169.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%Back">
+            <Button fx:id="btnHome" layoutX="828.0" layoutY="608.0" mnemonicParsing="false" onAction="#backAction" prefHeight="51.0" prefWidth="169.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;-fx-font-weight: bold;" text="%Back">
                <font>
                   <Font size="24.0" />
                </font>

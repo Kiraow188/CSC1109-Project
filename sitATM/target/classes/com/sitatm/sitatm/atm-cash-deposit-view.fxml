@@ -48,7 +48,7 @@
                   <Font size="36.0" />
                </font>
             </Label>
-            <TextField fx:id="txtFieldAmt" alignment="CENTER" layoutX="28.0" layoutY="344.0" prefHeight="53.0" prefWidth="560.0">
+            <TextField fx:id="txtFieldAmt" alignment="CENTER_RIGHT" layoutX="28.0" layoutY="344.0" prefHeight="53.0" prefWidth="560.0">
                <font>
                   <Font size="24.0" />
                </font>

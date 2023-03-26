@@ -62,9 +62,9 @@
                   <Font size="24.0" />
                </font>
             </Button>
-            <ImageView fitHeight="256.0" fitWidth="256.0" layoutX="678.0" layoutY="168.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="384.0" fitWidth="384.0" layoutX="630.0" layoutY="99.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../img/change_password.png" />
+                  <Image url="@../../../img/GUI_Change_Pin.png" />
                </image>
             </ImageView>
          </children>

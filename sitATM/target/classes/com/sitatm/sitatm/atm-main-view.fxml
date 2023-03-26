@@ -36,7 +36,7 @@
       </AnchorPane>
       <AnchorPane layoutY="85.0" prefHeight="684.0" prefWidth="1024.0">
          <children>
-            <Button fx:id="btnWithdrawl" layoutX="77.0" layoutY="96.0" mnemonicParsing="false" onAction="#cashWithdrawalAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;-fx-border-radius: 40px;" text="%CashWithdraw">
+            <Button fx:id="btnWithdrawl" layoutX="77.0" layoutY="96.0" mnemonicParsing="false" onAction="#cashWithdrawalAction" prefHeight="180.0" prefWidth="180.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%CashWithdraw">
                <font>
                   <Font name="System Bold" size="16.0" />
                </font></Button>

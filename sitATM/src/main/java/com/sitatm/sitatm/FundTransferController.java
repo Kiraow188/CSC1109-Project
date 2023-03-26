@@ -198,13 +198,17 @@ public class FundTransferController {
         // Limit ToAccTxtBox to 9 characters
         UnaryOperator<TextFormatter.Change> filter = change -> {
             String text = change.getControlNewText();
+            String amountTxt = change.getControlNewText();
             if (text.matches("\\d{0,9}")) {
+                return change;
+            }
+            if (amountTxt.matches("\\d")){
                 return change;
             }
             return null;
         };
         ToAccTxtBox.setTextFormatter(new TextFormatter<String>(filter));
-
+        TransfAmtTxtbox.setTextFormatter(new TextFormatter<String>(filter));
         System.out.println("Hi it's me debuggy!");
         String userID = a.getUserId();
         System.out.println("Debuggy{167}: Current UserID is - "+userID);

@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.ChangePinController">
+<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.ApplyLoanController">
    <children>
       <AnchorPane prefHeight="83.0" prefWidth="1024.0">
          <children>
@@ -37,36 +37,43 @@
       </AnchorPane>
       <AnchorPane layoutY="83.0" prefHeight="685.0" prefWidth="1024.0">
          <children>
-            <Label layoutX="28.0" layoutY="51.0" text="%OldPin">
+            <Label layoutX="28.0" layoutY="51.0" text="%AccNum">
                <font>
                   <Font size="36.0" />
                </font>
             </Label>
-            <PasswordField fx:id="oldPassTxtbox" layoutX="28.0" layoutY="104.0" prefHeight="53.0" prefWidth="560.0">
-               <font>
-                  <Font size="24.0" />
-               </font>
-            </PasswordField>
-            <Label layoutX="28.0" layoutY="216.0" text="%NewPin">
+            <Label layoutX="28.0" layoutY="216.0" text="%LoanAmt">
                <font>
                   <Font size="36.0" />
                </font>
             </Label>
-            <PasswordField fx:id="newPassTxtbox" layoutX="28.0" layoutY="269.0" prefHeight="53.0" prefWidth="560.0">
-               <font>
-                  <Font size="24.0" />
-               </font>
-            </PasswordField>
-            <Button fx:id="btnConfirm" layoutX="828.0" layoutY="608.0" mnemonicParsing="false" onAction="#changePin" prefHeight="51.0" prefWidth="169.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;-fx-font-weight: bold;" text="%ChangePin">
+            <Button fx:id="btnConfirm" layoutX="828.0" layoutY="608.0" mnemonicParsing="false" onAction="#applyLoan" prefHeight="51.0" prefWidth="169.0" style="-fx-background-color: #F2CD60;-fx-text-fill: white;-fx-font-weight: bold;" text="%Apply">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
             <ImageView fitHeight="384.0" fitWidth="384.0" layoutX="630.0" layoutY="99.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../img/GUI_Change_Pin.png" />
+                  <Image url="@../../../img/GUI_Loan_Application.png" />
                </image>
             </ImageView>
+            <TextField fx:id="txtFieldAmt" layoutX="28.0" layoutY="270.0" prefHeight="51.0" prefWidth="560.0">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </TextField>
+            <ChoiceBox fx:id="periodDrpDwn" layoutX="28.0" layoutY="431.0" prefHeight="53.0" prefWidth="560.0" style="-fx-font-size: 24px;-fx-background-color: #F2CD60;" />
+            <Label layoutX="28.0" layoutY="378.0" text="%LoanPeriod">
+               <font>
+                  <Font size="36.0" />
+               </font>
+            </Label>
+            <ChoiceBox fx:id="accDrpDwn" layoutX="28.0" layoutY="104.0" prefHeight="53.0" prefWidth="560.0" style="-fx-font-size: 24px;-fx-background-color: #F2CD60;" />
+            <Label layoutX="33.0" layoutY="269.0" text="\$">
+               <font>
+                  <Font size="36.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </children>

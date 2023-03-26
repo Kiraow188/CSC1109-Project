@@ -35,7 +35,7 @@ public class ChangePinController {
     @FXML
     private void backAction(ActionEvent event){
         try {
-            atm.changeScene("atm-main-view.fxml",l.getLocale());
+            atm.changeScene("atm-more-services-view.fxml",l.getLocale());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

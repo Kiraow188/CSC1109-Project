@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.UnaryOperator;
 
 public class CashDepositController {
     ATM atm = new ATM();
@@ -166,5 +167,13 @@ public class CashDepositController {
         } catch (SQLException e ){
             System.out.println("SQL Exception caught: " + e);
         }
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String text = change.getControlNewText();
+            if (text.matches("\\d*")) {
+                return change;
+            }
+            return null;
+        };
+        txtFieldAmt.setTextFormatter(new TextFormatter<String>(filter));
     }
 }

@@ -45,27 +45,9 @@ public class ATMController {
         setImageSize(cardReader);
         // Programmatically load the image onto the ImageView
         cardReader.setImage(cardReaderImg);
-        // Change image when the card reader is clicked
-        /**cardReader.setOnMouseClicked(event -> {
-         try {
-         root = FXMLLoader.load(getClass().getResource("card-selection-view.fxml"));
-         Stage cardSelection = new Stage();
-         StackPane layout = new StackPane();
-         Scene scene = new Scene(root);
-         cardSelection.setTitle("Select your Card");
-         cardSelection.setScene(scene);
-         cardSelection.getIcons().add(new Image(ATM.class.getResourceAsStream("/cardIcon.png")));
-         // set the stage to be non-resizable
-         cardSelection.setResizable(false);
-         cardSelection.show();
-         } catch (IOException e) {
-         throw new RuntimeException(e);
-         }
-         });**/
         // Textbox prompt for user to key in the card number
         cardReader.setOnMouseClicked(event -> {
             setImageSize(cardReader, 428, 369);
-            //Image cardReaderWCardImg = updateImage("/img/card_reader_w_card.png");
             cardReader.setImage(cardReaderWCardImg);
 
             AtomicBoolean validAccountNumber = new AtomicBoolean(false);

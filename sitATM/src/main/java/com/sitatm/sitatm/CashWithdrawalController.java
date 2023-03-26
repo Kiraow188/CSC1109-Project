@@ -22,7 +22,6 @@ import java.util.function.UnaryOperator;
 
 public class CashWithdrawalController {
     ATM atm = new ATM();
-    //ConfirmationViewController cvc = new ConfirmationViewController();
     @FXML
     private Button btnBack;
     @FXML

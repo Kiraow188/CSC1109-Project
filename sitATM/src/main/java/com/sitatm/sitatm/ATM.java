@@ -39,26 +39,10 @@ public class ATM extends Application {
         stg = primaryStage;
         Parent root = FXMLLoader.load(getClass().getResource("atm-login-view.fxml"));
         primaryStage.setTitle("SIT ATM");
-        primaryStage.getIcons().add(new Image(ATM.class.getResourceAsStream("/icon.png")));
+        primaryStage.getIcons().add(new Image(ATM.class.getResourceAsStream("/img/icon.png")));
         primaryStage.setResizable(false);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-
-        /**
-        // create a new FXMLLoader and load the FXML file "atm-view.fxml"
-        FXMLLoader fxmlLoader = new FXMLLoader(ATM.class.getResource("atm-view.fxml"));
-        // create a new Scene using the loaded FXML file and set it to the stage
-        Scene cardScene = new Scene(fxmlLoader.load());
-        // set the title of the stage to "SIT ATM"
-        primaryStage.setTitle("SIT ATM");
-        // load the icon.png image from the resources folder and add it to the stage
-        primaryStage.getIcons().add(new Image(ATM.class.getResourceAsStream("/icon.png")));
-        // set the stage to be non-resizable
-        primaryStage.setResizable(false);
-        // set the scene to the stage and show the stage
-        primaryStage.setScene(cardScene);
-        primaryStage.show();
-         **/
     }
     public void changeScene(String fxml) throws IOException{
         Parent pane = FXMLLoader.load(getClass().getResource(fxml));

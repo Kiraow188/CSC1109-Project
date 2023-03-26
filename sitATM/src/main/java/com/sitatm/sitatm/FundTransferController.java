@@ -57,30 +57,20 @@ public class FundTransferController {
         String fromAccNo = FromAccDrpDwn.getValue();
         String toAccNo = ToAccTxtBox.getText();
         if (FromAccDrpDwn.getValue() == null){
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Fund Transfer Confirmation");
-            withdrawConfirmation.setGraphic(null);
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Fund Transfer Warning");
             withdrawConfirmation.setHeaderText("Please select an account number to transfer from!");
             withdrawConfirmation.showAndWait();
         }
         else if (ToAccTxtBox.getText().equals("")){
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Fund Transfer Confirmation");
-            withdrawConfirmation.setGraphic(null);
-            withdrawConfirmation.setHeaderText("Please enter account number!");
-            withdrawConfirmation.showAndWait();
-        }
-        else if (!ToAccTxtBox.getText().matches("\\d{9}")){
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Fund Transfer Confirmation");
-            withdrawConfirmation.setGraphic(null);
-            withdrawConfirmation.setHeaderText("Account number must only contain digits!");
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Fund Transfer Warning");
+            withdrawConfirmation.setHeaderText("Please there the recipient's Account Number!");
             withdrawConfirmation.showAndWait();
         }
         else if (TransfAmtTxtbox.getText().equals("")){
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Fund Transfer Confirmation");
-            withdrawConfirmation.setGraphic(null);
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Fund Transfer Warning");
             withdrawConfirmation.setHeaderText("Please enter the amount you want to transfer!");
             withdrawConfirmation.showAndWait();
         }
@@ -107,7 +97,6 @@ public class FundTransferController {
                 if (accReBalanceFrom < transfer_amount) {
                     Alert withdrawalError = new Alert(Alert.AlertType.ERROR);
                     withdrawalError.setTitle("SIT ATM: Fund Transfer Error");
-                    withdrawalError.setGraphic(null);
                     withdrawalError.setHeaderText("You do not have sufficient funds to perform this action.");
                     withdrawalError.showAndWait();
                 }else{
@@ -145,14 +134,24 @@ public class FundTransferController {
                     transferToAmountBalance.setDouble(7, accReBalanceTo);
                     if (db.executeUpdate(transferFromAmountBalance) > 0 && db.executeUpdate(transferToAmountBalance) > 0) {
                         Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
-                        succAlert.setTitle("Success!");
-                        succAlert.setHeaderText(null);
-                        succAlert.setContentText("You have successfully transferred: $"+transfer_amount+"\n To: "+toAccNo);
+                        succAlert.setTitle("SIT ATM: Fund Transfer Successful!");
+                        succAlert.setHeaderText("You have successfully transferred: $"+transfer_amount+"\n To: "+toAccNo);
                         succAlert.showAndWait();
                         try {
                             atm.changeScene("atm-main-view.fxml",l.getLocale());
                         } catch (IOException e) {
                             throw new RuntimeException(e);
+                        }
+                    }
+                    else{
+                        Alert errAlert = new Alert(Alert.AlertType.ERROR);
+                        errAlert.setTitle("SIT ATM: Fund Transfer Failure!");
+                        errAlert.setHeaderText("Something went wrong, please try again later.");
+                        errAlert.showAndWait();
+                        try{
+                            atm.changeScene(fxmlFile,l.getLocale());
+                        } catch (IOException e) {
+                            System.out.println("IOException caught: "+e);
                         }
                     }
                 }

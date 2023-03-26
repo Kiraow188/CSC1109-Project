@@ -90,23 +90,20 @@ public class CashWithdrawalController {
             // Call your "No" function here
         }**/
         if (txtFieldAmt.getText().equals("")){
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Withdrawal Confirmation");
-            withdrawConfirmation.setGraphic(null);
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Withdrawal Warning");
             withdrawConfirmation.setHeaderText("Please enter an amount!");
             withdrawConfirmation.showAndWait();
         }
         else if (Integer.parseInt(txtFieldAmt.getText()) < 20){
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Withdrawal Confirmation");
-            withdrawConfirmation.setGraphic(null);
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Withdrawal Warning");
             withdrawConfirmation.setHeaderText("Minimum withdrawal amount is $20!");
             withdrawConfirmation.showAndWait();
         }
         else if (accDrpDwn.getValue() == null){
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Withdrawal Confirmation");
-            withdrawConfirmation.setGraphic(null);
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Withdrawal Warning");
             withdrawConfirmation.setHeaderText("Please select an account number to withdraw from!");
             withdrawConfirmation.showAndWait();
         }
@@ -133,7 +130,6 @@ public class CashWithdrawalController {
                     if (accReBalance < withdraw_amount){
                         Alert withdrawalError = new Alert(Alert.AlertType.ERROR);
                         withdrawalError.setTitle("SIT ATM: Withdrawal Error");
-                        withdrawalError.setGraphic(null);
                         withdrawalError.setHeaderText("You do not have sufficient funds to perform this action.");
                         withdrawalError.showAndWait();
                     }else {
@@ -149,9 +145,9 @@ public class CashWithdrawalController {
                         depositAmountBalance.setDouble(7, accReBalance);
                         if (db.executeUpdate(depositAmountBalance) > 0) {
                             Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
-                            succAlert.setTitle("Success!");
-                            succAlert.setHeaderText(null);
-                            succAlert.setContentText("$"+withdraw_amount+" has been withdrawn successfully!" +
+                            succAlert.setTitle("SIT ATM: Withdrawal Successful!");
+                            succAlert.setGraphic(null);
+                            succAlert.setHeaderText("$"+withdraw_amount+" has been withdrawn successfully!" +
                                     "\nCurrent Available Balance: $"+accReBalance+
                                     "\n\nThank you for banking with us!");
                             succAlert.showAndWait();
@@ -159,6 +155,17 @@ public class CashWithdrawalController {
                                 atm.changeScene("atm-main-view.fxml",l.getLocale());
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
+                            }
+                        }
+                        else{
+                            Alert errAlert = new Alert(Alert.AlertType.ERROR);
+                            errAlert.setTitle("SIT ATM: Cash Withdrawal Failure!");
+                            errAlert.setHeaderText("Something went wrong, please try again later.");
+                            errAlert.showAndWait();
+                            try{
+                                atm.changeScene(fxmlFile,l.getLocale());
+                            } catch (IOException e) {
+                                System.out.println("IOException caught: "+e);
                             }
                         }
                     }

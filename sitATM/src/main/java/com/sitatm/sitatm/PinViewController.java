@@ -77,7 +77,10 @@ public class PinViewController {
             if (resultSet.next()) {
                 String custName = resultSet.getString("full_name");
                 String userID = resultSet.getString("user_id");
+                String email = resultSet.getString("email");
                 customer.setfName(custName);
+                customer.setUserID(userID);
+                customer.setEmail(email);
                 holder.setUser(customer);
                 holder.setLocalization(localization);
                 holder.setAccount(user);

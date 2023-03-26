@@ -49,18 +49,18 @@ public class Account {
     }
 
     public Boolean checkAccountStatus(String accountNo){
-        Database db = UserHolder.getInstance().getDatabase();
+        Database db = new Database();
         boolean isDeactivated = true;
         try {
-            ResultSet resultSet = db
+            ResultSet statusResultSet = db
                     .executeQuery("SELECT deactivation_date FROM account WHERE account_number=" + accountNo);
-            if (resultSet.next()) {
-                String deactivationDate = resultSet.getString("deactivation_date");
+            if (statusResultSet.next()) {
+                String deactivationDate = statusResultSet.getString("deactivation_date");
                 if (deactivationDate == null) {
                     return isDeactivated = false;
                 }
             }
-            db.closeConnection();
+            //db.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }

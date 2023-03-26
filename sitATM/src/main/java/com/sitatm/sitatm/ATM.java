@@ -31,7 +31,7 @@ public class ATM extends Application {
                 //System.out.println(resultSet.getString(1) + " " + resultSet.getString(2));
                 System.out.println(resultSet.getString(1));
             }
-            db.closeConnection();
+            //db.closeConnection();
         }catch (SQLException e) {
             System.err.println("Error executing SQL query. Details: " + e.getMessage());
         }

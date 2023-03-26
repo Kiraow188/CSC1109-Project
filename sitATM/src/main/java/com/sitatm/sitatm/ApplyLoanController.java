@@ -27,6 +27,7 @@ public class ApplyLoanController {
     private Localization l = holder.getLocalization();
     private Database db = holder.getDatabase();
     private Account account = holder.getAccount();
+    private Customer customer = holder.getUser();
     private final String fxmlFile = "atm-apply-loan-view.fxml";
     @FXML
     private Button btnExit;
@@ -59,33 +60,29 @@ public class ApplyLoanController {
     @FXML
     private void applyLoan(ActionEvent event) throws SQLException, IOException {
         if (accDrpDwn.getValue() == null) {
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Loan Application Error");
-            withdrawConfirmation.setGraphic(null);
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Loan Application Warning");
             withdrawConfirmation.setHeaderText("Please select an account number to withdraw from!");
             withdrawConfirmation.showAndWait();
         } else if (txtFieldAmt.getText().equals("")) {
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Loan Application Error");
-            withdrawConfirmation.setGraphic(null);
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Loan Application Warning");
             withdrawConfirmation.setHeaderText("Please enter an amount!");
             withdrawConfirmation.showAndWait();
         } else if (Integer.parseInt(txtFieldAmt.getText()) < 1) {
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Loan Application Error");
-            withdrawConfirmation.setGraphic(null);
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Loan Application Warning");
             withdrawConfirmation.setHeaderText("You cannot loan an amount less than $0");
             withdrawConfirmation.showAndWait();
         } else if (periodDrpDwn.getValue() == null){
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Loan Application Error");
-            withdrawConfirmation.setGraphic(null);
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Loan Application Warning");
             withdrawConfirmation.setHeaderText("Please select a loan period from the drop down list!");
             withdrawConfirmation.showAndWait();
         }
         else {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("SIT ATM: Loan Application Error");
+            alert.setTitle("SIT ATM: Loan Application Confirmation");
             alert.setHeaderText("Please confirm the following action: \n\nLoan Application\nPrinciple Amount: $" + txtFieldAmt.getText() + "\nFor Account Number: " + accDrpDwn.getValue());
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK){
@@ -132,7 +129,7 @@ public class ApplyLoanController {
                         String formattedResult = decimalFormat.format(calcDebt);
                         calcDebt = Double.parseDouble(formattedResult);
                         Alert finalConfirmation = new Alert(Alert.AlertType.CONFIRMATION);
-                        finalConfirmation.setTitle("SIT ATM: Loan Application Error");
+                        finalConfirmation.setTitle("SIT ATM: Loan Application Confirmation");
                         finalConfirmation.setHeaderText("Break down of monthly instalment \n\nPrinciple Amount: $"+loanAmt+"\nLoan Duration: "+loanType+" Months\nMonthly Repayment: $"+calcDebt+" per month. \n\nDo you wish to proceed?");
                         Optional<ButtonType> cfmResult = finalConfirmation.showAndWait();
                         if (cfmResult.isPresent() && cfmResult.get() == ButtonType.OK){
@@ -155,20 +152,26 @@ public class ApplyLoanController {
                             int rowsDptAffected = depositAmountBalance.executeUpdate();
                             if (rowsDptAffected <= 0) {
                                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                                errorAlert.setTitle("SIT ATM: Loan Application Error");
-                                errorAlert.setHeaderText(null);
+                                errorAlert.setTitle("SIT ATM: Loan Application Failure");
                                 errorAlert.setContentText("Something went wrong while processing your loan. Please try again later.");
                                 errorAlert.showAndWait();
                             } else {
                                 Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
                                 succAlert.setTitle("SIT ATM: Loan Application Success");
-                                succAlert.setHeaderText(null);
-                                succAlert.setContentText("Your loan application has been submitted successfully!");
+                                succAlert.setGraphic(null);
+                                succAlert.setHeaderText("Your loan application has been submitted successfully!");
                                 succAlert.showAndWait();
+                                Email.sendLoanApplicationEmail(customer.getEmail());
                                 atm.changeScene("atm-main-view",l.getLocale());
                             }
                         }
                     }
+                }
+                else{
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setTitle("SIT ATM: Loan Application Failure");
+                    errorAlert.setHeaderText("You cannot apply for loan on a deactivated account!");
+                    errorAlert.showAndWait();
                 }
             }
 

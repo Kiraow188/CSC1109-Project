@@ -152,7 +152,7 @@ public class MainViewController {
 
         String accNo = a.getAccountNo();
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("SIT ATM: Fast Cash Withdrawal");
+        alert.setTitle("SIT ATM: Fast Cash Withdrawal Confirmation");
         alert.setHeaderText("Please confirm the following action: \n\nWithdraw: $"+buttonValue+"\nFrom Account Number: "+a.getAccountNo());
 
         Optional<ButtonType> result = alert.showAndWait();
@@ -171,8 +171,7 @@ public class MainViewController {
                 accReBalance = accReBalance - withdraw_amount;
                 if (accReBalance < withdraw_amount){
                     Alert withdrawalError = new Alert(Alert.AlertType.ERROR);
-                    withdrawalError.setTitle("SIT ATM: Withdrawal Error");
-                    withdrawalError.setGraphic(null);
+                    withdrawalError.setTitle("SIT ATM: Fast Cash Withdrawal Error");
                     withdrawalError.setHeaderText("You do not have sufficient funds to perform this action.");
                     withdrawalError.showAndWait();
                 }else {
@@ -188,16 +187,27 @@ public class MainViewController {
                     depositAmountBalance.setDouble(7, accReBalance);
                     if (db.executeUpdate(depositAmountBalance) > 0) {
                         Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
-                        succAlert.setTitle("Success!");
-                        succAlert.setHeaderText(null);
-                        succAlert.setContentText("$"+withdraw_amount+" has been withdrawn successfully!" +
+                        succAlert.setTitle("SIT ATM: Fast Cash Withdrawal Successful!");
+                        succAlert.setGraphic(null);
+                        succAlert.setHeaderText("$"+withdraw_amount+" has been withdrawn successfully!" +
                                 "\nCurrent Available Balance: $"+accReBalance+
                                 "\n\nThank you for banking with us!");
                         succAlert.showAndWait();
                     }
+                    else{
+                        Alert errAlert = new Alert(Alert.AlertType.ERROR);
+                        errAlert.setTitle("SIT ATM: Fast Cash Withdrawal Failure!");
+                        errAlert.setHeaderText("Something went wrong, please try again later.");
+                        errAlert.showAndWait();
+                        try{
+                            atm.changeScene(fxmlFile,l.getLocale());
+                        } catch (IOException e) {
+                            System.out.println("IOException caught: "+e);
+                        }
+                    }
                 }
             } catch (Exception e) {
-                System.out.println("An exception has occured: " + e);
+                System.out.println("An exception has occurred: " + e);
             }
         } else {
             System.out.println("Debuggy{149}: walao waste my time!");

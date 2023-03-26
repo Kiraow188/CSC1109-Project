@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,6 +21,7 @@ import java.util.function.UnaryOperator;
 public class ATMController {
     ATM atm = new ATM();
     UserHolder holder = UserHolder.getInstance();
+    Database db = holder.getDatabase();
     private Stage stage;
     private Scene scene;
     private Parent root;
@@ -54,7 +56,7 @@ public class ATMController {
             while (!validAccountNumber.get()) {
                 TextInputDialog dialog = new TextInputDialog();
                 dialog.setGraphic(null);
-                dialog.setTitle("Card Details");
+                dialog.setTitle("SIT ATM");
                 dialog.setHeaderText("Please enter your account number");
                 dialog.setContentText("Account Number: ");
 
@@ -78,33 +80,42 @@ public class ATMController {
                 Optional<String> accNum = dialog.showAndWait();
                 if (accNum.isPresent()) {
                     String input = accNum.get();
-                    Database db = new Database();
+                    //Database db = new Database();
                     try {
                         ResultSet resultSet = db.executeQuery("SELECT * FROM account where account_number='"+input+"'");
                         if (resultSet.next()){
                             Account user = new Account();
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-pin-view.fxml"));
-                            Parent root = loader.load();
-                            PinViewController controller = loader.getController();
-                            String userID = resultSet.getString("user_id");
-                            String pin = resultSet.getString("pin");
-                            String salt = resultSet.getString("salt");
-                            user.setAccountNo(input);
-                            user.setUserId(userID);
-                            user.setPin(pin);
-                            user.setSalt(salt);
-                            controller.setUser(user);
-                            holder.setAccount(user);
-                            validAccountNumber.set(true);
-                            Scene scene = new Scene(root);
-                            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                            stage.setScene(scene);
-                            stage.show();
-                            //atm.changeScene("atm-pin-view.fxml");
+                            Boolean isDeactived = user.checkAccountStatus(input);
+                            if (!isDeactived) {
+                                FXMLLoader loader = new FXMLLoader(getClass().getResource("atm-pin-view.fxml"));
+                                Parent root = loader.load();
+                                PinViewController controller = loader.getController();
+                                String userID = resultSet.getString("user_id");
+                                String pin = resultSet.getString("pin");
+                                String salt = resultSet.getString("salt");
+                                user.setAccountNo(input);
+                                user.setUserId(userID);
+                                user.setPin(pin);
+                                user.setSalt(salt);
+                                controller.setUser(user);
+                                holder.setAccount(user);
+                                validAccountNumber.set(true);
+                                Scene scene = new Scene(root);
+                                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                                stage.setScene(scene);
+                                stage.show();
+                                //atm.changeScene("atm-pin-view.fxml");
+                            }
+                            else {
+                                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                                errorAlert.setTitle("SIT ATM");
+                                errorAlert.setHeaderText("You cannot login using a deactivated account.\nPlease contact us for more information.");
+                                errorAlert.showAndWait();
+                            }
                         }else{
                             System.out.println("Incorrect Account number, please try again.");
                             Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Error");
+                            alert.setTitle("SIT ATM");
                             alert.setHeaderText("Invalid Account Number");
                             alert.setContentText("The account number you entered is incorrect. Please try again.");
                             alert.showAndWait();

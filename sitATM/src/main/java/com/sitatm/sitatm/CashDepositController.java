@@ -58,22 +58,22 @@ public class CashDepositController {
     @FXML
     private void deposit(ActionEvent event) throws SQLException {
         if (accDrpDwn.getValue() == null){
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Cash Deposit Confirmation");
-            withdrawConfirmation.setGraphic(null);
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Cash Deposit Warning");
+            //withdrawConfirmation.setGraphic(null);
             withdrawConfirmation.setHeaderText("Please select an account number to withdraw from!");
             withdrawConfirmation.showAndWait();
         }
         else if (txtFieldAmt.getText().equals("")){
-            Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
-            withdrawConfirmation.setTitle("SIT ATM: Cash Deposit Confirmation");
-            withdrawConfirmation.setGraphic(null);
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Cash Deposit Warning");
+            //withdrawConfirmation.setGraphic(null);
             withdrawConfirmation.setHeaderText("Please enter an amount!");
             withdrawConfirmation.showAndWait();
         }
         else {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("SIT ATM: Cash Deposit");
+            alert.setTitle("SIT ATM: Cash Deposit Confirmation");
             alert.setHeaderText("Please confirm the following action: " +
                     "\n\nDeposit: $"+txtFieldAmt.getText()+"\nTo Account Number: "+accDrpDwn.getValue());
 
@@ -104,15 +104,26 @@ public class CashDepositController {
                     depositAmountBalance.setDouble(7, accReBalance);
                     if (db.executeUpdate(depositAmountBalance) > 0) {
                         Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
-                        succAlert.setTitle("Success!");
-                        succAlert.setHeaderText(null);
-                        succAlert.setContentText("$"+deposit_amount+" has been deposited successfully.\nCurrent Available Balance: $"+accReBalance+
+                        succAlert.setTitle("SIT ATM: Cash Deposit Successful!");
+                        succAlert.setGraphic(null);
+                        succAlert.setHeaderText("$"+deposit_amount+" has been deposited successfully.\nCurrent Available Balance: $"+accReBalance+
                                 "\n\nThank you for banking with us!");
                         succAlert.showAndWait();
                         try {
                             atm.changeScene("atm-main-view.fxml",l.getLocale());
                         } catch (IOException e) {
                             throw new RuntimeException(e);
+                        }
+                    }
+                    else{
+                        Alert errAlert = new Alert(Alert.AlertType.ERROR);
+                        errAlert.setTitle("SIT ATM: Cash Deposit Failure!");
+                        errAlert.setHeaderText("Something went wrong, please try again later.");
+                        errAlert.showAndWait();
+                        try{
+                            atm.changeScene(fxmlFile,l.getLocale());
+                        } catch (IOException e) {
+                            System.out.println("IOException caught: "+e);
                         }
                     }
                 } catch (Exception e) {

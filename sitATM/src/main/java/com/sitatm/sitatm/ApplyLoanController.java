@@ -27,7 +27,7 @@ public class ApplyLoanController {
     private Localization l = holder.getLocalization();
     private Database db = holder.getDatabase();
     private Account account = holder.getAccount();
-    private final String fxmlFile = "atm-change-pin-view.fxml";
+    private final String fxmlFile = "atm-apply-loan-view.fxml";
     @FXML
     private Button btnExit;
     @FXML
@@ -57,7 +57,7 @@ public class ApplyLoanController {
         }
     }
     @FXML
-    private void applyLoan(ActionEvent event) throws SQLException {
+    private void applyLoan(ActionEvent event) throws SQLException, IOException {
         if (accDrpDwn.getValue() == null) {
             Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
             withdrawConfirmation.setTitle("SIT ATM: Loan Application Error");
@@ -86,7 +86,7 @@ public class ApplyLoanController {
         else {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("SIT ATM: Loan Application Error");
-            alert.setHeaderText("Please confirm the following action: \n\nLoan Application\nLoan Amount: $" + txtFieldAmt.getText() + "\nFor Account Number: " + accDrpDwn.getValue());
+            alert.setHeaderText("Please confirm the following action: \n\nLoan Application\nPrinciple Amount: $" + txtFieldAmt.getText() + "\nFor Account Number: " + accDrpDwn.getValue());
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK){
                 Boolean isDeactived = account.checkAccountStatus(account.getAccountNo());
@@ -126,11 +126,14 @@ public class ApplyLoanController {
                         withdrawConfirmation.setHeaderText("Account Number: " + accReNo + " has an ongoing loan.");
                         withdrawConfirmation.showAndWait();
                     } else {
+                        DecimalFormat decimalFormat = new DecimalFormat("#.##");
                         double calcDebt = (loanAmt / ((Math.pow(1 + ((intRate / 100) / 12), loanType) - 1)
                                 / (((intRate / 100) / 12) * (Math.pow(1 + ((intRate / 100) / 12), loanType)))));
+                        String formattedResult = decimalFormat.format(calcDebt);
+                        calcDebt = Double.parseDouble(formattedResult);
                         Alert finalConfirmation = new Alert(Alert.AlertType.CONFIRMATION);
                         finalConfirmation.setTitle("SIT ATM: Loan Application Error");
-                        finalConfirmation.setHeaderText("Installment Per Month for Principle $"+loanAmt+"\nLoan Type: "+loanType+" Months\nCalculates to $"+calcDebt+" per month. \n\nDo you wish to proceed?");
+                        finalConfirmation.setHeaderText("Break down of monthly instalment \n\nPrinciple Amount: $"+loanAmt+"\nLoan Duration: "+loanType+" Months\nMonthly Repayment: $"+calcDebt+" per month. \n\nDo you wish to proceed?");
                         Optional<ButtonType> cfmResult = finalConfirmation.showAndWait();
                         if (cfmResult.isPresent() && cfmResult.get() == ButtonType.OK){
                             DecimalFormat df = new DecimalFormat("#.##");
@@ -162,6 +165,7 @@ public class ApplyLoanController {
                                 succAlert.setHeaderText(null);
                                 succAlert.setContentText("Your loan application has been submitted successfully!");
                                 succAlert.showAndWait();
+                                atm.changeScene("atm-main-view",l.getLocale());
                             }
                         }
                     }
@@ -228,5 +232,7 @@ public class ApplyLoanController {
             return null;
         };
         txtFieldAmt.setTextFormatter(new TextFormatter<String>(filter));
+
+
     }
 }

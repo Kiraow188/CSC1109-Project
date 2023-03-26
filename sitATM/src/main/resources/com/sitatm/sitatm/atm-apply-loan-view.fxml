@@ -57,7 +57,7 @@
                   <Image url="@../../../img/GUI_Loan_Application.png" />
                </image>
             </ImageView>
-            <TextField fx:id="txtFieldAmt" layoutX="28.0" layoutY="270.0" prefHeight="51.0" prefWidth="560.0">
+            <TextField fx:id="txtFieldAmt" alignment="CENTER_RIGHT" layoutX="28.0" layoutY="270.0" prefHeight="51.0" prefWidth="560.0">
                <font>
                   <Font size="24.0" />
                </font>
@@ -74,6 +74,7 @@
                   <Font size="36.0" />
                </font>
             </Label>
+            <Button alignment="TOP_LEFT" layoutX="27.0" layoutY="531.0" mnemonicParsing="false" prefHeight="116.0" prefWidth="560.0" style="-fx-font-size: 24;-fx-background-color: #F2CD60;-fx-text-fill: white;" text="%Notice" />
          </children>
       </AnchorPane>
    </children>

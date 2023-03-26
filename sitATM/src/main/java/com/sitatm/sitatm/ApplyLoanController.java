@@ -161,7 +161,7 @@ public class ApplyLoanController {
                                 succAlert.setGraphic(null);
                                 succAlert.setHeaderText("Your loan application has been submitted successfully!");
                                 succAlert.showAndWait();
-                                Email.sendLoanApplicationEmail(customer.getEmail());
+                                Email.sendLoanApplicationEmail(customer.getfName(),customer.getEmail());
                                 atm.changeScene("atm-main-view",l.getLocale());
                             }
                         }

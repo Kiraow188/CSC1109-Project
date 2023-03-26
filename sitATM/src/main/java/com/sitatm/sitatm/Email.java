@@ -127,7 +127,7 @@ public class Email {
         }
     }
 
-    public static void sendLoanApplicationEmail(String recipient) {
+    public static void sendLoanApplicationEmail(String fName, String recipient) {
         try {
             Session session = createSession();
 
@@ -140,7 +140,63 @@ public class Email {
             // Set Subject: subject of the email
             message.setSubject("Your Loan Application");
             // set body of the email.
-            message.setText("Dear Customer,\n\nThank you for applying for a loan with SITATM. We are reviewing your application and will get back to you shortly.\n\nThank you,\nThe SITATM Team");
+            message.setText("Dear "+fName+",\n\nThank you for applying for a loan with SITATM. We are reviewing your application and will get back to you shortly.\n\nThank you,\nThe SITATM Team");
+            // Send email.
+            Transport.send(message);
+            System.out.println("Loan application email successfully sent to " + recipient);
+        } catch (MessagingException mex) {
+            mex.printStackTrace();
+        }
+    }
+    public static void sendLoanApprovalEmail(String fName, String recipient, double principle, String intRate, int duration, double repayment) {
+        try {
+            Session session = createSession();
+            String messageText = "Dear " + fName + ",\n\n" +
+                    "Your loan application has been approved!\n\n" +
+                    "Here is breakdown of your loan application\n" +
+                    "----------------------------------------------------------------------\n" +
+                    "Principle: $" + principle + "\n" +
+                    "Interest Rate: " + intRate + "%\n" +
+                    "Monthly Repayment Amount: $" + repayment + "\n" +
+                    "Term: " + duration + " Months \n\n" +
+                    "Thank you for banking with us.\n\n" +
+                    "Best regards,\n" +
+                    "The SIT Bank Team";
+            // MimeMessage object.
+            MimeMessage message = new MimeMessage(session);
+            // Set From Field: adding senders email to from field.
+            message.setFrom(new InternetAddress(SENDER_EMAIL));
+            // Set To Field: adding recipient's email to from field.
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+            // Set Subject: subject of the email
+            message.setSubject("SIT Bank Loan Application Result");
+            // set body of the email.
+            message.setText(messageText);
+            // Send email.
+            Transport.send(message);
+            System.out.println("Loan application email successfully sent to " + recipient);
+        } catch (MessagingException mex) {
+            mex.printStackTrace();
+        }
+    }
+    public static void sendLoanRejectionEmail(String fName, String recipient) {
+        try {
+            Session session = createSession();
+            String messageText = "Dear " + fName + ",\n\n" +
+                    "We regret to inform you that your loan application has been rejected.\n\n" +
+                    "Thank you for banking with us.\n\n" +
+                    "Best regards,\n" +
+                    "The SIT Bank Team";
+            // MimeMessage object.
+            MimeMessage message = new MimeMessage(session);
+            // Set From Field: adding senders email to from field.
+            message.setFrom(new InternetAddress(SENDER_EMAIL));
+            // Set To Field: adding recipient's email to from field.
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+            // Set Subject: subject of the email
+            message.setSubject("SIT Bank Loan Application Result");
+            // set body of the email.
+            message.setText(messageText);
             // Send email.
             Transport.send(message);
             System.out.println("Loan application email successfully sent to " + recipient);

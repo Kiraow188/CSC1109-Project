@@ -16,9 +16,9 @@ public class ExitViewController {
     private Localization l = holder.getLocalization();
     private final String fxmlFile = "atm-exit-view.fxml";
     @FXML
-    private Image collectCardImage = atmc.updateImage("/img/card_reader_collect_card.png");
+    private Image collectCardImage = atmc.updateImage("/img/card_reader_collect_Ycard.png");
     @FXML
-    private Image cardReaderWCardImg = atmc.updateImage("/img/card_reader_w_card.png");
+    private Image cardReaderWCardImg = atmc.updateImage("/img/card_reader_w_Ycard.png");
 
     public void collectCardImg(){
         atmc.setImageSize(cardReader,428,512);

@@ -6,9 +6,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -23,6 +26,10 @@ public class AllAccountController {
     private final String fxmlFile = "atm-all-account-view.fxml";
     @FXML
     private VBox accountVBox;
+    @FXML
+    private Button btnExit;
+    @FXML
+    private Button btnBack;
     @FXML
     private void backAction(ActionEvent event){
         try {
@@ -45,6 +52,17 @@ public class AllAccountController {
         btnHome.setOnMouseEntered(e -> btnHome.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 24px;"));
         // Set the style of the button when the mouse leaves it
         btnHome.setOnMouseExited(e -> btnHome.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 24px;"));
+        URL imageUrlExit = getClass().getResource("/img/exit.png");
+        Image exitImage = new Image(imageUrlExit.toString());
+        ImageView exitImgView = new ImageView(exitImage);
+        URL imageUrlBack = getClass().getResource("/img/left-arrow.png");
+        Image backImage = new Image(imageUrlBack.toString());
+        ImageView backImgView = new ImageView(backImage);
+
+        btnExit.setGraphic(exitImgView);
+        btnExit.setStyle("-fx-background-color: transparent; -fx-background-radius: 0; -fx-border-color: transparent;");
+        btnBack.setGraphic(backImgView);
+        btnBack.setStyle("-fx-background-color: transparent; -fx-background-radius: 0; -fx-border-color: transparent;");
 
         String userID = account.getUserId();
         ResultSet accountSet = db.executeQuery("SELECT account_number from account where user_id = "+userID);

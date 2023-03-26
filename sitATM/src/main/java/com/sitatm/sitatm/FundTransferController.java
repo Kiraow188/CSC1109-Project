@@ -4,8 +4,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,6 +26,10 @@ public class FundTransferController {
     private TextField TransfAmtTxtbox;
     @FXML
     private Button btnConfirm;
+    @FXML
+    private Button btnExit;
+    @FXML
+    private Button btnBack;
     private UserHolder holder = UserHolder.getInstance();
     private Localization l = holder.getLocalization();
     private Account a = holder.getAccount();
@@ -176,6 +183,17 @@ public class FundTransferController {
         btnConfirm.setOnMouseEntered(e -> btnConfirm.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 24px;"));
         // Set the style of the button when the mouse leaves it
         btnConfirm.setOnMouseExited(e -> btnConfirm.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 24px;"));
+        URL imageUrlExit = getClass().getResource("/img/exit.png");
+        Image exitImage = new Image(imageUrlExit.toString());
+        ImageView exitImgView = new ImageView(exitImage);
+        URL imageUrlBack = getClass().getResource("/img/left-arrow.png");
+        Image backImage = new Image(imageUrlBack.toString());
+        ImageView backImgView = new ImageView(backImage);
+
+        btnExit.setGraphic(exitImgView);
+        btnExit.setStyle("-fx-background-color: transparent; -fx-background-radius: 0; -fx-border-color: transparent;");
+        btnBack.setGraphic(backImgView);
+        btnBack.setStyle("-fx-background-color: transparent; -fx-background-radius: 0; -fx-border-color: transparent;");
 
         // Limit ToAccTxtBox to 9 characters
         UnaryOperator<TextFormatter.Change> filter = change -> {

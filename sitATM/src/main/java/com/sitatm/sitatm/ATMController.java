@@ -26,7 +26,7 @@ public class ATMController {
     @FXML
     private ImageView cardReader;
     private Image cardReaderImg = updateImage("/img/card_reader_wo_card.png");
-    private Image cardReaderWCardImg = updateImage("/img/card_reader_w_card.png");
+    private Image cardReaderWCardImg = updateImage("/img/card_reader_w_Ycard.png");
 
     private void setImageSize(ImageView img){
         img.setFitWidth(428);

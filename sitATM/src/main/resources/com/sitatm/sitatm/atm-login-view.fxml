@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sitatm.sitatm.ATMController">
    <children>
-      <Label layoutX="213.0" layoutY="143.0" text="Welcome to SIT Bank" style="-fx-text-fill: #F2CD60;-fx-font-weight: bold">
-         <font>
-            <Font size="64.0" />
-         </font>
-      </Label>
-      <Label layoutX="349.0" layoutY="270.0" text="Please Insert Your Card">
+      <Label layoutX="349.0" layoutY="335.0" text="Please Insert Your Card">
          <font>
             <Font size="32.0" />
          </font>
       </Label>
-      <ImageView fx:id="cardReader" fitHeight="191.0" fitWidth="428.0" layoutX="298.0" layoutY="328.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="cardReader" fitHeight="191.0" fitWidth="428.0" layoutX="298.0" layoutY="393.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fitHeight="267.0" fitWidth="630.0" layoutX="197.0" layoutY="39.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../img/GUI_Welcome.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="258.0" fitWidth="376.0" layoutX="668.0" layoutY="496.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../img/GUI_Login_Right.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="285.0" fitWidth="376.0" layoutX="-28.0" layoutY="469.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../img/GUI_Login_Left.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>

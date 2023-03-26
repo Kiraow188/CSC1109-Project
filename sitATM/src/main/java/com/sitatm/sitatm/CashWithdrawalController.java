@@ -7,9 +7,12 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -185,6 +188,17 @@ public class CashWithdrawalController {
         btnConfirm.setOnMouseEntered(e -> btnConfirm.setStyle("-fx-background-color: white; -fx-text-fill: #F2CD60;-fx-font-weight: bold;-fx-font-size: 24px;"));
         // Set the style of the button when the mouse leaves it
         btnConfirm.setOnMouseExited(e -> btnConfirm.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 24px;"));
+        URL imageUrlExit = getClass().getResource("/img/exit.png");
+        Image exitImage = new Image(imageUrlExit.toString());
+        ImageView exitImgView = new ImageView(exitImage);
+        URL imageUrlBack = getClass().getResource("/img/left-arrow.png");
+        Image backImage = new Image(imageUrlBack.toString());
+        ImageView backImgView = new ImageView(backImage);
+
+        btnExit.setGraphic(exitImgView);
+        btnExit.setStyle("-fx-background-color: transparent; -fx-background-radius: 0; -fx-border-color: transparent;");
+        btnBack.setGraphic(backImgView);
+        btnBack.setStyle("-fx-background-color: transparent; -fx-background-radius: 0; -fx-border-color: transparent;");
 
         System.out.println("Hi it's me debuggy!");
         String userID = a.getUserId();

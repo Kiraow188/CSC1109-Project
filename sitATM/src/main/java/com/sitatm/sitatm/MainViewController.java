@@ -9,8 +9,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.PreparedStatement;
@@ -51,6 +54,7 @@ public class MainViewController {
     private Button btn300;
     @FXML
     private Button btnMreSvc;
+
 
     //public Locale locale = new Locale("en");
     //public ResourceBundle bundle = ResourceBundle.getBundle("labelText",locale);
@@ -252,5 +256,12 @@ public class MainViewController {
         btn300.setOnMouseExited(e -> btn300.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
         btnAllAcc.setOnMouseExited(e -> btnAllAcc.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
         btnMreSvc.setOnMouseExited(e -> btnMreSvc.setStyle("-fx-background-color: #F2CD60; -fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 16px;"));
+
+        URL imageUrl = getClass().getResource("/img/exit.png");
+        Image image = new Image(imageUrl.toString());
+        ImageView exitImgView = new ImageView(image);
+
+        btnExit.setGraphic(exitImgView);
+        btnExit.setStyle("-fx-background-color: transparent; -fx-background-radius: 0; -fx-border-color: transparent;");
     }
 }

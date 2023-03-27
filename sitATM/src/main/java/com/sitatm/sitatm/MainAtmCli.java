@@ -17,12 +17,697 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.io.Console;
 
+class CustomerLogin {
+    public static String validator(String accNum, String pin) throws Exception {
+        String userId = null;
+        String hashedPin;
+        String salt;
+        System.out.println("Account Number: " + accNum + "\nPin: " + pin);
+        Database db = new Database();
+        // SQL Connection
+        try {
+            // Customer table
+            ResultSet loginSet = db.executeQuery("SELECT * FROM `account` WHERE `account_number` =" + accNum);
+            if (loginSet.next()) {
+                hashedPin = loginSet.getString("pin");
+                salt = loginSet.getString("salt");
+                boolean correctPin = PinHash.hashMatching(pin, salt, hashedPin);
+                if (correctPin) {
+                    userId = loginSet.getString("user_id");
+                    MainAtmCli.showCustomerMenu(accNum, pin, userId);
+                } else {
+                    System.out.println(
+                            MainAtmCli.ANSI_RED +
+                                    "Invalid username or password!\n" + MainAtmCli.ANSI_RESET);
+                    MainAtmCli.CustomerMode();
+                }
+            }
+        } catch (SQLException e) {
+            // System.out.println("Error: " + e.getMessage());
+            System.out.println(
+                    MainAtmCli.ANSI_RED +
+                            "Exception: Invalid username or password!\n" + MainAtmCli.ANSI_RESET);
+            MainAtmCli.CustomerMode();
+        }
+        return userId;
+    }
+}
+
+class CustomerStat {
+    public static String getProfile(String userId, String pin) {
+        int count = 0;
+        String name = null;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(MainAtmCli.url, MainAtmCli.user, MainAtmCli.pass);
+            Statement statement = connection.createStatement();
+
+            ResultSet ProfileSet = statement
+                    .executeQuery(
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id WHERE account.user_id ="
+                                    + userId); //
+            while (ProfileSet.next()) {
+                name = ProfileSet.getString("full_name");
+                count++;
+            }
+        } catch (Exception e) {
+            // System.out.println("Error: " + e.getMessage());
+            System.out.println(
+                    MainAtmCli.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                            + MainAtmCli.ANSI_RESET);
+            return name;
+        }
+        if (count > 0) {
+            return name;
+        } else {
+            return null;
+        }
+    }
+
+    public static String getAccounts(String userId, String accType, String pin) {
+        String accNo = null;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(MainAtmCli.url, MainAtmCli.user, MainAtmCli.pass);
+            Statement statement = connection.createStatement();
+
+            ResultSet accSet = statement
+                    .executeQuery("SELECT * FROM `account` WHERE `user_id` =" + userId
+                            + " AND `account_type` = '" + accType + "'");
+            while (accSet.next()) {
+                accNo = accSet.getString("account_number");
+            }
+        } catch (Exception e) {
+            // System.out.println("Error: " + e.getMessage());
+            System.out.println(
+                    MainAtmCli.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                            + MainAtmCli.ANSI_RESET);
+            return accNo;
+        }
+        return accNo;
+    }
+
+    public static double getBalanceFromAccount(String accNo, String pin) {
+        double balance = 0;
+        int count = 0;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(MainAtmCli.url, MainAtmCli.user, MainAtmCli.pass);
+            Statement statement = connection.createStatement();
+
+            ResultSet balanceSet = statement
+                    .executeQuery(
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                    + accNo + " AND account.account_number = " + accNo
+                                    + " ORDER BY transaction_id DESC LIMIT 1;"); //
+            while (balanceSet.next()) {
+                balance = balanceSet.getDouble("balance_amt");
+                count++;
+                return balance;
+            }
+        } catch (Exception e) {
+            // System.out.println("Error: " + e.getMessage());
+            System.out.println(
+                    MainAtmCli.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                            + MainAtmCli.ANSI_RESET);
+            return count;
+        }
+        if (count > 0) {
+            return balance;
+        }
+        return 0;
+    }
+
+    public static List<String> selectAccount(Scanner sc, String CAaccNo, String SAaccNo, String action) {
+        String accType = "checking";
+        boolean persistant = true;
+        String accTypeName = null;
+        List<String> accList = new ArrayList<String>();
+        accList.clear();
+        // loops until valid account type entered
+        while (persistant) {
+            persistant = false;
+            System.out.println(
+                    MainAtmCli.ANSI_YELLOW + "\nPlease select the account to " + action + " from: "
+                            + MainAtmCli.ANSI_RESET
+                            + "\n[1] for Checking\n[2] for Savings");
+            accType = sc.next();
+
+            switch (accType) {
+                case "1":
+                    accType = "checking";
+                    accTypeName = "Checking";
+                    accList.add(CAaccNo);
+                    accList.add(accTypeName);
+                    break;
+                case "2":
+                    accType = "savings";
+                    accTypeName = "Savings";
+                    accList.add(SAaccNo);
+                    accList.add(accTypeName);
+                    break;
+                default:
+                    System.out.println(
+                            MainAtmCli.ANSI_RED + "Invalid option, please re-enter." +
+                                    MainAtmCli.ANSI_RESET);
+                    persistant = true;
+            }
+        }
+        return accList;
+    }
+
+    public static List<Object> retrieveAcc(String accNo, String pin, String accTypeName) {
+        List<Object> rList = new ArrayList<Object>();
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(MainAtmCli.url, MainAtmCli.user, MainAtmCli.pass);
+            Statement statement = connection.createStatement();
+            int count = 0;
+            double accReBalance = 0;
+            String trfName = null;
+            ResultSet AccRetreival = statement
+                    .executeQuery(
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                    + accNo + " AND account.account_number = " + accNo
+                                    + " ORDER BY transaction_id DESC LIMIT 1;"); //
+            while (AccRetreival.next()) {
+                accReBalance = AccRetreival.getDouble("balance_amt");
+                trfName = AccRetreival.getString("full_name");
+                count++;
+            }
+            if (count <= 0) {
+                if (accTypeName == "***") {
+                    System.out.printf("%sThis account does not exist.%s\n",
+                            MainAtmCli.ANSI_RED, MainAtmCli.ANSI_RESET);
+                    rList.add(false);
+                    return rList;
+                }
+                System.out.printf("\n%s%s account is not opened.%s\n\n",
+                        MainAtmCli.ANSI_RED, accTypeName, MainAtmCli.ANSI_RESET);
+                rList.add(false);
+                return rList;
+            } else {
+                rList.add(true);
+                rList.add(accReBalance);
+                rList.add(trfName);
+                return rList;
+            }
+        } catch (Exception e) {
+            // System.out.println("Error: " + e.getMessage());
+            System.out.printf("%sAccount is not found.%s\n",
+                    MainAtmCli.ANSI_RED, MainAtmCli.ANSI_RESET);
+            rList.add(false);
+            return rList;
+        }
+    }
+
+}
+
+class CustomerATM {
+    public static void cDeposit(Scanner sc, String userId, String pin, String accReNo, String accTypeName,
+            String action, String actionStatement, double deposit_amount, double accReBalance, String trfName) {
+        boolean persistent = true;
+        String pinOp = "0";
+        while (persistent) {
+            if (action == "deposit" || action == "withdraw") {
+                System.out.println(
+                        MainAtmCli.ANSI_CYAN + "\nProceed with " + action + "?" + MainAtmCli.ANSI_RESET
+                                + "\n[1] Yes\n[2] No" + MainAtmCli.ANSI_RESET);
+                pinOp = sc.next();
+            } else {
+                pinOp = "1";
+            }
+            persistent = false;
+            switch (pinOp) {
+                case "1":
+                    try {
+                        Class.forName("com.mysql.cj.jdbc.Driver");
+                        Connection connection = DriverManager.getConnection(MainAtmCli.url, MainAtmCli.user,
+                                MainAtmCli.pass);
+
+                        accReBalance = accReBalance + deposit_amount;
+                        String depositAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
+                        PreparedStatement depositAmountBalance = connection
+                                .prepareStatement(depositAmountBalanceQuery);
+                        depositAmountBalance.setString(1, accReNo);
+                        depositAmountBalance.setDate(2,
+                                java.sql.Date.valueOf(java.time.LocalDate.now()));
+                        depositAmountBalance.setString(3, actionStatement);
+                        depositAmountBalance.setInt(4, 0);
+                        depositAmountBalance.setDouble(5, 0);
+                        depositAmountBalance.setDouble(6, deposit_amount);
+                        depositAmountBalance.setDouble(7, accReBalance);
+                        int rowsDptAffected = depositAmountBalance.executeUpdate();
+                        if (rowsDptAffected <= 0) {
+                            System.out.printf("\n%sSQL Error. Please try again.%s\n\n",
+                                    MainAtmCli.ANSI_RED, MainAtmCli.ANSI_RESET);
+                            break;
+                        } else {
+                            if (action == "deposit" || action == "withdraw") {
+                                askReceipt(sc, accReNo, action, actionStatement,
+                                        deposit_amount, accTypeName,
+                                        accReBalance);
+                            } else if (action == "transfer") {
+                                System.out.printf(
+                                        "\n%sYou have successfully transferred $%.2f to Acc No. %s (%s) %s",
+                                        MainAtmCli.ANSI_CYAN,
+                                        deposit_amount,
+                                        accReNo, trfName, MainAtmCli.ANSI_RESET);
+                                return;
+                            }
+                        }
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                        System.out.println(
+                                MainAtmCli.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                                        + MainAtmCli.ANSI_RESET);
+                    }
+                    break;
+                case "2":
+                    System.out.println(
+                            MainAtmCli.ANSI_RED + "\nOperation cancelled.\n"
+                                    + MainAtmCli.ANSI_RESET);
+                    break;
+                default:
+                    System.out.println(
+                            MainAtmCli.ANSI_RED + "Invalid option, please re-enter.\n"
+                                    + MainAtmCli.ANSI_RESET);
+                    persistent = true;
+            }
+        }
+    }
+
+
+    public static void cWithdraw(Scanner sc, String userId, String pin, String accReNo, String accTypeName,
+            String action, String actionStatement, double withdraw_amount, double accReBalance, String trfName) {
+        boolean persistent = true;
+        String pinOp = "0";
+        while (persistent) {
+            if (action == "deposit" || action == "withdraw") {
+                System.out.println(
+                        MainAtmCli.ANSI_CYAN + "\nProceed with " + action + "?" + MainAtmCli.ANSI_RESET
+                                + "\n[1] Yes\n[2] No" + MainAtmCli.ANSI_RESET);
+                pinOp = sc.next();
+            } else {
+                pinOp = "1";
+            }
+            persistent = false;
+            switch (pinOp) {
+                case "1":
+                    try {
+                        Class.forName("com.mysql.cj.jdbc.Driver");
+                        Connection connection = DriverManager.getConnection(MainAtmCli.url, MainAtmCli.user,
+                                MainAtmCli.pass);
+
+                        accReBalance = accReBalance - withdraw_amount;
+                        String depositAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
+                        PreparedStatement depositAmountBalance = connection
+                                .prepareStatement(depositAmountBalanceQuery);
+                        depositAmountBalance.setString(1, accReNo);
+                        depositAmountBalance.setDate(2,
+                                java.sql.Date.valueOf(java.time.LocalDate.now()));
+                        depositAmountBalance.setString(3, actionStatement);
+                        depositAmountBalance.setInt(4, 0);
+                        depositAmountBalance.setDouble(5, withdraw_amount);
+                        depositAmountBalance.setDouble(6, 0);
+                        depositAmountBalance.setDouble(7, accReBalance);
+                        int rowsDptAffected = depositAmountBalance.executeUpdate();
+                        if (rowsDptAffected <= 0) {
+                            System.out.printf("\n%sSQL Error. Please try again.%s\n\n",
+                                    MainAtmCli.ANSI_RED, MainAtmCli.ANSI_RESET);
+                            break;
+                        } else {
+                            if (action == "deposit" || action == "withdraw") {
+                                askReceipt(sc, accReNo, action, actionStatement,
+                                        withdraw_amount, accTypeName,
+                                        accReBalance);
+                            } else if (action == "transfer") {
+                                System.out.printf(
+                                        "%sand your current %s Account Balance is $%.2f.%s\n\n",
+                                        MainAtmCli.ANSI_CYAN, accTypeName, accReBalance, MainAtmCli.ANSI_RESET);
+                                return;
+                            }
+                        }
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                        System.out.println(
+                                MainAtmCli.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                                        + MainAtmCli.ANSI_RESET);
+                    }
+                    break;
+                case "2":
+                    System.out.println(
+                            MainAtmCli.ANSI_RED + "\nOperation cancelled.\n"
+                                    + MainAtmCli.ANSI_RESET);
+                    break;
+                default:
+                    System.out.println(
+                            MainAtmCli.ANSI_RED + "Invalid option, please re-enter.\n"
+                                    + MainAtmCli.ANSI_RESET);
+                    persistent = true;
+            }
+        }
+    }
+
+    public static void applyLoan(Scanner sc, String userId, String pin, String accReNo, String accTypeName,
+            String action, String actionStatement, double loanAmt, double intRate, double proRate, double lateRate)
+            throws SQLException {
+        Database db = new Database();
+        String fName = "";
+        String email = "";
+        ResultSet getInfo = db.executeQuery(
+                "SELECT customer.full_name,customer.email FROM customer INNER JOIN account ON customer.user_id = account.user_id WHERE account.account_number = '"
+                        + accReNo + "'");
+        while (getInfo.next()) {
+            fName = getInfo.getString("full_name");
+            email = getInfo.getString("email");
+        }
+        List<Object> rList = CustomerStat.retrieveAcc(accReNo, pin, accTypeName);
+        boolean passedTest = (boolean) rList.get(0);
+        if (passedTest) {
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection connection = DriverManager.getConnection(MainAtmCli.url, MainAtmCli.user, MainAtmCli.pass);
+                Statement statement = connection.createStatement();
+                int count = 0;
+                ResultSet checkLoanIP = statement
+                        .executeQuery(
+                                "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN loan ON account.account_number = loan.account_number WHERE account.account_number = "
+                                        + accReNo + " AND loan.status = 'PENDING'"); //
+                while (checkLoanIP.next()) {
+                    count++;
+                }
+                checkLoanIP = statement
+                        .executeQuery(
+                                "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN loan ON account.account_number = loan.account_number WHERE account.account_number = "
+                                        + accReNo + " AND loan.status = 'APPROVED'"); //
+                while (checkLoanIP.next()) {
+                    count++;
+                }
+
+                if (count > 0) {
+                    System.out.printf("\n%s%s account has an ongoing loan.%s\n\n",
+                            MainAtmCli.ANSI_RED, accTypeName, MainAtmCli.ANSI_RESET);
+                } else {
+                    String loanTypeOp;
+                    int loanType = 0;
+                    boolean persistent = true;
+                    while (persistent) {
+                        persistent = false;
+                        System.out.println(
+                                MainAtmCli.ANSI_CYAN + "\nPlease select Loan Tenor: " + MainAtmCli.ANSI_RESET
+                                        + "\n[1] for 3 Months\n[2] for 12 Months\n[3] for 24 Months");
+                        loanTypeOp = sc.next();
+                        switch (loanTypeOp) {
+                            case "1":
+                                loanType = 3;
+                                break;
+                            case "2":
+                                loanType = 12;
+                                break;
+                            case "3":
+                                loanType = 24;
+                                break;
+                            default:
+                                System.out.print(
+                                        MainAtmCli.ANSI_RED + "Invalid option, "
+                                                + "please re-enter.\n" + MainAtmCli.ANSI_RESET);
+                                persistent = true;
+                        }
+                    }
+                    double calcDebt = (loanAmt / ((Math.pow(1 + ((intRate / 100) / 12), loanType) - 1)
+                            / (((intRate / 100) / 12) * (Math.pow(1 + ((intRate / 100) / 12), loanType)))));
+                    System.out.printf("\nInstallment Per Month for Loan $%.2f/%d Months: $%.2f\n\n",
+                            loanAmt, loanType, calcDebt);
+
+                    persistent = true;
+                    while (persistent) {
+                        System.out.println(
+                                MainAtmCli.ANSI_CYAN + "Proceed with loan request?  " + MainAtmCli.ANSI_RESET
+                                        + "\n[1] Yes\n[2] No" + MainAtmCli.ANSI_RESET);
+                        String loanOp = sc.next();
+                        persistent = false;
+                        switch (loanOp) {
+                            case "1":
+                                try {
+                                    DecimalFormat df = new DecimalFormat("#.##");
+                                    calcDebt = Double.valueOf(df.format(calcDebt));
+
+                                    String depositAmountBalanceQuery = "INSERT INTO `loan`(`loan_id`, `account_number`, `principle_amt`, `interest_rate`, `duration`, `debt`, `date_created`, `repayment_date`, `status`) VALUES (?,?,?,?,?,?,?,?,?);";
+                                    PreparedStatement depositAmountBalance = connection
+                                            .prepareStatement(depositAmountBalanceQuery);
+                                    depositAmountBalance.setInt(1, 0);
+                                    depositAmountBalance.setString(2, accReNo);
+                                    depositAmountBalance.setDouble(3, loanAmt);
+                                    depositAmountBalance.setDouble(4, intRate);
+                                    depositAmountBalance.setInt(5, loanType);
+                                    depositAmountBalance.setDouble(6, calcDebt * loanType);
+                                    depositAmountBalance.setDate(7,
+                                            java.sql.Date.valueOf(java.time.LocalDate.now()));
+                                    depositAmountBalance.setDate(8, null);
+                                    depositAmountBalance.setString(9, "PENDING");
+                                    int rowsDptAffected = depositAmountBalance.executeUpdate();
+                                    if (rowsDptAffected <= 0) {
+                                        System.out.printf("\n%sSQL Error. Please try again.%s\n\n",
+                                                MainAtmCli.ANSI_RED, MainAtmCli.ANSI_RESET);
+                                        break;
+                                    } else {
+                                        System.out.println(
+                                                MainAtmCli.ANSI_CYAN + "\nLoan request has been processed.\n"
+                                                        + MainAtmCli.ANSI_RESET);
+                                        Email.sendLoanApplicationEmail(fName, email);
+                                    }
+                                } catch (Exception e) {
+                                    // TODO: handle exception
+                                    System.out.println(
+                                            MainAtmCli.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                                                    + MainAtmCli.ANSI_RESET);
+                                }
+                                break;
+                            case "2":
+                                System.out.println(
+                                        MainAtmCli.ANSI_RED + "\nLoan request cancelled.\n"
+                                                + MainAtmCli.ANSI_RESET);
+                                break;
+                            default:
+                                System.out.println(
+                                        MainAtmCli.ANSI_RED + "Invalid option, "
+                                                + "please re-enter.\n" + MainAtmCli.ANSI_RESET);
+                                persistent = true;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // System.out.println("Error: " + e.getMessage());
+                System.out.println(
+                        MainAtmCli.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                                + MainAtmCli.ANSI_RESET);
+                return;
+            }
+        }
+    }
+
+    public static void printLatestTransactions(String accStatNo, String pin, String accStatType) {
+        String accStat = "";
+        double accStatD = 0;
+        double accStatW = 0;
+        double accStatBalance = 0;
+        int count = 0;
+        System.out.println("\nShowing (5) latest transactions:");
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(MainAtmCli.url, MainAtmCli.user, MainAtmCli.pass);
+            Statement statement = connection.createStatement();
+            ResultSet StatRetreival = statement
+                    .executeQuery(
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                    + accStatNo + " AND account.account_number = " + accStatNo
+                                    + " ORDER BY transaction_id DESC LIMIT 5;"); //
+
+            String leftAlignFormat = "| %-44s | %-12.2f | %-12.2f | %-12.2f |%n";
+            System.out.format(
+                    "+----------------------------------------------+--------------+--------------+--------------+%n");
+            System.out.format(
+                    "| Transactions                                 | Desposit     | Withdrawal   | Balance      |%n");
+            System.out.format(
+                    "+----------------------------------------------+--------------+--------------+--------------+%n");
+
+            while (StatRetreival.next()) {
+                accStat = StatRetreival.getString("transaction_details");
+                accStatD = StatRetreival.getDouble("deposit_amt");
+                accStatW = StatRetreival.getDouble("withdrawal_amt");
+                accStatBalance = StatRetreival.getDouble("balance_amt");
+                count++;
+                System.out.format(leftAlignFormat, accStat, accStatD,
+                        accStatW,
+                        accStatBalance);
+                System.out.format(
+                        "+----------------------------------------------+--------------+--------------+--------------+%n");
+            }
+            System.out.println();
+        } catch (Exception e) {
+            System.out.println(
+                    MainAtmCli.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                            + MainAtmCli.ANSI_RESET);
+            return;
+        }
+    }
+
+    public static void askReceipt(Scanner sc, String accReNo, String action, String actionStatement,
+            double transaction_amount, String accTypeName,
+            double accReBalance) {
+        boolean persistent = true;
+        while (persistent) {
+            System.out.println(
+                    MainAtmCli.ANSI_CYAN + "\nPrint Receipt? " + MainAtmCli.ANSI_RESET
+                            + "\n[1] Yes\n[2] No" + MainAtmCli.ANSI_RESET);
+            String pinOp = sc.next();
+            persistent = false;
+            switch (pinOp) {
+                case "1":
+                    printReceipt(accReNo, action, actionStatement,
+                            transaction_amount, accTypeName,
+                            accReBalance);
+                    break;
+                case "2":
+                    noReceipt(action, transaction_amount, accTypeName, accReBalance);
+                    break;
+                default:
+                    System.out.println(
+                            MainAtmCli.ANSI_RED + "Invalid option, please re-enter.\n"
+                                    + MainAtmCli.ANSI_RESET);
+                    persistent = true;
+            }
+        }
+    }
+
+    public static void printReceipt(String accReNo, String action, String actionStatement, double transaction_amount,
+            String accTypeName, double accReBalance) {
+        String strReFormat = "| %-20s   %-12s |%n";
+        String leftReFormat = "| %-20s   %-12.2f |%n";
+        System.out.println();
+        System.out.format(
+                "+-------------------------------------+%n");
+        System.out.format(
+                "|               Receipt               |%n");
+        System.out.format(
+                "+-------------------------------------+%n");
+        System.out.format(
+                strReFormat, "Account No.",
+                accReNo);
+        System.out.format(
+                "|                                     |%n");
+        System.out.format(leftReFormat,
+                actionStatement,
+                transaction_amount);
+        System.out.format(leftReFormat, "Account Balance",
+                accReBalance);
+        System.out.format(
+                "+-------------------------------------+%n");
+        System.out.println();
+        noReceipt(action, transaction_amount, accTypeName, accReBalance);
+    }
+
+    public static void noReceipt(String action, double transaction_amount, String accTypeName, double accReBalance) {
+        System.out.printf(
+                "\n%sYou have are successfully %s $%.2f and your current %s Account Balance is $%.2f.%s\n\n",
+                MainAtmCli.ANSI_CYAN,
+                action,
+                transaction_amount,
+                accTypeName,
+                accReBalance, MainAtmCli.ANSI_RESET);
+    }
+
+    public static void changePin(Scanner sc, String userId) {
+        Console console = System.console();
+        boolean persistent = true;
+        while (persistent) {
+            persistent = false;
+            System.out.print("\nEnter new 6 Digit Pin: ");
+            String newPin = sc.nextLine();
+            if (System.console() != null) {
+                char[] enteredPin = console.readPassword();
+                newPin = String.valueOf(enteredPin);
+            }
+
+            if (newPin.matches("\\d{6}")) {
+                // Hash customer's pin with Salt and Pepper
+                String[] hashAlgo;
+                try {
+                    hashAlgo = PinHash.hashPin(newPin);
+                    String newHashedPin = hashAlgo[1];
+                    String newSalt = hashAlgo[0];
+                    // Debug
+                    System.out.println("Random Salt: " + hashAlgo[1]);
+                    System.out.println("Hashed Password: " + hashAlgo[0]);
+                    persistent = true;
+                    while (persistent) {
+                        System.out.println(
+                                MainAtmCli.ANSI_CYAN + "\nProceed with pin change? " + MainAtmCli.ANSI_RESET
+                                        + "\n[1] Yes\n[2] No" + MainAtmCli.ANSI_RESET);
+                        String pinOp = sc.next();
+                        persistent = false;
+                        switch (pinOp) {
+                            case "1":
+                                try {
+                                    Class.forName("com.mysql.cj.jdbc.Driver");
+                                    Connection connection = DriverManager.getConnection(MainAtmCli.url,
+                                            MainAtmCli.user, MainAtmCli.pass);
+
+                                    String npQuery = "UPDATE account SET pin = ?, salt = ? WHERE user_id = ?";
+                                    PreparedStatement npStatement = connection
+                                            .prepareStatement(npQuery);
+                                    npStatement.setString(1, newHashedPin);
+                                    npStatement.setString(2, newSalt);
+                                    npStatement.setString(3, userId);
+                                    npStatement.executeUpdate();
+                                    System.out
+                                            .println(
+                                                    MainAtmCli.ANSI_CYAN
+                                                            + "\nYou have successfully changed your pin.\n"
+                                                            + MainAtmCli.ANSI_RESET);
+                                } catch (Exception e) {
+                                    // TODO: handle exception
+                                    System.out.println(
+                                            MainAtmCli.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                                                    + MainAtmCli.ANSI_RESET);
+                                }
+                                break;
+                            case "2":
+                                System.out.println(
+                                        MainAtmCli.ANSI_RED + "\nOperation cancelled.\n"
+                                                + MainAtmCli.ANSI_RESET);
+                                break;
+                            default:
+                                System.out.println(
+                                        MainAtmCli.ANSI_RED + "Invalid option, please re-enter.\n"
+                                                + MainAtmCli.ANSI_RESET);
+                                persistent = true;
+                        }
+                    }
+                } catch (NoSuchAlgorithmException e) {
+                    // TODO Auto-generated catch block
+                    System.out.println(
+                            MainAtmCli.ANSI_RED + "\nAn error has occurred, please try again.\n"
+                                    + MainAtmCli.ANSI_RESET);
+                }
+                break;
+            } else {
+                System.out.println(
+                        MainAtmCli.ANSI_RED + "\nInvalid input. " + MainAtmCli.ANSI_RESET
+                                + "Please enter a 6 digit pin: ");
+                persistent = true;
+            }
+        }
+    }
+}
+
 public class MainAtmCli {
     private final static int checking = 1;
     private final static int savings = 2;
-    private final static String url = "jdbc:mysql://localhost:3306/sitatm";
-    private final static String user = "root";
-    private final static String pass = "";
+    protected final static String url = "jdbc:mysql://localhost:3306/sitatm";
+    protected final static String user = "root";
+    protected final static String pass = "";
 
     // Color Codes
     public static final String ANSI_RESET = "\u001B[0m";
@@ -62,666 +747,6 @@ public class MainAtmCli {
         return !deactivated;
     }
 
-    public static String validator(String accNum, String pin) throws Exception {
-        String userId = null;
-        String hashedPin;
-        String salt;
-        System.out.println("Account Number: "+accNum+"\nPin: "+pin);
-        Database db = new Database();
-        // SQL Connection
-        try {
-            // Customer table
-            ResultSet loginSet = db.executeQuery("SELECT * FROM `account` WHERE `account_number` =" + accNum);
-            if (loginSet.next()) {
-                hashedPin = loginSet.getString("pin");
-                salt = loginSet.getString("salt");
-                boolean correctPin = PinHash.hashMatching(pin, salt,hashedPin);
-                if (correctPin){
-                    userId = loginSet.getString("user_id");
-                    showCustomerMenu(accNum, pin, userId);
-                }else{
-                    System.out.println(ANSI_RED +
-                            "Invalid username or password!\n" + ANSI_RESET);
-                    CustomerMode();
-                }
-            }
-        } catch (SQLException e) {
-            // System.out.println("Error: " + e.getMessage());
-            System.out.println(ANSI_RED +
-                    "Exception: Invalid username or password!\n" + ANSI_RESET);
-            CustomerMode();
-        }
-        return userId;
-    }
-
-    public static String getProfile(String userId, String pin) {
-        int count = 0;
-        String name = null;
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, user, pass);
-            Statement statement = connection.createStatement();
-
-            ResultSet ProfileSet = statement
-                    .executeQuery(
-                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id WHERE account.user_id ="
-                                    + userId); //
-            while (ProfileSet.next()) {
-                name = ProfileSet.getString("full_name");
-                count++;
-            }
-        } catch (Exception e) {
-            // System.out.println("Error: " + e.getMessage());
-            System.out.println(
-                    ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
-                            + ANSI_RESET);
-            return name;
-        }
-        if (count > 0) {
-            return name;
-        } else {
-            return null;
-        }
-    }
-
-    public static String getAccounts(String userId, String accType, String pin) {
-        String accNo = null;
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, user, pass);
-            Statement statement = connection.createStatement();
-
-            ResultSet accSet = statement
-                    .executeQuery("SELECT * FROM `account` WHERE `user_id` =" + userId
-                            + " AND `account_type` = '" + accType + "'");
-            while (accSet.next()) {
-                accNo = accSet.getString("account_number");
-            }
-        } catch (Exception e) {
-            // System.out.println("Error: " + e.getMessage());
-            System.out.println(
-                    ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
-                            + ANSI_RESET);
-            return accNo;
-        }
-        return accNo;
-    }
-
-    public static double getBalanceFromAccount(String accNo, String pin) {
-        double balance = 0;
-        int count = 0;
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, user, pass);
-            Statement statement = connection.createStatement();
-
-            ResultSet balanceSet = statement
-                    .executeQuery(
-                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
-                                    + accNo + " AND account.account_number = " + accNo
-                                    + " ORDER BY transaction_id DESC LIMIT 1;"); //
-            while (balanceSet.next()) {
-                balance = balanceSet.getDouble("balance_amt");
-                count++;
-                return balance;
-            }
-        } catch (Exception e) {
-            // System.out.println("Error: " + e.getMessage());
-            System.out.println(
-                    ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
-                            + ANSI_RESET);
-            return count;
-        }
-        if (count > 0) {
-            return balance;
-        }
-        return 0;
-    }
-
-    public static List<String> selectAccount(Scanner sc, String CAaccNo, String SAaccNo, String action){
-        String accType = "checking";
-        boolean persistant = true;
-        String accTypeName = null;
-        List<String> accList = new ArrayList<String>();
-        accList.clear();
-        // loops until valid account type entered
-        while (persistant) {
-            persistant = false;
-            System.out.println(
-                    ANSI_YELLOW + "\nPlease select the account to " + action + " from: " + ANSI_RESET
-                            + "\n[1] for Checking\n[2] for Savings");
-            accType = sc.next();
-
-            switch (accType) {
-                case "1":
-                    accType = "checking";
-                    accTypeName = "Checking";
-                    accList.add(CAaccNo);
-                    accList.add(accTypeName);
-                    break;
-                case "2":
-                    accType = "savings";
-                    accTypeName = "Savings";
-                    accList.add(SAaccNo);
-                    accList.add(accTypeName);
-                    break;
-                default:
-                    System.out.println(ANSI_RED + "Invalid option, please re-enter." +
-                            ANSI_RESET);
-                    persistant = true;
-            }
-        }
-        return accList;
-    }
-
-    public static List<Object> retrieveAcc(String accNo, String pin, String accTypeName) {
-        List<Object> rList = new ArrayList<Object>();
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, user, pass);
-            Statement statement = connection.createStatement();
-            int count = 0;
-            double accReBalance = 0;
-            String trfName = null;
-            ResultSet AccRetreival = statement
-                    .executeQuery(
-                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
-                                    + accNo + " AND account.account_number = " + accNo
-                                    + " ORDER BY transaction_id DESC LIMIT 1;"); //
-            while (AccRetreival.next()) {
-                accReBalance = AccRetreival.getDouble("balance_amt");
-                trfName = AccRetreival.getString("full_name");
-                count++;
-            }
-            if (count <= 0) {
-                if (accTypeName == "***") {
-                    System.out.printf("%sThis account does not exist.%s\n",
-                            ANSI_RED, ANSI_RESET);
-                    rList.add(false);
-                    return rList;
-                }
-                System.out.printf("\n%s%s account is not opened.%s\n\n",
-                        ANSI_RED, accTypeName, ANSI_RESET);
-                rList.add(false);
-                return rList;
-            } else {
-                rList.add(true);
-                rList.add(accReBalance);
-                rList.add(trfName);
-                return rList;
-            }
-        } catch (Exception e) {
-            // System.out.println("Error: " + e.getMessage());
-            System.out.printf("%sAccount is not found.%s\n",
-                    ANSI_RED, ANSI_RESET);
-            rList.add(false);
-            return rList;
-        }
-    }
-
-    public static void cDeposit(Scanner sc, String userId, String pin, String accReNo, String accTypeName,
-            String action, String actionStatement, double deposit_amount, double accReBalance, String trfName) {
-        boolean persistent = true;
-        while (persistent) {
-            System.out.println(
-                    ANSI_CYAN + "\nProceed with " + action + "?" + ANSI_RESET
-                            + "\n[1] Yes\n[2] No"
-                            + ANSI_RESET);
-            String pinOp = sc.next();
-            persistent = false;
-            switch (pinOp) {
-                case "1":
-                    try {
-                        Class.forName("com.mysql.cj.jdbc.Driver");
-                        Connection connection = DriverManager.getConnection(url, user, pass);
-
-                        accReBalance = accReBalance + deposit_amount;
-                        String depositAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
-                        PreparedStatement depositAmountBalance = connection
-                                .prepareStatement(depositAmountBalanceQuery);
-                        depositAmountBalance.setString(1, accReNo);
-                        depositAmountBalance.setDate(2,
-                                java.sql.Date.valueOf(java.time.LocalDate.now()));
-                        depositAmountBalance.setString(3, actionStatement);
-                        depositAmountBalance.setInt(4, 0);
-                        depositAmountBalance.setDouble(5, 0);
-                        depositAmountBalance.setDouble(6, deposit_amount);
-                        depositAmountBalance.setDouble(7, accReBalance);
-                        int rowsDptAffected = depositAmountBalance.executeUpdate();
-                        if (rowsDptAffected <= 0) {
-                            System.out.printf("\n%sSQL Error. Please try again.%s\n\n",
-                                    ANSI_RED, ANSI_RESET);
-                            break;
-                        } else {
-                            if (action == "deposit" || action == "withdraw") {
-                                askReceipt(sc, accReNo, action, actionStatement,
-                                        deposit_amount, accTypeName,
-                                        accReBalance);
-                                receiptPrinter receipt = new receiptPrinter("test", String.valueOf(java.sql.Date.valueOf(LocalDate.now())), userId, 50, deposit_amount, accReBalance, 0);
-                                receipt.printReceipt();
-                            } else if (action == "transfer") {
-                                System.out.printf(
-                                        "\n%sYou have successfully transferred $%.2f to Acc No. %s (%s) ",
-                                        ANSI_CYAN,
-                                        deposit_amount,
-                                        accReNo, trfName);
-                                return;
-                            }
-                        }
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                        System.out.println(
-                                ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
-                                        + ANSI_RESET);
-                        return;
-                    }
-                    break;
-                case "2":
-                    System.out.println(ANSI_RED + "\nOperation cancelled.\n"
-                            + ANSI_RESET);
-                    break;
-                default:
-                    System.out.println(
-                            ANSI_RED + "Invalid option, please re-enter.\n"
-                                    + ANSI_RESET);
-                    persistent = true;
-            }
-        }
-    }
-
-    public static void cWithdraw(Scanner sc, String userId, String pin, String accReNo, String accTypeName,
-            String action, String actionStatement, double withdraw_amount, double accReBalance, String trfName) {
-        boolean persistent = true;
-        String pinOp = "0";
-        while (persistent) {
-            if (action == "deposit" || action == "withdraw") {
-                System.out.println(
-                        ANSI_CYAN + "\nProceed with " + action + "?" + ANSI_RESET
-                                + "\n[1] Yes\n[2] No"
-                                + ANSI_RESET);
-                pinOp = sc.next();
-            } else {
-                pinOp = "1";
-            }
-            persistent = false;
-            switch (pinOp) {
-                case "1":
-                    try {
-                        Class.forName("com.mysql.cj.jdbc.Driver");
-                        Connection connection = DriverManager.getConnection(url, user, pass);
-
-                        accReBalance = accReBalance - withdraw_amount;
-                        String depositAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
-                        PreparedStatement depositAmountBalance = connection
-                                .prepareStatement(depositAmountBalanceQuery);
-                        depositAmountBalance.setString(1, accReNo);
-                        depositAmountBalance.setDate(2,
-                                java.sql.Date.valueOf(java.time.LocalDate.now()));
-                        depositAmountBalance.setString(3, actionStatement);
-                        depositAmountBalance.setInt(4, 0);
-                        depositAmountBalance.setDouble(5, withdraw_amount);
-                        depositAmountBalance.setDouble(6, 0);
-                        depositAmountBalance.setDouble(7, accReBalance);
-                        int rowsDptAffected = depositAmountBalance.executeUpdate();
-                        if (rowsDptAffected <= 0) {
-                            System.out.printf("\n%sSQL Error. Please try again.%s\n\n",
-                                    ANSI_RED, ANSI_RESET);
-                            break;
-                        } else {
-                            if (action == "deposit" || action == "withdraw") {
-                                askReceipt(sc, accReNo, action, actionStatement,
-                                        withdraw_amount, accTypeName,
-                                        accReBalance);
-                            } else if (action == "transfer") {
-                                System.out.printf(
-                                        "and your current %s Account Balance is $%.2f.%s\n\n",
-                                        accTypeName, accReBalance, ANSI_RESET);
-                                return;
-                            }
-                        }
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                        System.out.println(
-                                ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
-                                        + ANSI_RESET);
-                    }
-                    break;
-                case "2":
-                    System.out.println(ANSI_RED + "\nOperation cancelled.\n"
-                            + ANSI_RESET);
-                    break;
-                default:
-                    System.out.println(
-                            ANSI_RED + "Invalid option, please re-enter.\n"
-                                    + ANSI_RESET);
-                    persistent = true;
-            }
-        }
-    }
-
-    public static void applyLoan(Scanner sc, String userId, String pin, String accReNo, String accTypeName,
-            String action, String actionStatement, double loanAmt, double intRate, double proRate, double lateRate) throws SQLException {
-        Database db = new Database();
-        String fName = "";
-        String email = "";
-        ResultSet getInfo = db.executeQuery("SELECT customer.full_name,customer.email FROM customer INNER JOIN account ON customer.user_id = account.user_id WHERE account.account_number = '"+accReNo+"'");
-        while (getInfo.next()){
-            fName = getInfo.getString("full_name");
-            email = getInfo.getString("email");
-        }
-        List<Object> rList = retrieveAcc(accReNo, pin, accTypeName);
-        boolean passedTest = (boolean) rList.get(0);
-        if (passedTest) {
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection connection = DriverManager.getConnection(url, user, pass);
-                Statement statement = connection.createStatement();
-                int count = 0;
-                ResultSet checkLoanIP = statement
-                        .executeQuery(
-                                "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN loan ON account.account_number = loan.account_number WHERE account.account_number = "
-                                        + accReNo + " AND loan.status = 'PENDING'"); //
-                while (checkLoanIP.next()) {
-                    count++;
-                }
-                checkLoanIP = statement
-                        .executeQuery(
-                                "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN loan ON account.account_number = loan.account_number WHERE account.account_number = "
-                                        + accReNo + " AND loan.status = 'APPROVED'"); //
-                while (checkLoanIP.next()) {
-                    count++;
-                }
-
-                if (count > 0) {
-                    System.out.printf("\n%s%s account has an ongoing loan.%s\n\n",
-                            ANSI_RED, accTypeName, ANSI_RESET);
-                } else {
-                    String loanTypeOp;
-                    int loanType = 0;
-                    boolean persistent = true;
-                    while (persistent) {
-                        persistent = false;
-                        System.out.println(
-                                ANSI_CYAN + "\nPlease select Loan Tenor: " + ANSI_RESET
-                                        + "\n[1] for 3 Months\n[2] for 12 Months\n[3] for 24 Months");
-                        loanTypeOp = sc.next();
-                        switch (loanTypeOp) {
-                            case "1":
-                                loanType = 3;
-                                break;
-                            case "2":
-                                loanType = 12;
-                                break;
-                            case "3":
-                                loanType = 24;
-                                break;
-                            default:
-                                System.out.print(ANSI_RED + "Invalid option, "
-                                        + "please re-enter.\n" + ANSI_RESET);
-                                persistent = true;
-                        }
-                    }
-                    double calcDebt = (loanAmt / ((Math.pow(1 + ((intRate / 100) / 12), loanType) - 1)
-                            / (((intRate / 100) / 12) * (Math.pow(1 + ((intRate / 100) / 12), loanType)))));
-                    System.out.printf("\nInstallment Per Month for Loan $%.2f/%d Months: $%.2f\n\n",
-                            loanAmt, loanType, calcDebt);
-
-                    persistent = true;
-                    while (persistent) {
-                        System.out.println(
-                                ANSI_CYAN + "Proceed with loan request?  " + ANSI_RESET
-                                        + "\n[1] Yes\n[2] No");
-                        String loanOp = sc.next();
-                        persistent = false;
-                        switch (loanOp) {
-                            case "1":
-                                try {
-                                    DecimalFormat df = new DecimalFormat("#.##");
-                                    calcDebt = Double.valueOf(df.format(calcDebt));
-
-                                    String depositAmountBalanceQuery = "INSERT INTO `loan`(`loan_id`, `account_number`, `principle_amt`, `interest_rate`, `duration`, `debt`, `date_created`, `repayment_date`, `status`) VALUES (?,?,?,?,?,?,?,?,?);";
-                                    PreparedStatement depositAmountBalance = connection
-                                            .prepareStatement(depositAmountBalanceQuery);
-                                    depositAmountBalance.setInt(1, 0);
-                                    depositAmountBalance.setString(2, accReNo);
-                                    depositAmountBalance.setDouble(3, loanAmt);
-                                    depositAmountBalance.setDouble(4, intRate);
-                                    depositAmountBalance.setInt(5, loanType);
-                                    depositAmountBalance.setDouble(6, calcDebt * loanType);
-                                    depositAmountBalance.setDate(7,
-                                            java.sql.Date.valueOf(java.time.LocalDate.now()));
-                                    depositAmountBalance.setDate(8, null);
-                                    depositAmountBalance.setString(9, "PENDING");
-                                    int rowsDptAffected = depositAmountBalance.executeUpdate();
-                                    if (rowsDptAffected <= 0) {
-                                        System.out.printf("\n%sSQL Error. Please try again.%s\n\n",
-                                                ANSI_RED, ANSI_RESET);
-                                        break;
-                                    } else {
-                                        System.out.println(ANSI_CYAN + "\nLoan request has been processed.\n"
-                                                + ANSI_RESET);
-                                        Email.sendLoanApplicationEmail(fName,email);
-                                    }
-                                } catch (Exception e) {
-                                    // TODO: handle exception
-                                    System.out.println(
-                                            ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
-                                                    + ANSI_RESET);
-                                }
-                                break;
-                            case "2":
-                                System.out.println(ANSI_RED + "\nLoan request cancelled.\n"
-                                        + ANSI_RESET);
-                                break;
-                            default:
-                                System.out.println(ANSI_RED + "Invalid option, "
-                                        + "please re-enter.\n" + ANSI_RESET);
-                                persistent = true;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                //System.out.println("Error: " + e.getMessage());
-                System.out.println(
-                        ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
-                                + ANSI_RESET);
-                return;
-            }
-        }
-    }
-
-    public static void printLatestTransactions(String accStatNo, String pin, String accStatType) {
-        String accStat = "";
-        double accStatD = 0;
-        double accStatW = 0;
-        double accStatBalance = 0;
-        int count = 0;
-        System.out.println("\nShowing (5) latest transactions:");
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, user, pass);
-            Statement statement = connection.createStatement();
-            ResultSet StatRetreival = statement
-                    .executeQuery(
-                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
-                                    + accStatNo + " AND account.account_number = " + accStatNo
-                                    + " ORDER BY transaction_id DESC LIMIT 5;"); //
-
-            String leftAlignFormat = "| %-44s | %-12.2f | %-12.2f | %-12.2f |%n";
-            System.out.format(
-                    "+----------------------------------------------+--------------+--------------+--------------+%n");
-            System.out.format(
-                    "| Transactions                                 | Desposit     | Withdrawal   | Balance      |%n");
-            System.out.format(
-                    "+----------------------------------------------+--------------+--------------+--------------+%n");
-
-            while (StatRetreival.next()) {
-                accStat = StatRetreival.getString("transaction_details");
-                accStatD = StatRetreival.getDouble("deposit_amt");
-                accStatW = StatRetreival.getDouble("withdrawal_amt");
-                accStatBalance = StatRetreival.getDouble("balance_amt");
-                count++;
-                System.out.format(leftAlignFormat, accStat, accStatD,
-                        accStatW,
-                        accStatBalance);
-                System.out.format(
-                        "+----------------------------------------------+--------------+--------------+--------------+%n");
-            }
-            System.out.println();
-        } catch (Exception e) {
-            System.out.println(
-                    ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
-                            + ANSI_RESET);
-            return;
-        }
-    }
-
-    public static void askReceipt(Scanner sc, String accReNo, String action, String actionStatement,
-            double transaction_amount, String accTypeName,
-            double accReBalance) {
-        boolean persistent = true;
-        while (persistent) {
-            System.out.println(
-                    ANSI_CYAN + "\nPrint Receipt? " + ANSI_RESET
-                            + "\n[1] Yes\n[2] No"
-                            + ANSI_RESET);
-            String pinOp = sc.next();
-            persistent = false;
-            switch (pinOp) {
-                case "1":
-                    printReceipt(accReNo, action, actionStatement,
-                            transaction_amount, accTypeName,
-                            accReBalance);
-                    break;
-                case "2":
-                    noReceipt(action, transaction_amount, accTypeName, accReBalance);
-                    break;
-                default:
-                    System.out.println(
-                            ANSI_RED + "Invalid option, please re-enter.\n"
-                                    + ANSI_RESET);
-                    persistent = true;
-            }
-        }
-    }
-
-    public static void printReceipt(String accReNo, String action, String actionStatement, double transaction_amount,
-            String accTypeName, double accReBalance) {
-        String strReFormat = "| %-20s   %-12s |%n";
-        String leftReFormat = "| %-20s   %-12.2f |%n";
-        System.out.println();
-        System.out.format(
-                "+-------------------------------------+%n");
-        System.out.format(
-                "|               Receipt               |%n");
-        System.out.format(
-                "+-------------------------------------+%n");
-        System.out.format(
-                strReFormat, "Account No.",
-                accReNo);
-        System.out.format(
-                "|                                     |%n");
-        System.out.format(leftReFormat,
-                actionStatement,
-                transaction_amount);
-        System.out.format(leftReFormat, "Account Balance",
-                accReBalance);
-        System.out.format(
-                "+-------------------------------------+%n");
-        System.out.println();
-        noReceipt(action, transaction_amount, accTypeName, accReBalance);
-    }
-
-    public static void noReceipt(String action, double transaction_amount, String accTypeName, double accReBalance) {
-        System.out.printf(
-                "\n%sYou have are successfully %s $%.2f and your current %s Account Balance is $%.2f.%s\n\n",
-                ANSI_CYAN,
-                action,
-                transaction_amount,
-                accTypeName,
-                accReBalance, ANSI_RESET);
-    }
-
-    public static void changePin(Scanner sc, String userId) {
-        Console console = System.console();
-        boolean persistent = true;
-        while (persistent) {
-            persistent = false;
-            System.out.print("\nEnter new 6 Digit Pin: ");
-            String newPin = sc.nextLine();
-            char[] enteredPin = console.readPassword();
-            newPin = String.valueOf(enteredPin);
-
-            if (newPin.matches("\\d{6}")) {
-                // Hash customer's pin with Salt and Pepper
-                String[] hashAlgo;
-                try {
-                    hashAlgo = PinHash.hashPin(newPin);
-                    String newHashedPin = hashAlgo[1];
-                    String newSalt = hashAlgo[0];
-                    // Debug
-                    System.out.println("Random Salt: " + hashAlgo[1]);
-                    System.out.println("Hashed Password: " + hashAlgo[0]);
-                    persistent = true;
-                    while (persistent) {
-                        System.out.println(
-                                ANSI_CYAN + "\nProceed with pin change? " + ANSI_RESET
-                                        + "\n[1] Yes\n[2] No"
-                                        + ANSI_RESET);
-                        String pinOp = sc.next();
-                        persistent = false;
-                        switch (pinOp) {
-                            case "1":
-                                try {
-                                    Class.forName("com.mysql.cj.jdbc.Driver");
-                                    Connection connection = DriverManager.getConnection(url, user, pass);
-
-                                    String npQuery = "UPDATE account SET pin = ?, salt = ? WHERE user_id = ?";
-                                    PreparedStatement npStatement = connection
-                                            .prepareStatement(npQuery);
-                                    npStatement.setString(1, newHashedPin);
-                                    npStatement.setString(2, newSalt);
-                                    npStatement.setString(3, userId);
-                                    npStatement.executeUpdate();
-                                    System.out
-                                            .println(
-                                                    ANSI_CYAN
-                                                            + "\nYou have successfully changed your pin.\n"
-                                                            + ANSI_RESET);
-                                } catch (Exception e) {
-                                    // TODO: handle exception
-                                    System.out.println(
-                                            ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
-                                                    + ANSI_RESET);
-                                }
-                                break;
-                            case "2":
-                                System.out.println(ANSI_RED + "\nOperation cancelled.\n"
-                                        + ANSI_RESET);
-                                break;
-                            default:
-                                System.out.println(
-                                        ANSI_RED + "Invalid option, please re-enter.\n"
-                                                + ANSI_RESET);
-                                persistent = true;
-                        }
-                    }
-                } catch (NoSuchAlgorithmException e) {
-                    // TODO Auto-generated catch block
-                    System.out.println(
-                            ANSI_RED + "\nAn error has occurred, please try again.\n"
-                                    + ANSI_RESET);
-                }
-                break;
-            } else {
-                System.out.println(
-                        ANSI_RED + "\nInvalid input. " + ANSI_RESET
-                                + "Please enter a 6 digit pin: ");
-                persistent = true;
-            }
-        }
-    }
-
     public static void CustomerMode() throws Exception {
         // need to change userid to cc no.?
         // pin login by decryptng hash
@@ -736,13 +761,15 @@ public class MainAtmCli {
         String accNum = sc.next();
         System.out.println("Please Enter Your Pin: ");
         String pin = sc.nextLine();
-        char[] enteredPin = console.readPassword();
-        pin = String.valueOf(enteredPin);
+        if (System.console() != null) {
+            char[] enteredPin = console.readPassword();
+            pin = String.valueOf(enteredPin);
+        }
         System.out.println();
 
-        validator(accNum, pin);
+        CustomerLogin.validator(accNum, pin);
     }
-        
+
     public static void showCustomerMenu(String accNum, String pin, String userId) throws Exception {
         Scanner sc = new Scanner(System.in);
         // SQL Connection
@@ -756,18 +783,18 @@ public class MainAtmCli {
         double savingsBalance = 0;
         double checkingBalance = 0;
 
-        name = getProfile(userId, pin);
-        SAaccNo = getAccounts(userId, "Savings Account", pin);
-        CAaccNo = getAccounts(userId, "Current Account", pin);
-        savingsBalance = getBalanceFromAccount(SAaccNo, pin);
-        checkingBalance = getBalanceFromAccount(CAaccNo, pin);
+        name = CustomerStat.getProfile(userId, pin);
+        SAaccNo = CustomerStat.getAccounts(userId, "Savings Account", pin);
+        CAaccNo = CustomerStat.getAccounts(userId, "Current Account", pin);
+        savingsBalance = CustomerStat.getBalanceFromAccount(SAaccNo, pin);
+        checkingBalance = CustomerStat.getBalanceFromAccount(CAaccNo, pin);
 
         String choice;
         double totalBalance = checkingBalance + savingsBalance;
         double deposit_amount = 0;
         double transfer_amount = 0;
         double withdrawal_amount = 0; // Not sure if we should impose a min withdraw amount
-        double loan_amount= 0;
+        double loan_amount = 0;
 
         System.out.println(ANSI_YELLOW + "Hello " + name + ",");
         System.out.println("As of " + new java.util.Date() + "," + ANSI_RESET);
@@ -822,8 +849,8 @@ public class MainAtmCli {
             choice = sc.next();
             switch (choice) {
                 case "1":
-                    savingsBalance = getBalanceFromAccount(SAaccNo, pin);
-                    checkingBalance = getBalanceFromAccount(CAaccNo, pin);
+                    savingsBalance = CustomerStat.getBalanceFromAccount(SAaccNo, pin);
+                    checkingBalance = CustomerStat.getBalanceFromAccount(CAaccNo, pin);
                     totalBalance = checkingBalance + savingsBalance;
                     System.out.printf("\n%sYour current balance is $%.2f%s\n", ANSI_YELLOW, totalBalance, ANSI_RESET);
                     System.out.println(ANSI_YELLOW + "Last Updated: " + new java.util.Date() + ANSI_RESET);
@@ -839,12 +866,12 @@ public class MainAtmCli {
 
                 case "2":
                     String action = "transfer";
-                    List<String> accList = selectAccount(sc, CAaccNo, SAaccNo, action);
+                    List<String> accList = CustomerStat.selectAccount(sc, CAaccNo, SAaccNo, action);
                     String accTrfNo = accList.get(0);
                     String accRrfNo = null;
                     String accTypeName = accList.get(1);
 
-                    List<Object> trfList = retrieveAcc(accTrfNo, pin, accTypeName);
+                    List<Object> trfList = CustomerStat.retrieveAcc(accTrfNo, pin, accTypeName);
                     boolean trfpassedTest = (boolean) trfList.get(0);
                     double trfaccReBalance = 0;
                     String trfName = null;
@@ -854,6 +881,8 @@ public class MainAtmCli {
                     double rrfaccReBalance = 0;
                     String rrfName = null;
 
+                    boolean checker = true;
+
                     if (trfpassedTest) {
                         trfaccReBalance = (double) trfList.get(1);
                         trfName = (String) trfList.get(2);
@@ -861,8 +890,14 @@ public class MainAtmCli {
                             System.out.print(
                                     "\nEnter Account No. to transfer to: #");
                             accRrfNo = sc.next();
-                            rrfList = retrieveAcc(accRrfNo, pin, "***");
+                            rrfList = CustomerStat.retrieveAcc(accRrfNo, pin, "***");
                             rrfpassedTest = (boolean) rrfList.get(0);
+
+                            if (accRrfNo.equals(accTrfNo)) {
+                                System.out.println(
+                                        ANSI_RED + "You cannot transfer to the same account.\n" + ANSI_RESET);
+                                checker = false;
+                            }
                         }
                         rrfaccReBalance = (double) rrfList.get(1);
                         rrfName = (String) rrfList.get(2);
@@ -871,12 +906,12 @@ public class MainAtmCli {
                         String actionStatementFrom = "TRANSFER FROM ACC NO." + accTrfNo;
 
                         // Get current available balance
-                        double currentBalanceToTransfer = getBalanceFromAccount(accTrfNo, pin);
-                        boolean checker = true;
+                        double currentBalanceToTransfer = CustomerStat.getBalanceFromAccount(accTrfNo, pin);
                         while (checker) {
                             checker = false;
                             System.out.print("\nEnter amount to transfer: $");
                             transfer_amount = sc.nextDouble();
+
                             if (transfer_amount > currentBalanceToTransfer) {
                                 System.out
                                         .println(ANSI_RED + "Your balance is insufficient, please re-enter amount."
@@ -893,12 +928,14 @@ public class MainAtmCli {
                                                 + ANSI_RESET);
                                 checker = true;
                             } else {
-                                cDeposit(sc, userId, pin, accRrfNo, accTypeName, action, actionStatementFrom,
+                                CustomerATM.cDeposit(sc, userId, pin, accRrfNo, accTypeName, action,
+                                        actionStatementFrom,
                                         transfer_amount,
                                         rrfaccReBalance, rrfName);
-                                cWithdraw(sc, userId, pin, accTrfNo, accTypeName, action, actionStatementTo,
-                                        transfer_amount,
-                                        trfaccReBalance, trfName);
+                                CustomerATM
+                                        .cWithdraw(sc, userId, pin, accTrfNo, accTypeName, action, actionStatementTo,
+                                                transfer_amount,
+                                                trfaccReBalance, trfName);
                             }
                         }
                     }
@@ -907,17 +944,17 @@ public class MainAtmCli {
                 case "3":
                     action = "withdraw";
                     String actionStatement = "ATM WITHDRAWAL";
-                    accList = selectAccount(sc, CAaccNo, SAaccNo, action);
+                    accList = CustomerStat.selectAccount(sc, CAaccNo, SAaccNo, action);
                     String accReNo = accList.get(0);
                     accTypeName = accList.get(1);
 
-                    List<Object> rList = retrieveAcc(accReNo, pin, accTypeName);
+                    List<Object> rList = CustomerStat.retrieveAcc(accReNo, pin, accTypeName);
                     boolean passedTest = (boolean) rList.get(0);
                     if (passedTest) {
                         double accReBalance = (double) rList.get(1);
                         trfName = (String) rList.get(2);
                         // Get current avaliable balance
-                        double currentBalanceToWithdraw = getBalanceFromAccount(accReNo, pin);
+                        double currentBalanceToWithdraw = CustomerStat.getBalanceFromAccount(accReNo, pin);
                         System.out.print("\nEnter amount to withdraw: $");
                         withdrawal_amount = sc.nextDouble();
                         while (withdrawal_amount > currentBalanceToWithdraw) {
@@ -926,7 +963,7 @@ public class MainAtmCli {
                             System.out.print("Enter amount to withdraw: $");
                             withdrawal_amount = sc.nextDouble();
                         }
-                        boolean checker = true;
+                        checker = true;
                         while (checker) {
                             checker = false;
                             if (withdrawal_amount <= 0) {
@@ -939,13 +976,15 @@ public class MainAtmCli {
                             }
                         }
                         // withdraw(accNum, pin, withdrawal_amount, totalBalance);
-                        cWithdraw(sc, userId, pin, accReNo, accTypeName, action, actionStatement, withdrawal_amount,
-                                accReBalance, trfName);
+                        CustomerATM
+                                .cWithdraw(sc, userId, pin, accReNo, accTypeName, action, actionStatement,
+                                        withdrawal_amount,
+                                        accReBalance, trfName);
                     }
                     break;
                 case "4":
-                    savingsBalance = getBalanceFromAccount(SAaccNo, pin);
-                    checkingBalance = getBalanceFromAccount(CAaccNo, pin);
+                    savingsBalance = CustomerStat.getBalanceFromAccount(SAaccNo, pin);
+                    checkingBalance = CustomerStat.getBalanceFromAccount(CAaccNo, pin);
                     totalBalance = checkingBalance + savingsBalance;
                     System.out.println(ANSI_YELLOW + "\nAs of " + new java.util.Date() + "," + ANSI_RESET);
                     System.out.println("Here are your list of accounts: ");
@@ -966,18 +1005,18 @@ public class MainAtmCli {
                 case "5":
                     action = "deposit";
                     actionStatement = "ATM DEPOSIT";
-                    accList = selectAccount(sc, CAaccNo, SAaccNo, action);
+                    accList = CustomerStat.selectAccount(sc, CAaccNo, SAaccNo, action);
                     accReNo = accList.get(0);
                     accTypeName = accList.get(1);
 
-                    rList = retrieveAcc(accReNo, pin, accTypeName);
+                    rList = CustomerStat.retrieveAcc(accReNo, pin, accTypeName);
                     passedTest = (boolean) rList.get(0);
                     if (passedTest) {
                         double accReBalance = (double) rList.get(1);
                         trfName = (String) rList.get(2);
                         System.out.print("\nEnter amount to deposit: $");
                         deposit_amount = sc.nextDouble();
-                        boolean checker = true;
+                        checker = true;
                         while (checker) {
                             checker = false;
                             if (deposit_amount <= 0) {
@@ -989,9 +1028,11 @@ public class MainAtmCli {
                                 checker = true;
                             }
                         }
-                        cDeposit(sc, userId, pin, accReNo, accTypeName, action, actionStatement, deposit_amount,
-                                accReBalance,
-                                trfName);
+                        CustomerATM
+                                .cDeposit(sc, userId, pin, accReNo, accTypeName, action, actionStatement,
+                                        deposit_amount,
+                                        accReBalance,
+                                        trfName);
                     }
                     break;
                 case "6":
@@ -1055,7 +1096,7 @@ public class MainAtmCli {
         String xchoice = sc.next();
         switch (xchoice) {
             case "1":
-                changePin(sc, userId);
+                CustomerATM.changePin(sc, userId);
                 break;
 
             case "2":
@@ -1066,7 +1107,7 @@ public class MainAtmCli {
                 // when approved, set repayment date by 1 month from approval
                 String action = "repay loan";
                 String actionStatement = "LOAN REPAYMENT";
-                List<String> accList = selectAccount(sc, CAaccNo, SAaccNo, action);
+                List<String> accList = CustomerStat.selectAccount(sc, CAaccNo, SAaccNo, action);
                 String accReNo = accList.get(0);
                 String accTypeName = accList.get(1);
 
@@ -1128,19 +1169,19 @@ public class MainAtmCli {
 
                     action = "repay loan";
                     actionStatement = "LOAN REPAYMENT";
-                    accList = selectAccount(sc, CAaccNo, SAaccNo, action);
+                    accList = CustomerStat.selectAccount(sc, CAaccNo, SAaccNo, action);
                     accReNo = accList.get(0);
                     accTypeName = accList.get(1);
 
                     double currentMonthDebt = currentDebt / duration;
 
-                    List<Object> payList = retrieveAcc(accReNo, pin, accTypeName);
+                    List<Object> payList = CustomerStat.retrieveAcc(accReNo, pin, accTypeName);
                     boolean passedTest = (boolean) payList.get(0);
                     if (passedTest) {
                         double accReBalance = (double) payList.get(1);
                         String trfName = (String) payList.get(2);
                         // Get current avaliable balance
-                        double currentBalanceToWithdraw = getBalanceFromAccount(accReNo, pin);
+                        double currentBalanceToWithdraw = CustomerStat.getBalanceFromAccount(accReNo, pin);
                         System.out.printf("\nAmount to repay: $%.2f", currentMonthDebt);
                         if (currentMonthDebt > currentBalanceToWithdraw) {
                             System.out.println(
@@ -1162,9 +1203,10 @@ public class MainAtmCli {
                             }
                             debt -= currentMonthDebt;
 
-                            cWithdraw(sc, userId, pin, accReNo, accTypeName, action, actionStatement,
-                                    currentMonthDebt,
-                                    accReBalance, trfName);
+                            CustomerATM
+                                    .cWithdraw(sc, userId, pin, accReNo, accTypeName, action, actionStatement,
+                                            currentMonthDebt,
+                                            accReBalance, trfName);
                             String updateLoanQuery = "UPDATE `loan` SET `principle_amt`=?,`interest_rate`=?,`duration`=?,`debt`=?,`repayment_date`=?,`status`=? WHERE `loan_id` = ?";
                             PreparedStatement updateLoanStatement = connection
                                     .prepareStatement(updateLoanQuery);
@@ -1197,7 +1239,7 @@ public class MainAtmCli {
 
                 action = "loan application";
                 actionStatement = "LOAN APPLICATION";
-                accList = selectAccount(sc, CAaccNo, SAaccNo, actionStatement);
+                accList = CustomerStat.selectAccount(sc, CAaccNo, SAaccNo, actionStatement);
                 accLoanNo = accList.get(0);
                 accLoanTypeName = accList.get(1);
 
@@ -1216,19 +1258,20 @@ public class MainAtmCli {
                     }
                 }
 
-                applyLoan(sc, userId, pin, accLoanNo, accLoanTypeName, action, actionStatement, loan_amount,
-                        intRate, proRate, lateRate);
+                CustomerATM
+                        .applyLoan(sc, userId, pin, accLoanNo, accLoanTypeName, action, actionStatement, loan_amount,
+                                intRate, proRate, lateRate);
                 break;
 
             case "5":
                 actionStatement = "PRINT LATEST TRANSACTIONS";
-                accList = selectAccount(sc, CAaccNo, SAaccNo, actionStatement);
+                accList = CustomerStat.selectAccount(sc, CAaccNo, SAaccNo, actionStatement);
                 String accStatNo = accList.get(0);
                 String accStatType = accList.get(1);
-                List<Object> pList = retrieveAcc(accStatNo, pin, accStatType);
+                List<Object> pList = CustomerStat.retrieveAcc(accStatNo, pin, accStatType);
                 boolean passedTest = (boolean) pList.get(0);
                 if (passedTest) {
-                    printLatestTransactions(accStatNo, pin, accStatType);
+                    CustomerATM.printLatestTransactions(accStatNo, pin, accStatType);
                 }
                 break;
 
@@ -1241,7 +1284,6 @@ public class MainAtmCli {
                 System.exit(0);
         }
     }
-    
 
     public static void TellerMode() throws Exception {
         Scanner sc = new Scanner(System.in);
@@ -1249,7 +1291,7 @@ public class MainAtmCli {
                 "Please enter your username: ");
         String username = sc.next();
         Console console = System.console();
-        char[] passwordArray = console.readPassword("Enter your  password: ");
+        char[] passwordArray = console.readPassword("Enter your password: ");
         String password = String.valueOf(passwordArray);
         try {
             Database db = new Database();
@@ -1282,16 +1324,16 @@ public class MainAtmCli {
         Scanner sc = new Scanner(System.in);
         while (true) {
             System.out.println("""
-                What would you like to do today?
-                [1] Create a new customer account
-                [2] Add account to an existing customer
-                [3] Add card to an existing customer
-                [4] Close customer account
-                [5] Change customer pin number
-                [6] Loan Approval
-                [7] [TEST FUNCTION] Send Welcome Email
-                [0] Quit
-                """);
+                    What would you like to do today?
+                    [1] Create a new customer account
+                    [2] Add account to an existing customer
+                    [3] Add card to an existing customer
+                    [4] Close customer account
+                    [5] Change customer pin number
+                    [6] Loan Approval
+                    [7] [TEST FUNCTION] Send Welcome Email
+                    [0] Quit
+                    """);
             try {
                 int choice = sc.nextInt();
                 switch (choice) {
@@ -1322,8 +1364,8 @@ public class MainAtmCli {
                     }
                     case 7 -> {
                         System.out.println("Option [7]: Send Welcome Email\n[NOTICE] THIS IS A EXPERIMENTAL FEATURE!");
-                        //Email.sendEmailPrep("250404701",1);
-                        Email.sendEmailPrep("250404701",2);
+                        // Email.sendEmailPrep("250404701",1);
+                        Email.sendEmailPrep("250404701", 2);
                     }
                     case 0 -> {
                         System.out.println("Good bye!");
@@ -1334,7 +1376,7 @@ public class MainAtmCli {
                 if (choice >= 1 && choice <= 3) {
                     break;
                 }
-            }catch (java.util.InputMismatchException e){
+            } catch (java.util.InputMismatchException e) {
                 System.out.println("Invalid input. Please enter a number.");
                 sc.nextLine();
             }
@@ -1354,7 +1396,7 @@ public class MainAtmCli {
             System.out.println("Invalid selection. Please try again.");
             customerType = sc.nextInt();
         }
-        if (customerType == 1){
+        if (customerType == 1) {
             String nric;
             boolean isValid = false;
 
@@ -1370,96 +1412,98 @@ public class MainAtmCli {
                     System.out.println(nric + " is not a valid NRIC number. Please enter a valid NRIC.");
                 }
             }
-        }else{
+        } else {
             String passNum;
             boolean isValid = false;
-            while (!isValid){
+            while (!isValid) {
                 System.out.println("Please enter the customer's passport number: ");
                 passNum = sc.next().toUpperCase();
 
-                if (Customer.isValidPassport(passNum)){
+                if (Customer.isValidPassport(passNum)) {
                     System.out.println(passNum + " is a valid passport number.");
                     cust.setPnumber(passNum);
                     isValid = true;
-                }else{
-                    System.out.println(passNum + " is not a valid passport number. Please enter a valid passport number");
+                } else {
+                    System.out
+                            .println(passNum + " is not a valid passport number. Please enter a valid passport number");
                 }
             }
         }
-        //consume the end of line at the end of sc.next()
+        // consume the end of line at the end of sc.next()
         sc.nextLine();
         System.out.println("Please enter the customer's country: ");
         cust.setCountry(sc.nextLine().toUpperCase());
         System.out.println("Please enter the customer's gender: ");
         cust.setGender(sc.next().toUpperCase());
-        //consume the end of line at the end of sc.next()
+        // consume the end of line at the end of sc.next()
         sc.nextLine();
         System.out.println("Please enter the customer's date of birth (YYYY-MM-DD): ");
         cust.setDob(sc.next());
-        //System.out.println("Please enter the customer's mobile number: ");
-        //cust.setmNumber(sc.next());
-        //String mNum = sc.next();
+        // System.out.println("Please enter the customer's mobile number: ");
+        // cust.setmNumber(sc.next());
+        // String mNum = sc.next();
         boolean isValid = false;
-        while (!isValid){
+        while (!isValid) {
             System.out.println("Please enter the customer's mobile number: ");
             cust.setmNumber(sc.next());
-            if (Customer.isValidMobileNumber(cust.getmNumber())){
+            if (Customer.isValidMobileNumber(cust.getmNumber())) {
                 System.out.println("Valid mobile number");
                 isValid = true;
-            }else{
+            } else {
                 System.out.println("Invalid mobile number, please enter a valid mobile number.");
             }
         }
-        //System.out.println("Please enter the customer's email: ");
-        //cust.setEmail(sc.next());
+        // System.out.println("Please enter the customer's email: ");
+        // cust.setEmail(sc.next());
         isValid = false;
-        while (!isValid){
+        while (!isValid) {
             System.out.println("Please enter the customer's email: ");
             cust.setEmail(sc.next());
-            if (Customer.isValidEmail(cust.getEmail())){
+            if (Customer.isValidEmail(cust.getEmail())) {
                 System.out.println("Valid email");
                 isValid = true;
-            }else{
+            } else {
                 System.out.println("Invalid email address, please enter a valid email address.");
             }
         }
-        //consume the end of line at the end of sc.next()
+        // consume the end of line at the end of sc.next()
         sc.nextLine();
         System.out.println("Please enter the customer's address: ");
         cust.setAddress(sc.nextLine());
 
-        //Generate timestamp for account creation
+        // Generate timestamp for account creation
         java.util.Date dt = new java.util.Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String creationDateTime = sdf.format(dt);
 
-
-        //Check if customer exist in the database
+        // Check if customer exist in the database
         try {
             ResultSet resultSet;
-            if (customerType == 1){
+            if (customerType == 1) {
                 String query = "SELECT user_id,nric,passport_number FROM customer WHERE nric=?";
                 PreparedStatement pStatement = db.getConnection().prepareStatement(query);
-                pStatement.setString(1, cust.getNric());;
+                pStatement.setString(1, cust.getNric());
+                ;
                 resultSet = db.executeQuery(pStatement);
 
-            } else{
+            } else {
                 String query = "SELECT user_id,nric,passport_number FROM customer WHERE passport_number=?";
                 PreparedStatement pStatement = db.getConnection().prepareStatement(query);
-                pStatement.setString(1, cust.getPnumber());;
+                pStatement.setString(1, cust.getPnumber());
+                ;
                 resultSet = db.executeQuery(pStatement);
             }
             if (resultSet.next()) {
                 System.out.println("This account already exist!");
                 showTellerMenu();
             }
-        }catch (ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             System.out.println("Error: MySQL driver not found.");
-        }catch (SQLException e){
+        } catch (SQLException e) {
             System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
         }
 
-        //Insert customer account into DB
+        // Insert customer account into DB
         try {
             String query = "INSERT INTO customer(full_name, nric, passport_number, country, gender, dob, mobile_number, address, email, created_date,deactivation_date) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement pStatement = db.getConnection().prepareStatement(query);
@@ -1473,16 +1517,19 @@ public class MainAtmCli {
             pStatement.setString(8, cust.getAddress());
             pStatement.setString(9, cust.getEmail());
             pStatement.setString(10, creationDateTime);
-            pStatement.setNull(11,Types.DATE);
+            pStatement.setNull(11, Types.DATE);
             if (db.executeUpdate(pStatement) > 0) {
                 System.out.println("Customer account has been created successfully!");
                 ResultSet resultSet;
-                if (customerType == 1){
+                if (customerType == 1) {
                     System.out.println("NRIC route");
-                    resultSet = db.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE nric='" + cust.getNric() + "'");
-                }else{
+                    resultSet = db.executeQuery(
+                            "SELECT user_id,nric,passport_number FROM customer WHERE nric='" + cust.getNric() + "'");
+                } else {
                     System.out.println("Pnumber route");
-                    resultSet = db.executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE passport_number='" + cust.getPnumber() + "'");
+                    resultSet = db
+                            .executeQuery("SELECT user_id,nric,passport_number FROM customer WHERE passport_number='"
+                                    + cust.getPnumber() + "'");
                 }
                 String userId = null;
                 if (resultSet.next()) {
@@ -1513,27 +1560,28 @@ public class MainAtmCli {
             System.out.println("Invalid selection. Please try again.");
             selection = sc.nextInt();
         }
-        if (selection == 1){
+        if (selection == 1) {
             acc.setAccountType("Savings Account");
-        } else{
+        } else {
             acc.setAccountType("Current Account");
         }
         String bankAccountNumber = null;
         while (bankAccountNumber == null) {
-            //Generate 9-digit account number with prefix
+            // Generate 9-digit account number with prefix
             bankAccountNumber = BnkAccNumGen.generateNumber(selection);
-            //Debug
+            // Debug
             System.out.println("Bank Account Number Generated: " + bankAccountNumber);
             try {
                 ResultSet resultSet;
                 String query = "SELECT account_number, user_id FROM account where account_number=?";
                 PreparedStatement pStatement = db.getConnection().prepareStatement(query);
-                pStatement.setString(1, bankAccountNumber);;
+                pStatement.setString(1, bankAccountNumber);
+                ;
                 resultSet = db.executeQuery(pStatement);
                 if (resultSet.next()) {
                     System.out.println("This account number already exist!" +
                             "\nRegenerating a new account number...");
-                    bankAccountNumber = null; //Reset Bank Account Number to null to regenerate a new account number
+                    bankAccountNumber = null; // Reset Bank Account Number to null to regenerate a new account number
                 }
             } catch (SQLException e) {
                 System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
@@ -1551,23 +1599,23 @@ public class MainAtmCli {
             }
         }
 
-        //Hash customer's pin with Salt and Pepper
+        // Hash customer's pin with Salt and Pepper
         String[] hashAlgo = PinHash.hashPin(pin);
         acc.setPin(hashAlgo[1]);
         acc.setSalt(hashAlgo[0]);
-        //String hashedPin = hashAlgo[0];
-        //String salt = hashAlgo[1];
+        // String hashedPin = hashAlgo[0];
+        // String salt = hashAlgo[1];
 
-        //Debug
+        // Debug
         System.out.println("Random Salt: " + hashAlgo[0]);
         System.out.println("Hashed Password: " + hashAlgo[1]);
 
-        //Generate timestamp for account creation
+        // Generate timestamp for account creation
         java.util.Date dt = new java.util.Date();
         SimpleDateFormat cd = new SimpleDateFormat("yyyy-MM-dd");
         String creationDate = cd.format(dt);
 
-        //Insert customer account into DB
+        // Insert customer account into DB
         try {
             String query = "INSERT INTO account(account_number, user_id, pin, salt, account_type, created_date) VALUES(?,?,?,?,?,?)";
             PreparedStatement pStatement = db.getConnection().prepareStatement(query);
@@ -1580,27 +1628,27 @@ public class MainAtmCli {
             int rowsAffected = pStatement.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Customer account has been created successfully!");
-                Email.sendEmailPrep(acc.getAccountNo(),1);
+                Email.sendEmailPrep(acc.getAccountNo(), 1);
                 System.out.println("""
                         Do you want to proceed to card creation?
                         [1] Yes
                         [2] No
                         """);
                 int choice = sc.nextInt();
-                while (choice != 1 && choice != 2){
+                while (choice != 1 && choice != 2) {
                     System.out.println("Invalid selection, please enter your choice: ");
                     choice = sc.nextInt();
                 }
-                if (choice == 1){
+                if (choice == 1) {
                     createCard(bankAccountNumber);
-                }else{
+                } else {
                     showTellerMenu();
                 }
             }
             db.closeConnection();
         } catch (SQLException e) {
             System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
-        } catch (ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             System.out.println("Class error: " + e.getMessage());
         }
     }
@@ -1613,19 +1661,19 @@ public class MainAtmCli {
 
         System.out.println("\nCard Creation Process");
         System.out.println("""
-               Please select the card type:
-               [1] Debit Card
-               [2] Credit Card
-               """);
+                Please select the card type:
+                [1] Debit Card
+                [2] Credit Card
+                """);
         String cardType = null;
         int selection = sc.nextInt();
         while (selection != 1 && selection != 2) {
             System.out.println("Invalid selection. Please try again.");
             selection = sc.nextInt();
         }
-        if (selection == 1){
+        if (selection == 1) {
             card.setCardType("Debit Card");
-        } else{
+        } else {
             card.setCardType("Credit Card");
         }
         System.out.println("""
@@ -1638,40 +1686,41 @@ public class MainAtmCli {
             System.out.println("Invalid selection. Please try again.");
             cardNetworkSelection = sc.nextInt();
         }
-        //Generate Card Number
+        // Generate Card Number
         String cardNumber = null;
         while (cardNumber == null) {
-            //Generate 16 digit card number depending on Visa or Masters
+            // Generate 16 digit card number depending on Visa or Masters
             cardNumber = CardGenerator.generateCardNumber(cardNetworkSelection);
-            //Debug
+            // Debug
             System.out.println("ATM Card Number Generated: " + cardNumber);
             try {
-                ResultSet resultSet = db.executeQuery("SELECT card_number,account_number FROM card WHERE card_number=" + cardNumber);
+                ResultSet resultSet = db
+                        .executeQuery("SELECT card_number,account_number FROM card WHERE card_number=" + cardNumber);
                 if (resultSet.next()) {
                     System.out.println("This card number already exist!" +
                             "\nRegenerating a new card number...");
-                    cardNumber = null; //Reset cardNumber to null to regenerate a new card number
+                    cardNumber = null; // Reset cardNumber to null to regenerate a new card number
                 }
             } catch (SQLException e) {
                 System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
             }
         }
         card.setCardNumber(cardNumber);
-        //Create Expiry date (+5 years from date of issue)
+        // Create Expiry date (+5 years from date of issue)
         Calendar expiryDate = Calendar.getInstance();
         expiryDate.add(Calendar.YEAR, 5); // add 5 years
         SimpleDateFormat sdf = new SimpleDateFormat("MM/yyyy");
-        //String formattedExpiryDate = sdf.format(expiryDate.getTime());
+        // String formattedExpiryDate = sdf.format(expiryDate.getTime());
         card.setExpDate(sdf.format(expiryDate.getTime()));
-        //debug
+        // debug
         System.out.println(card.getExpDate());
 
-        //generate CVV
+        // generate CVV
         card.setCVV(CVVGenerator.generateCVV(cardNumber, card.getExpDate()));
-        //debug
-        System.out.println("CVV:"+card.getCVV());
+        // debug
+        System.out.println("CVV:" + card.getCVV());
 
-        //Generate timestamp for account creation
+        // Generate timestamp for account creation
         java.util.Date dt = new java.util.Date();
         SimpleDateFormat cd = new SimpleDateFormat("yyyy-MM-dd");
         String creationDate = cd.format(dt);
@@ -1687,7 +1736,7 @@ public class MainAtmCli {
             int rowsAffected = pStatement.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("The customer's card is successfully created!");
-                Email.sendEmailPrep(accNum,2);
+                Email.sendEmailPrep(accNum, 2);
                 showTellerMenu();
             } else {
                 System.out.println("Sum ting wong!");
@@ -1698,32 +1747,32 @@ public class MainAtmCli {
         }
     }
 
-    public static void addAccount(){
+    public static void addAccount() {
         Scanner sc = new Scanner(System.in);
         Database db = new Database();
         System.out.println("Please enter customer's current account number: ");
         String accNo = sc.next();
         String userId = null;
-        try{
+        try {
             ResultSet resultSet;
-            resultSet = db.executeQuery("SELECT * FROM account where account_number = "+accNo);
-            if (resultSet.next()){
+            resultSet = db.executeQuery("SELECT * FROM account where account_number = " + accNo);
+            if (resultSet.next()) {
                 userId = resultSet.getString("user_id");
                 createAccount(userId);
-            }else{
+            } else {
                 System.out.println("""
                         No customer account found!
                         Do you want to create one now?
                         [1] Yes
                         [2] No""");
                 int selection = sc.nextInt();
-                while (selection != 1 && selection != 2){
+                while (selection != 1 && selection != 2) {
                     System.out.println("Invalid selection, please enter your choice: ");
                     selection = sc.nextInt();
                 }
-                if (selection == 1){
+                if (selection == 1) {
                     CreateNewCustomerAccount();
-                }else{
+                } else {
                     showTellerMenu();
                 }
             }
@@ -1733,11 +1782,11 @@ public class MainAtmCli {
         } catch (NoSuchAlgorithmException e) {
             System.out.println("Algorithmic Error: " + e.getMessage());
         } catch (ClassNotFoundException e) {
-            System.out.println("Class Error: "+ e.getMessage());
+            System.out.println("Class Error: " + e.getMessage());
         }
     }
 
-    public static void addCard(){
+    public static void addCard() {
         Scanner sc = new Scanner(System.in);
         Database db = new Database();
         System.out.println("\n[Notice] The account number entered will be the account tied to the card!");
@@ -1751,28 +1800,28 @@ public class MainAtmCli {
                 System.out.println("Invalid input. Please enter customer's current account number: ");
             }
         }
-        try{
+        try {
             ResultSet resultSet;
-            resultSet = db.executeQuery("SELECT * FROM account where account_number = "+accNo);
-            if (resultSet.next()){
-                resultSet = db.executeQuery("SELECT account_number FROM card where account_number = "+accNo);
-                if (resultSet.next()){
+            resultSet = db.executeQuery("SELECT * FROM account where account_number = " + accNo);
+            if (resultSet.next()) {
+                resultSet = db.executeQuery("SELECT account_number FROM card where account_number = " + accNo);
+                if (resultSet.next()) {
                     createCard(accNo);
                 }
-            }else{
+            } else {
                 System.out.println("""
                         No customer account found!
                         Do you want to create one now?
                         [1] Yes
                         [2] No""");
                 int selection = sc.nextInt();
-                while (selection != 1 && selection != 2){
+                while (selection != 1 && selection != 2) {
                     System.out.println("Invalid selection, please enter your choice: ");
                     selection = sc.nextInt();
                 }
-                if (selection == 1){
+                if (selection == 1) {
                     CreateNewCustomerAccount();
-                }else{
+                } else {
                     showTellerMenu();
                 }
             }
@@ -1782,7 +1831,7 @@ public class MainAtmCli {
         } catch (NoSuchAlgorithmException e) {
             System.out.println("Algorithmic Error: " + e.getMessage());
         } catch (ClassNotFoundException e) {
-            System.out.println("Class Error: "+ e.getMessage());
+            System.out.println("Class Error: " + e.getMessage());
         }
     }
 
@@ -1791,16 +1840,17 @@ public class MainAtmCli {
         System.out.println("\nClose Account Process");
         System.out.println("Please enter customer's account number: ");
         String accountNumber = sc.next();
-        //Generate timestamp for account creation
+        // Generate timestamp for account creation
         java.util.Date dt = new java.util.Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String deactivationDate = sdf.format(dt);
-        if (accountExists(accountNumber)){
-            if(accountDeactivated(accountNumber)){
+        if (accountExists(accountNumber)) {
+            if (accountDeactivated(accountNumber)) {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 Connection connection = DriverManager.getConnection(url, user, pass);
                 Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM account WHERE account_number=" + accountNumber);
+                ResultSet resultSet = statement
+                        .executeQuery("SELECT * FROM account WHERE account_number=" + accountNumber);
                 if (resultSet.next()) {
                     System.out.println("Getting user ID");
                     String userId = resultSet.getString("user_id");
@@ -1835,10 +1885,10 @@ public class MainAtmCli {
                         }
                     }
                 }
-            }else{
+            } else {
                 System.out.println("Error: Account is already closed!");
             }
-        }else {
+        } else {
             System.out.println("Error: Account does not exist!");
         }
     }
@@ -1847,8 +1897,8 @@ public class MainAtmCli {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter the customer's Account Number");
         String accNo = sc.next();
-        if (accountExists(accNo)){
-            if (accountDeactivated(accNo)){
+        if (accountExists(accNo)) {
+            if (accountDeactivated(accNo)) {
                 System.out.println("Please enter the new pin number: ");
                 String newPin = null;
                 while (true) {
@@ -1859,11 +1909,11 @@ public class MainAtmCli {
                         System.out.print("Invalid pin. Please enter a 6 digit pin: ");
                     }
                 }
-                //Hash customer's pin with Salt and Pepper
+                // Hash customer's pin with Salt and Pepper
                 String[] hashAlgo = PinHash.hashPin(newPin);
                 String hashedPin = hashAlgo[0];
                 String salt = hashAlgo[1];
-                //Debug
+                // Debug
                 System.out.println("Random Salt: " + hashAlgo[0]);
                 System.out.println("Hashed Password: " + hashAlgo[1]);
                 try {
@@ -1885,10 +1935,10 @@ public class MainAtmCli {
                 } catch (SQLException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
-            }else{
+            } else {
                 System.out.println("Error: You cannot change pin for a deactivated account!");
             }
-        }else{
+        } else {
             System.out.println("Error: Account does not exist!");
         }
     }
@@ -1908,7 +1958,8 @@ public class MainAtmCli {
             while (resultSet.next()) {
                 String accountType = resultSet.getString("account_type");
                 double balanceAmt = Double.parseDouble(resultSet.getString("balance_amt"));
-                System.out.printf("Your current balance in your %s account is $%.2f\n", ANSI_YELLOW +accountType +ANSI_RESET, balanceAmt);
+                System.out.printf("Your current balance in your %s account is $%.2f\n",
+                        ANSI_YELLOW + accountType + ANSI_RESET, balanceAmt);
             }
             resultSet.close();
             statement.close();
@@ -1920,7 +1971,8 @@ public class MainAtmCli {
         }
     }
 
-    public static void deposit(String accNum, String pin, double amount, double balance) throws ClassNotFoundException, SQLException {
+    public static void deposit(String accNum, String pin, double amount, double balance)
+            throws ClassNotFoundException, SQLException {
         Scanner sc = new Scanner(System.in);
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -1941,7 +1993,8 @@ public class MainAtmCli {
                 // iterate through the result set and print out the values in the desired format
                 while (resultSet2.next()) {
                     Double balanceAmt = Double.parseDouble(resultSet2.getString("balance_amt"));
-                    System.out.printf("You have successfully deposited $%.2f. \nYour current balance account is: $%.2f" , amount, balanceAmt);
+                    System.out.printf("You have successfully deposited $%.2f. \nYour current balance account is: $%.2f",
+                            amount, balanceAmt);
                 }
                 resultSet2.close();
                 pStatement2.close();
@@ -1964,7 +2017,11 @@ public class MainAtmCli {
             Connection connection = DriverManager.getConnection(url, user, pass);
             Statement statement = connection.createStatement();
             double balance = 0;
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM customer c JOIN account a ON c.user_id = a.user_id JOIN ( SELECT * FROM transaction WHERE account_number = " + accNum + " ORDER BY date DESC LIMIT 1) t ON a.account_number = t.account_number WHERE a.account_number = " + accNum + " AND a.pin = " + pin);
+            ResultSet resultSet = statement.executeQuery(
+                    "SELECT * FROM customer c JOIN account a ON c.user_id = a.user_id JOIN ( SELECT * FROM transaction WHERE account_number = "
+                            + accNum
+                            + " ORDER BY date DESC LIMIT 1) t ON a.account_number = t.account_number WHERE a.account_number = "
+                            + accNum + " AND a.pin = " + pin);
             while (resultSet.next()) {
                 balance = resultSet.getDouble("balance_amt");
                 System.out.printf("Your current Balance is $%.2f\n", balance);
@@ -1981,7 +2038,8 @@ public class MainAtmCli {
         return 0;
     }
 
-    public static void withdraw(String accNum, String pin, double amount, double balance) throws ClassNotFoundException, SQLException {
+    public static void withdraw(String accNum, String pin, double amount, double balance)
+            throws ClassNotFoundException, SQLException {
         Scanner sc = new Scanner(System.in);
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -2002,7 +2060,9 @@ public class MainAtmCli {
                 // iterate through the result set and print out the values in the desired format
                 while (resultSet2.next()) {
                     double balanceAmt = Double.parseDouble(resultSet2.getString("balance_amt"));
-                    System.out.printf("You have successfully withdrawed $%.2f. \nYour current account balance is: $%.2f.\n" , amount, balanceAmt);
+                    System.out.printf(
+                            "You have successfully withdrawed $%.2f. \nYour current account balance is: $%.2f.\n",
+                            amount, balanceAmt);
                 }
                 resultSet2.close();
                 pStatement2.close();
@@ -2017,6 +2077,7 @@ public class MainAtmCli {
             System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
         }
     }
+
     public static void loanApproval() throws SQLException {
         Scanner sc = new Scanner(System.in);
         Database db = new Database();
@@ -2028,13 +2089,13 @@ public class MainAtmCli {
 
             // Get the number of columns in the ResultSet
             int numColumns = metaData.getColumnCount();
-                    
+
             // Print out the column names
             for (int i = 1; i <= numColumns; i++) {
                 System.out.printf("%-20s", metaData.getColumnName(i));
             }
             System.out.println();
-            
+
             // Print out the rows (if any)
             boolean hasRows = false;
             while (resultSet.next()) {
@@ -2050,18 +2111,21 @@ public class MainAtmCli {
                 System.out.println("\nPlease select the account you want to approve: ");
                 String accNum = sc.next();
 
-                ResultSet getInfo = db.executeQuery("SELECT customer.full_name,customer.email FROM customer INNER JOIN account ON customer.user_id = account.user_id WHERE account.account_number = '"+accNum+"'");
-                while (getInfo.next()){
+                ResultSet getInfo = db.executeQuery(
+                        "SELECT customer.full_name,customer.email FROM customer INNER JOIN account ON customer.user_id = account.user_id WHERE account.account_number = '"
+                                + accNum + "'");
+                while (getInfo.next()) {
                     fName = getInfo.getString("full_name");
                     email = getInfo.getString("email");
                 }
-                ResultSet approvalResultSet = db.executeQuery("SELECT * FROM loan WHERE status = 'PENDING' and account_number = '"+accNum+"'");
-                if (approvalResultSet.next()){
+                ResultSet approvalResultSet = db.executeQuery(
+                        "SELECT * FROM loan WHERE status = 'PENDING' and account_number = '" + accNum + "'");
+                if (approvalResultSet.next()) {
                     requestedAmount = Double.parseDouble(approvalResultSet.getString("principle_amt"));
                     String intRate = approvalResultSet.getString("interest_rate");
                     int duration = Integer.parseInt(approvalResultSet.getString("duration"));
                     double debt = Double.parseDouble(approvalResultSet.getString("debt"));
-                    double repayment = debt/duration;
+                    double repayment = debt / duration;
                     loanID = approvalResultSet.getInt("loan_id");
                     String status;
                     if (!loan.approveLoan(requestedAmount)) {
@@ -2075,18 +2139,17 @@ public class MainAtmCli {
                             int rowsAffected = pStatement.executeUpdate();
                             if (rowsAffected > 0) {
                                 System.out.println("Sorry, the loan application is declined.\n");
-                                Email.sendLoanRejectionEmail(fName,email);
+                                Email.sendLoanRejectionEmail(fName, email);
                                 showTellerMenu();
                             }
-                        } catch (SQLException e){
-                            System.out.println("SQL Exception caught: "+e);
+                        } catch (SQLException e) {
+                            System.out.println("SQL Exception caught: " + e);
                         } catch (NoSuchAlgorithmException e) {
-                            System.out.println("No Such Algorithm Exception caught: "+e);
+                            System.out.println("No Such Algorithm Exception caught: " + e);
                         } catch (ClassNotFoundException e) {
-                            System.out.println("Runtime Exception caught: "+e);
+                            System.out.println("Runtime Exception caught: " + e);
                         }
-                    }
-                    else{
+                    } else {
                         status = "APPROVED";
                         // Get today's date
                         LocalDate today = LocalDate.now();
@@ -2095,30 +2158,31 @@ public class MainAtmCli {
                         try {
                             String query = "UPDATE loan SET status = ?, repayment_date = ? WHERE account_number = ? AND loan_id = ?";
                             PreparedStatement pStatement = db.getConnection().prepareStatement(query);
-                            pStatement.setString(1,status);
+                            pStatement.setString(1, status);
                             pStatement.setDate(2, java.sql.Date.valueOf(repaymentDate));
-                            pStatement.setString(3,accNum);
-                            pStatement.setInt(4,loanID);
+                            pStatement.setString(3, accNum);
+                            pStatement.setInt(4, loanID);
                             int rowsAffected = pStatement.executeUpdate();
                             if (rowsAffected > 0) {
                                 System.out.println("The loan has been approved!\n");
-                                Email.sendLoanApprovalEmail(fName,email,requestedAmount,intRate,duration,repayment);
+                                Email.sendLoanApprovalEmail(fName, email, requestedAmount, intRate, duration,
+                                        repayment);
                                 showTellerMenu();
                             }
-                        }catch (SQLException e){
-                            System.out.println("SQL Exception caught: "+e);
+                        } catch (SQLException e) {
+                            System.out.println("SQL Exception caught: " + e);
                         } catch (NoSuchAlgorithmException e) {
-                            System.out.println("No Such Algorithm Exception caught: "+e);
+                            System.out.println("No Such Algorithm Exception caught: " + e);
                         } catch (ClassNotFoundException e) {
-                            System.out.println("Runtime Exception caught: "+e);
+                            System.out.println("Runtime Exception caught: " + e);
                         }
                     }
                 }
-            }else {
+            } else {
                 System.out.println("\nNo loans to be approved, Looks like it's a quite day huh...\n");
             }
-        }catch (SQLException e){
-            System.out.println("SQL Exception caught: "+e);
+        } catch (SQLException e) {
+            System.out.println("SQL Exception caught: " + e);
         }
     }
 
@@ -2132,9 +2196,11 @@ public class MainAtmCli {
                 "               \\__/  \\__/     |_______||_______| \\______| \\______/  |__|  |__| |_______|\n" +
                 "                                                                                        \n" +
                 "    .___________.  ______           _______. __  .___________.    ___   .___________..___  ___. \n" +
-                "    |           | /  __  \\         /       ||  | |           |   /   \\  |           ||   \\/   | \n" +
+                "    |           | /  __  \\         /       ||  | |           |   /   \\  |           ||   \\/   | \n"
+                +
                 "    `---|  |----`|  |  |  |       |   (----`|  | `---|  |----`  /  ^  \\ `---|  |----`|  \\  /  | \n" +
-                "        |  |     |  |  |  |        \\   \\    |  |     |  |      /  /_\\  \\    |  |     |  |\\/|  | \n" +
+                "        |  |     |  |  |  |        \\   \\    |  |     |  |      /  /_\\  \\    |  |     |  |\\/|  | \n"
+                +
                 "        |  |     |  `--'  |    .----)   |   |  |     |  |     /  _____  \\   |  |     |  |  |  | \n" +
                 "        |__|      \\______/     |_______/    |__|     |__|    /__/     \\__\\  |__|     |__|  |__| ");
         System.out.println("\n");

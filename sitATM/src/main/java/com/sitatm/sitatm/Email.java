@@ -68,7 +68,8 @@ public class Email {
         try {
             Session session = createSession();
             String messageText = "Dear " + fName + ",\n\n" +
-                    "Welcome to SITBank! Your account has been successfully created.\n\n" +
+                    "Welcome to SITBank!\n\n" +
+                    "Your account has been successfully created.\n\n" +
                     "Here is a summary of your account information.\n" +
                     "----------------------------------------------------------------------\n" +
                     "Account number: " + accNum + "\n" +

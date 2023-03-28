@@ -1302,8 +1302,9 @@ public class MainAtmCli {
             ResultSet resultSet = db.executeQuery(pStatement);
             if (resultSet.next()) {
                 String tellerName = resultSet.getString("full_name");
-                System.out.println("\n" +
+                System.out.println("\n" + ANSI_YELLOW +
                         "Welcome " + tellerName + "!");
+                System.out.println("What would you like to do today?"+ANSI_RESET);
                 showTellerMenu();
             } else {
                 System.out.println("\n" +
@@ -1323,17 +1324,24 @@ public class MainAtmCli {
     public static void showTellerMenu() throws NoSuchAlgorithmException, SQLException, ClassNotFoundException {
         Scanner sc = new Scanner(System.in);
         while (true) {
-            System.out.println("""
-                    What would you like to do today?
-                    [1] Create a new customer account
-                    [2] Add account to an existing customer
-                    [3] Add card to an existing customer
-                    [4] Close customer account
-                    [5] Change customer pin number
-                    [6] Loan Approval
-                    [7] [TEST FUNCTION] Send Welcome Email
-                    [0] Quit
-                    """);
+            String[] menuOptions = {"Create a new customer account", 
+                         "Add account to an existing customer", 
+                         "Add card to an existing customer", 
+                         "Close customer account", 
+                         "Change customer pin number", 
+                         "Loan Approval"};
+
+            String leftMenuFormat = "| %-1s | %-36s |%n";
+
+            System.out.println("+---+--------------------------------------+");
+            for (int i = 1; i <= menuOptions.length; i++) {
+                System.out.format(leftMenuFormat, i, menuOptions[i-1]);
+                System.out.println("+---+--------------------------------------+");
+            }
+
+            System.out.format(leftMenuFormat, 0, "Quit");
+            System.out.println("+---+--------------------------------------+");
+
             try {
                 int choice = sc.nextInt();
                 switch (choice) {
@@ -1390,18 +1398,23 @@ public class MainAtmCli {
 
         System.out.println("Please enter customer's full name: ");
         cust.setfName(sc.nextLine().toUpperCase());
-        System.out.println("Is the customer \n[1] Singaporean/PR or \n[2] Foreigner?");
-        int customerType = sc.nextInt();
-        while (customerType != 1 && customerType != 2) {
-            System.out.println("Invalid selection. Please try again.");
-            customerType = sc.nextInt();
-        }
+        
+        int customerType;
+        do {
+            System.out.println("\nIs the customer \n[1] Singaporean/PR or \n[2] Foreigner?");
+            while (!sc.hasNextInt()) {
+                System.out.println(ANSI_RED+"Invalid selection. Please enter [1] for Singaporean/PR or [2] for Foreigner:"+ANSI_RESET);
+                sc.next();
+            }
+        customerType = sc.nextInt();
+        } while (customerType != 1 && customerType != 2);
+        
         if (customerType == 1) {
             String nric;
             boolean isValid = false;
 
             while (!isValid) {
-                System.out.println("Please enter the customer's NRIC: ");
+                System.out.println("\nPlease enter the customer's NRIC: ");
                 nric = sc.next().toUpperCase();
 
                 if (Customer.isValidNRIC(nric)) {
@@ -1416,7 +1429,7 @@ public class MainAtmCli {
             String passNum;
             boolean isValid = false;
             while (!isValid) {
-                System.out.println("Please enter the customer's passport number: ");
+                System.out.println("\nPlease enter the customer's passport number: ");
                 passNum = sc.next().toUpperCase();
 
                 if (Customer.isValidPassport(passNum)) {
@@ -1424,27 +1437,33 @@ public class MainAtmCli {
                     cust.setPnumber(passNum);
                     isValid = true;
                 } else {
-                    System.out
-                            .println(passNum + " is not a valid passport number. Please enter a valid passport number");
+                    System.out.println(passNum + " is not a valid passport number. Please enter a valid passport number");
                 }
             }
         }
         // consume the end of line at the end of sc.next()
         sc.nextLine();
-        System.out.println("Please enter the customer's country: ");
+        System.out.println("\nPlease enter the customer's country: ");
         cust.setCountry(sc.nextLine().toUpperCase());
-        System.out.println("Please enter the customer's gender: ");
+        System.out.println("\nPlease enter the customer's gender: ");
         cust.setGender(sc.next().toUpperCase());
         // consume the end of line at the end of sc.next()
         sc.nextLine();
-        System.out.println("Please enter the customer's date of birth (YYYY-MM-DD): ");
-        cust.setDob(sc.next());
+        System.out.println("\nPlease enter the customer's date of birth (YYYY-MM-DD): ");
+        String dobRegex = "\\d{4}-\\d{2}-\\d{2}";
+        String dob = sc.next();
+        while (!dob.matches(dobRegex)) {
+            System.out.println(ANSI_RED+"Invalid date format. Please enter the customer's date of birth in this format YYYY-MM-DD: "+ANSI_RESET);
+            dob = sc.next();
+        }
+        cust.setDob(dob);
+        //cust.setDob(sc.next());
         // System.out.println("Please enter the customer's mobile number: ");
         // cust.setmNumber(sc.next());
         // String mNum = sc.next();
         boolean isValid = false;
         while (!isValid) {
-            System.out.println("Please enter the customer's mobile number: ");
+            System.out.println("\nPlease enter the customer's mobile number: ");
             cust.setmNumber(sc.next());
             if (Customer.isValidMobileNumber(cust.getmNumber())) {
                 System.out.println("Valid mobile number");
@@ -1457,7 +1476,7 @@ public class MainAtmCli {
         // cust.setEmail(sc.next());
         isValid = false;
         while (!isValid) {
-            System.out.println("Please enter the customer's email: ");
+            System.out.println("\nPlease enter the customer's email: ");
             cust.setEmail(sc.next());
             if (Customer.isValidEmail(cust.getEmail())) {
                 System.out.println("Valid email");
@@ -1468,7 +1487,7 @@ public class MainAtmCli {
         }
         // consume the end of line at the end of sc.next()
         sc.nextLine();
-        System.out.println("Please enter the customer's address: ");
+        System.out.println("\nPlease enter the customer's home address: ");
         cust.setAddress(sc.nextLine());
 
         // Generate timestamp for account creation
@@ -1550,17 +1569,24 @@ public class MainAtmCli {
         Database db = new Database();
 
         System.out.println("\nAccount Creation Process");
-        System.out.println("""
+        int accountType;
+        do {
+            System.out.println("""
                 Please select the Account type:
                 [1] Savings Account
                 [2] Current Account""");
-        String accountType = null;
-        int selection = sc.nextInt();
-        while (selection != 1 && selection != 2) {
-            System.out.println("Invalid selection. Please try again.");
-            selection = sc.nextInt();
-        }
-        if (selection == 1) {
+            while (!sc.hasNextInt()) {
+                System.out.println(ANSI_RED+"""
+                Invalid Selection.
+                Please select the Account type:
+                [1] Savings Account
+                [2] Current Account"""+ANSI_RESET);
+                sc.next();
+            }
+            accountType = sc.nextInt();
+        } while (accountType != 1 && accountType != 2);
+
+        if (accountType == 1) {
             acc.setAccountType("Savings Account");
         } else {
             acc.setAccountType("Current Account");
@@ -1568,7 +1594,7 @@ public class MainAtmCli {
         String bankAccountNumber = null;
         while (bankAccountNumber == null) {
             // Generate 9-digit account number with prefix
-            bankAccountNumber = BnkAccNumGen.generateNumber(selection);
+            bankAccountNumber = BnkAccNumGen.generateNumber(accountType);
             // Debug
             System.out.println("Bank Account Number Generated: " + bankAccountNumber);
             try {
@@ -1579,8 +1605,8 @@ public class MainAtmCli {
                 ;
                 resultSet = db.executeQuery(pStatement);
                 if (resultSet.next()) {
-                    System.out.println("This account number already exist!" +
-                            "\nRegenerating a new account number...");
+                    System.out.println(ANSI_RED+"This account number already exist!" +
+                            "\nRegenerating a new account number..."+ANSI_RESET);
                     bankAccountNumber = null; // Reset Bank Account Number to null to regenerate a new account number
                 }
             } catch (SQLException e) {
@@ -1588,23 +1614,28 @@ public class MainAtmCli {
             }
         }
         acc.setAccountNo(bankAccountNumber);
-        System.out.println("Customer to enter 6 Digit Pin: ");
-        String pin = null;
+
+
+        //System.out.println("\nCustomer to enter 6 Digit Pin: ");
+        //String pin = null;
+        Console console = System.console();
+        System.out.println("\nCustomer to enter 6 Digit Pin: ");
+        char[] pinChars = console.readPassword();
+        String pin = new String(pinChars);
+
         while (true) {
-            pin = sc.next();
             if (pin.matches("\\d{6}")) {
                 break;
             } else {
-                System.out.print("Invalid pin. Please enter a 6 digit pin: ");
+                System.out.print(ANSI_RED+"Invalid pin. Please enter a 6 digit pin: "+ANSI_RESET);
+                pinChars = console.readPassword();
+                pin = new String(pinChars);
             }
         }
-
         // Hash customer's pin with Salt and Pepper
         String[] hashAlgo = PinHash.hashPin(pin);
         acc.setPin(hashAlgo[1]);
         acc.setSalt(hashAlgo[0]);
-        // String hashedPin = hashAlgo[0];
-        // String salt = hashAlgo[1];
 
         // Debug
         System.out.println("Random Salt: " + hashAlgo[0]);
@@ -1629,16 +1660,25 @@ public class MainAtmCli {
             if (rowsAffected > 0) {
                 System.out.println("Customer account has been created successfully!");
                 Email.sendEmailPrep(acc.getAccountNo(), 1);
-                System.out.println("""
-                        Do you want to proceed to card creation?
+                int choice;
+                do {
+                    System.out.println("""
+                        \nDo you want to proceed to card creation?
                         [1] Yes
                         [2] No
                         """);
-                int choice = sc.nextInt();
-                while (choice != 1 && choice != 2) {
-                    System.out.println("Invalid selection, please enter your choice: ");
+                    while (!sc.hasNextInt()) {
+                        System.out.println(ANSI_RED+"""
+                            \nInvalid Selection.
+                            Do you want to proceed to card creation?
+                            [1] Yes
+                            [2] No
+                            """+ANSI_RESET);
+                        sc.next();
+                    }
                     choice = sc.nextInt();
-                }
+                } while (choice != 1 && choice != 2);
+
                 if (choice == 1) {
                     createCard(bankAccountNumber);
                 } else {
@@ -1660,32 +1700,49 @@ public class MainAtmCli {
         card.setAccountNumber(accNum);
 
         System.out.println("\nCard Creation Process");
-        System.out.println("""
-                Please select the card type:
+        int selection;
+        do {
+            System.out.println("""
+                \nPlease select the card type:
                 [1] Debit Card
                 [2] Credit Card
                 """);
-        String cardType = null;
-        int selection = sc.nextInt();
-        while (selection != 1 && selection != 2) {
-            System.out.println("Invalid selection. Please try again.");
+            while (!sc.hasNextInt()) {
+                System.out.println(ANSI_RED+"""
+                    \nInvaild Selection.
+                    Please select the card type:
+                    [1] Debit Card
+                    [2] Credit Card
+                    """+ANSI_RESET);
+                sc.next();
+            }
             selection = sc.nextInt();
-        }
+        } while (selection != 1 && selection != 2);
         if (selection == 1) {
             card.setCardType("Debit Card");
         } else {
             card.setCardType("Credit Card");
         }
-        System.out.println("""
+
+        int cardNetworkSelection;
+        do{
+            System.out.println("""
                 Please select the card network:
                 [1] Mastercard
                 [2] Visa
                 """);
-        int cardNetworkSelection = sc.nextInt();
-        while (cardNetworkSelection != 1 && cardNetworkSelection != 2) {
-            System.out.println("Invalid selection. Please try again.");
+            while (!sc.hasNextInt()) {
+                System.out.println(ANSI_RED+"""
+                    \nInvalid Selection.
+                    Please select the card network:
+                    [1] Mastercard
+                    [2] Visa
+                    """+ANSI_RESET);
+                sc.next();
+            }
             cardNetworkSelection = sc.nextInt();
-        }
+        } while(selection != 1 && selection != 2);
+        
         // Generate Card Number
         String cardNumber = null;
         while (cardNumber == null) {
@@ -1739,7 +1796,7 @@ public class MainAtmCli {
                 Email.sendEmailPrep(accNum, 2);
                 showTellerMenu();
             } else {
-                System.out.println("Sum ting wong!");
+                System.out.println("Something went wrong, please try again later.");
             }
             db.closeConnection();
         } catch (SQLException | ClassNotFoundException e) {
@@ -1760,29 +1817,37 @@ public class MainAtmCli {
                 userId = resultSet.getString("user_id");
                 createAccount(userId);
             } else {
-                System.out.println("""
-                        No customer account found!
+                int selection;
+                do{
+                    System.out.println("""
+                        \nNo customer account found!
                         Do you want to create one now?
                         [1] Yes
                         [2] No""");
-                int selection = sc.nextInt();
-                while (selection != 1 && selection != 2) {
-                    System.out.println("Invalid selection, please enter your choice: ");
-                    selection = sc.nextInt();
-                }
+                    while (!sc.hasNextInt()) {
+                        System.out.println(ANSI_RED+"""
+                        \nInvaild Selection.
+                        There is no customer account found,
+                        Do you want to create one now?
+                        [1] Yes
+                        [2] No"""+ANSI_RESET);
+                    sc.next();
+                    }
+                selection = sc.nextInt();
+                } while(selection != 1 && selection != 2);
+
                 if (selection == 1) {
                     CreateNewCustomerAccount();
                 } else {
                     showTellerMenu();
                 }
             }
-
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query. Details: \n" + e.getMessage());
+            System.out.println("Error executing SQL query. Details: \n" + e);
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("Algorithmic Error: " + e.getMessage());
+            System.out.println("Algorithmic Error: " + e);
         } catch (ClassNotFoundException e) {
-            System.out.println("Class Error: " + e.getMessage());
+            System.out.println("Class Error: " + e);
         }
     }
 
@@ -1809,16 +1874,24 @@ public class MainAtmCli {
                     createCard(accNo);
                 }
             } else {
-                System.out.println("""
-                        No customer account found!
+                int selection;
+                do{
+                    System.out.println("""
+                        \nNo customer account found!
                         Do you want to create one now?
                         [1] Yes
                         [2] No""");
-                int selection = sc.nextInt();
-                while (selection != 1 && selection != 2) {
-                    System.out.println("Invalid selection, please enter your choice: ");
+                    while (!sc.hasNextInt()) {
+                        System.out.println(ANSI_RED+"""
+                        \nInvaild Selection.
+                        There is no customer account found,
+                        Do you want to create one now?
+                        [1] Yes
+                        [2] No"""+ANSI_RESET);
+                        sc.next();
+                    }
                     selection = sc.nextInt();
-                }
+                } while(selection != 1 && selection != 2);
                 if (selection == 1) {
                     CreateNewCustomerAccount();
                 } else {
@@ -1854,8 +1927,16 @@ public class MainAtmCli {
                 if (resultSet.next()) {
                     System.out.println("Getting user ID");
                     String userId = resultSet.getString("user_id");
-                    System.out.println("Are you sure you want to close this account?\n[1] Yes [2] No");
-                    int confirmation = sc.nextInt();
+                    int confirmation;
+                    do{
+                        System.out.println("Are you sure you want to close this account?\n[1] Yes \n[2] No");
+                        while (!sc.hasNextInt()) {
+                            System.out.println(ANSI_RED+"Invalid Selection. Are you sure you want to close this account?\n[1] Yes \n[2] No"+ANSI_RESET);
+                            sc.next();
+                        }
+                        confirmation = sc.nextInt();
+                    } while(confirmation != 1 && confirmation != 2);
+
                     if (confirmation == 1) {
                         try {
                             String customerQuery = "UPDATE customer SET deactivation_date = ? WHERE user_id = ?";
@@ -1876,7 +1957,7 @@ public class MainAtmCli {
                             if (rowsAffected1 > 0 && rowsAffected2 > 0 && rowsAffected3 > 0) {
                                 System.out.println("The customer's account has been deactivated.");
                             } else {
-                                System.out.println("Sum ting wong!");
+                                System.out.println("Something went wrong while processing your loan. Please try again later.");
                             }
                             statement.close();
                             connection.close();

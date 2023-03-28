@@ -16,11 +16,13 @@ import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
+import java.text.DecimalFormat;
 
 public class CashDepositController {
     ATM atm = new ATM();
@@ -39,6 +41,7 @@ public class CashDepositController {
     private Account a = holder.getAccount();
     private Database db = holder.getDatabase();
     private final String fxmlFile = "atm-cash-deposit-view.fxml";
+    DecimalFormat df = new DecimalFormat("#.##");
     @FXML
     private void backAction(ActionEvent event){
         try {
@@ -106,7 +109,7 @@ public class CashDepositController {
                         Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
                         succAlert.setTitle("SIT ATM: Cash Deposit Successful!");
                         succAlert.setGraphic(null);
-                        succAlert.setHeaderText("$"+deposit_amount+" has been deposited successfully.\nCurrent Available Balance: $"+accReBalance+
+                        succAlert.setHeaderText("$"+deposit_amount+" has been deposited successfully to account no. "+accNo+"\nCurrent Available Balance: $"+df.format(accReBalance)+
                                 "\n\nThank you for banking with us!");
                         succAlert.showAndWait();
                         try {

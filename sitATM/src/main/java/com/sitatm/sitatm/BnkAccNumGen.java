@@ -2,7 +2,7 @@ package com.sitatm.sitatm;
 
 import java.security.SecureRandom;
 
-public class BnkAccNumGen {
+public class BnkAccNumGen extends Account{
     private static SecureRandom secureRandom = new SecureRandom();
 
     public static String generateNumber(int accType) {

@@ -378,8 +378,8 @@ public class Account {
                  ***/
                 // Hash customer's pin with Salt and Pepper
                 String[] hashAlgo = PinHash.hashPin(newPin);
-                String hashedPin = hashAlgo[0];
-                String salt = hashAlgo[1];
+                String hashedPin = hashAlgo[1];
+                String salt = hashAlgo[0];
                 // Debug
                 System.out.println("Random Salt: " + hashAlgo[0]);
                 System.out.println("Hashed Password: " + hashAlgo[1]);

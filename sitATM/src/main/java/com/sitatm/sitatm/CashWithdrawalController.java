@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
+import java.text.DecimalFormat;
 
 public class CashWithdrawalController {
     ATM atm = new ATM();
@@ -39,6 +40,7 @@ public class CashWithdrawalController {
     private Database db = holder.getDatabase();
     private Account a = holder.getAccount();
     private final String fxmlFile = "atm-cash-withdrawal-view.fxml";
+    DecimalFormat df = new DecimalFormat("#.##");
     @FXML
     private void backAction(ActionEvent event){
         try {
@@ -147,8 +149,8 @@ public class CashWithdrawalController {
                             Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
                             succAlert.setTitle("SIT ATM: Withdrawal Successful!");
                             succAlert.setGraphic(null);
-                            succAlert.setHeaderText("$"+withdraw_amount+" has been withdrawn successfully!" +
-                                    "\nCurrent Available Balance: $"+accReBalance+
+                            succAlert.setHeaderText("$"+withdraw_amount+" has been withdrawn successfully from Account no. "+ accNo +
+                                    "\nCurrent Available Balance: $"+df.format(accReBalance)+
                                     "\n\nThank you for banking with us!");
                             succAlert.showAndWait();
                             try {

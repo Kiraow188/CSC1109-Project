@@ -2,7 +2,7 @@ package com.sitatm.sitatm;
 
 import java.security.SecureRandom;
 
-public class CVVGenerator {
+public class CVVGenerator extends Card{
     private static SecureRandom secureRandom = new SecureRandom();
 
     public static String generateCVV(String cardNumber, String expiryDate) {

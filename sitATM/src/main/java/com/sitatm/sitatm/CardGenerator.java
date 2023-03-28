@@ -2,7 +2,7 @@ package com.sitatm.sitatm;
 import java.util.Arrays;
 import java.util.Random;
 
-public class CardGenerator {
+public class CardGenerator extends Card{
     public static String generateCardNumber(int cardType){
         Random random = new Random();
         StringBuilder sb = new StringBuilder();

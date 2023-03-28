@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 
 public class AllAccountController {
     ATM atm = new ATM();
@@ -24,6 +25,7 @@ public class AllAccountController {
     private Database db = holder.getDatabase();
     private Account account = holder.getAccount();
     private final String fxmlFile = "atm-all-account-view.fxml";
+    DecimalFormat df = new DecimalFormat("#.##");
     @FXML
     private VBox accountVBox;
     @FXML
@@ -78,10 +80,10 @@ public class AllAccountController {
         for (String accountNumber : accountNumbers) {
             ResultSet balanceSet = db.executeQuery("SELECT * FROM customer c JOIN account a ON c.user_id = a.user_id JOIN ( SELECT * FROM transaction WHERE account_number = "+accountNumber+" ORDER BY transaction_id DESC LIMIT 1) t ON a.account_number = t.account_number WHERE a.account_number = "+accountNumber);
             if (balanceSet.next()){
-                String latestBal = balanceSet.getString("balance_amt");
+                double latestBal = balanceSet.getDouble("balance_amt");
                 String accType = balanceSet.getString("account_type");
                 // Programmatically create buttons
-                Button button = new Button(accType+"\n"+accountNumber+"\n$"+latestBal);
+                Button button = new Button(accType+"\n"+accountNumber+"\n$"+df.format(latestBal));
                 button.setPrefWidth(490);
                 button.setPrefHeight(130);
                 button.setAlignment(Pos.CENTER_LEFT);

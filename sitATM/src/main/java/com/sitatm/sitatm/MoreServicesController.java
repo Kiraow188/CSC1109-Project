@@ -21,7 +21,7 @@ public class MoreServicesController {
     private Button btnPinCng;
     @FXML
     private Button btnAppLoan;
-    private UserHolder holder = UserHolder.getInstance();
+    private Singleton holder = Singleton.getInstance();
     private Localization l = holder.getLocalization();
     private final String fxmlFile = "atm-more-services-view.fxml";
     @FXML

@@ -2,10 +2,7 @@ package com.sitatm.sitatm;
 
 import java.io.Console;
 import java.security.NoSuchAlgorithmException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,12 +28,11 @@ public class Customer {
     private String address;
     private String email;
     private static final Pattern EMAIL_PATTERN = Pattern.compile("[A-Z0-9._%+]+@[A-Z0-9.]+\\.[A-Z]{2,6}", Pattern.CASE_INSENSITIVE);
-
-    public Customer() {
-
-    }
+    public Customer() {}
     public String getUserID() { return userID; }
+
     public void setUserID(String id) { this.userID = userID; }
+
     public String getfName() {
         return fName;
     }
@@ -141,12 +137,15 @@ public class Customer {
             return nric.charAt(8) == lastChars[remainder + 4];
         }
     }
+
     public static boolean isValidPassport(String passportNumber) {
         return PASSPORT_PATTERN.matcher(passportNumber).matches();
     }
+
     public static boolean isValidMobileNumber(String mnum){
         return MNUMBER_PATTERN.matcher(mnum).matches();
     }
+
     public static boolean isValidEmail(String email){
         return EMAIL_PATTERN.matcher(email).matches();
     }
@@ -230,10 +229,6 @@ public class Customer {
             dob = sc.next();
         }
         cust.setDob(dob);
-        //cust.setDob(sc.next());
-        // System.out.println("Please enter the customer's mobile number: ");
-        // cust.setmNumber(sc.next());
-        // String mNum = sc.next();
         boolean isValid = false;
         while (!isValid) {
             System.out.println("\nPlease enter the customer's mobile number: ");
@@ -245,8 +240,6 @@ public class Customer {
                 System.out.println("Invalid mobile number, please enter a valid mobile number.");
             }
         }
-        // System.out.println("Please enter the customer's email: ");
-        // cust.setEmail(sc.next());
         isValid = false;
         while (!isValid) {
             System.out.println("\nPlease enter the customer's email: ");
@@ -502,11 +495,11 @@ public class Customer {
                                 deposit(sc, userId, pin, accRrfNo, accTypeName, action,
                                         actionStatementFrom,
                                         transfer_amount,
-                                        rrfaccReBalance, rrfName);
+                                        rrfaccReBalance, rrfName, name);
                                 withdraw(sc, userId, pin, accTrfNo, accTypeName, action,
                                                 actionStatementTo,
                                                 transfer_amount,
-                                                trfaccReBalance, trfName);
+                                                trfaccReBalance, trfName, name);
                             }
                         }
                     }
@@ -547,10 +540,9 @@ public class Customer {
                                 checker = true;
                             }
                         }
-                        // withdraw(accNum, pin, withdrawal_amount, totalBalance);
                         withdraw(sc, userId, pin, accReNo, accTypeName, action, actionStatement,
                                         withdrawal_amount,
-                                        accReBalance, trfName);
+                                        accReBalance, trfName,name);
                     }
                     break;
                 case "4":
@@ -585,11 +577,11 @@ public class Customer {
                         deposit(sc, userId, pin, accReNo, accTypeName, action, actionStatement,
                                         deposit_amount,
                                         accReBalance,
-                                        trfName);
+                                        trfName,name);
                     }
                     break;
                 case "6":
-                    showCustomerSubMenu(accNum, pin, userId, CAaccNo, SAaccNo);
+                    showCustomerSubMenu(accNum, pin, userId, CAaccNo, SAaccNo, name);
                     break;
                 case "7":
                     System.out.println("\nThank you for banking with SIT ATM.\n");
@@ -598,7 +590,7 @@ public class Customer {
         }
     }
 
-    public static void showCustomerSubMenu(String accNum, String pin, String userId, String CAaccNo, String SAaccNo)
+    public static void showCustomerSubMenu(String accNum, String pin, String userId, String CAaccNo, String SAaccNo, String name)
             throws Exception {
         Database db = new Database();
         System.out.println("\n" + ANSI_YELLOW + "Other Services" + ANSI_RESET);
@@ -752,7 +744,7 @@ public class Customer {
                             debt -= currentMonthDebt;
                             withdraw(sc, userId, pin, accReNo, accTypeName, action, actionStatement,
                                             currentMonthDebt,
-                                            accReBalance, trfName);
+                                            accReBalance, trfName,name);
                             String updateLoanQuery = "UPDATE `loan` SET `principle_amt`=?,`interest_rate`=?,`duration`=?,`debt`=?,`repayment_date`=?,`status`=? WHERE `loan_id` = ?";
                             PreparedStatement updateLoanStatement = db.getConnection()
                                     .prepareStatement(updateLoanQuery);
@@ -848,35 +840,6 @@ public class Customer {
         System.out.format(
                 "+----------------------+--------------+%n");
         System.out.println();
-        // try {
-        // Class.forName("com.mysql.cj.jdbc.Driver");
-        // Connection connection = DriverManager.getConnection(User.url, User.user,
-        // User.pass);
-        // Statement statement = connection.createStatement();
-        // double balance = 0;
-        // ResultSet resultSet = statement.executeQuery(
-        // "SELECT * FROM customer c JOIN account a ON c.user_id = a.user_id JOIN
-        // (SELECT * FROM transaction WHERE account_number = "
-        // + accNum
-        // + " ORDER BY date DESC LIMIT 1) t ON a.account_number = t.account_number
-        // WHERE a.account_number = "
-        // + accNum + " AND a.pin = " + pin);
-        // while (resultSet.next()) {
-        // balance = resultSet.getDouble("balance_amt");
-        // System.out.printf("Your current Balance is $%.2f\n", balance);
-        // return balance;
-        // }
-        // resultSet.close();
-        // statement.close();
-        // connection.close();
-        // } catch (ClassNotFoundException e) {
-        // System.out.println("Error: MySQL class not found. Details: \n" +
-        // e.getMessage());
-        // } catch (SQLException e) {
-        // System.out.println("Error executing SQL query. Details: \n" +
-        // e.getMessage());
-        // }
-        // return 0;
     }
 
     public static void showAllAccounts(String SAaccNo, String CAaccNo, String pin)
@@ -899,42 +862,10 @@ public class Customer {
         System.out.format(
                 "+----------------------+--------------+%n");
         System.out.println();
-        // try {
-        // Class.forName("com.mysql.cj.jdbc.Driver");
-        // Connection connection = DriverManager.getConnection(User.url, User.user,
-        // User.pass);
-        // Statement statement = connection.createStatement();
-        // String query = "SELECT a.account_type, a.account_number, t.balance_amt FROM
-        // account a JOIN customer c ON a.user_id = c.user_id LEFT JOIN ( SELECT
-        // account_number, balance_amt FROM transaction t1 WHERE t1.transaction_id =
-        // (SELECT MAX(t2.transaction_id) FROM transaction t2 WHERE t2.account_number =
-        // t1.account_number) ) t ON a.account_number = t.account_number WHERE c.user_id
-        // = ( SELECT user_id FROM account WHERE account_number = ? AND pin = ? ) ";
-        // PreparedStatement pStatement = connection.prepareStatement(query);
-        // pStatement.setString(1, accNum);
-        // pStatement.setString(2, pin);
-        // ResultSet resultSet = pStatement.executeQuery();
-        // // iterate through the result set and print out the values in the desired
-        // while (resultSet.next()) {
-        // String accountType = resultSet.getString("account_type");
-        // double balanceAmt = Double.parseDouble(resultSet.getString("balance_amt"));
-        // System.out.printf("Your current balance in your %s account is $%.2f\n",
-        // Customer.ANSI_YELLOW + accountType + Customer.ANSI_RESET, balanceAmt);
-        // }
-        // resultSet.close();
-        // statement.close();
-        // connection.close();
-        // } catch (ClassNotFoundException e) {
-        // System.out.println("Error: MySQL class not found. Details: \n" +
-        // e.getMessage());
-        // } catch (SQLException e) {
-        // System.out.println("Error executing SQL query. Details: \n" +
-        // e.getMessage());
-        // }
     }
 
     public static void deposit(Scanner sc, String userId, String pin, String accReNo, String accTypeName,
-            String action, String actionStatement, double deposit_amount, double accReBalance, String trfName) throws ClassNotFoundException, SQLException {
+            String action, String actionStatement, double deposit_amount, double accReBalance, String trfName, String name) throws ClassNotFoundException, SQLException {
         boolean persistent = true;
         String pinOp = "0";
         Database db = new Database();
@@ -953,7 +884,7 @@ public class Customer {
                     try {
                         accReBalance = accReBalance + deposit_amount;
                         String depositAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
-                        PreparedStatement depositAmountBalance = db.getConnection().prepareStatement(depositAmountBalanceQuery);
+                        PreparedStatement depositAmountBalance = db.getConnection().prepareStatement(depositAmountBalanceQuery, Statement.RETURN_GENERATED_KEYS);
                         depositAmountBalance.setString(1, accReNo);
                         depositAmountBalance.setDate(2,
                                 java.sql.Date.valueOf(java.time.LocalDate.now()));
@@ -968,17 +899,22 @@ public class Customer {
                                     Customer.ANSI_RED, Customer.ANSI_RESET);
                             break;
                         } else {
-                            if (action == "deposit" || action == "withdraw") {
-                                askReceipt(sc, accReNo, action, actionStatement,
-                                        deposit_amount, accTypeName,
-                                        accReBalance);
-                            } else if (action == "transfer") {
-                                System.out.printf(
-                                        "\n%sYou have successfully transferred $%.2f to Acc No. %s (%s) %s",
-                                        Customer.ANSI_CYAN,
-                                        deposit_amount,
-                                        accReNo, trfName, Customer.ANSI_RESET);
-                                return;
+                            try (ResultSet rs = depositAmountBalance.getGeneratedKeys()) {
+                                if (rs.next()) {
+                                    int transactionId = rs.getInt(1);
+                                    if (action == "deposit" || action == "withdraw") {
+                                        askReceipt(sc, accReNo, action, actionStatement,
+                                                deposit_amount, accTypeName,
+                                                accReBalance,name,transactionId);
+                                    } else if (action == "transfer") {
+                                        System.out.printf(
+                                                "\n%sYou have successfully transferred $%.2f to Acc No. %s (%s) %s",
+                                                Customer.ANSI_CYAN,
+                                                deposit_amount,
+                                                accReNo, trfName, Customer.ANSI_RESET);
+                                        return;
+                                    }
+                                }
                             }
                         }
                     } catch (SQLException e) {
@@ -998,56 +934,10 @@ public class Customer {
                     persistent = true;
             }
         }
-        // public static void deposit(String accNum, String pin, double amount, double
-        // balance)
-        // throws ClassNotFoundException, SQLException {
-        // Scanner sc = new Scanner(System.in);
-        // try {
-        // Class.forName("com.mysql.cj.jdbc.Driver");
-        // Connection connection = DriverManager.getConnection(url, user, pass);
-        // Statement statement = connection.createStatement();
-        // String query = "UPDATE transaction t INNER JOIN account a ON t.account_number
-        // = a.account_number SET t.balance_amt = ? + ? WHERE a.account_number = ? AND
-        // a.pin = ? ";
-        // PreparedStatement pStatement = connection.prepareStatement(query);
-        // pStatement.setString(1, String.valueOf(balance));
-        // pStatement.setString(2, String.valueOf(amount));
-        // pStatement.setString(3, accNum);
-        // pStatement.setString(4, pin);
-        // int rowsUpdated = pStatement.executeUpdate();
-        // if (rowsUpdated > 0) {
-        // String query2 = "SELECT balance_amt FROM transaction WHERE account_number = ?
-        // ORDER BY transaction_id DESC LIMIT 1";
-        // PreparedStatement pStatement2 = connection.prepareStatement(query2);
-        // pStatement2.setString(1, accNum);
-        // ResultSet resultSet2 = pStatement2.executeQuery();
-        // // iterate through the result set and print out the values in the desired
-        // format
-        // while (resultSet2.next()) {
-        // Double balanceAmt = Double.parseDouble(resultSet2.getString("balance_amt"));
-        // System.out.printf("You have successfully deposited $%.2f. \nYour current
-        // balance account is: $%.2f",
-        // amount, balanceAmt);
-        // }
-        // resultSet2.close();
-        // pStatement2.close();
-        // } else {
-        // System.out.println("Deposit failed. Please check account number and PIN.");
-        // }
-        // statement.close();
-        // connection.close();
-        // } catch (ClassNotFoundException e) {
-        // System.out.println("Error: MySQL class not found. Details: \n" +
-        // e.getMessage());
-        // } catch (SQLException e) {
-        // System.out.println("Error executing SQL query. Details: \n" +
-        // e.getMessage());
-        // }
-        // }
     }
 
     public static void withdraw(Scanner sc, String userId, String pin, String accReNo, String accTypeName,
-            String action, String actionStatement, double withdraw_amount, double accReBalance, String trfName)
+            String action, String actionStatement, double withdraw_amount, double accReBalance, String trfName, String name)
             throws ClassNotFoundException, SQLException {
         boolean persistent = true;
         String pinOp = "0";
@@ -1082,15 +972,20 @@ public class Customer {
                                     Customer.ANSI_RED, Customer.ANSI_RESET);
                             break;
                         } else {
-                            if (action == "deposit" || action == "withdraw") {
-                                askReceipt(sc, accReNo, action, actionStatement,
-                                        withdraw_amount, accTypeName,
-                                        accReBalance);
-                            } else if (action == "transfer") {
-                                System.out.printf(
-                                        "%sand your current %s Account Balance is $%.2f.%s\n\n",
-                                        Customer.ANSI_CYAN, accTypeName, accReBalance, Customer.ANSI_RESET);
-                                return;
+                            try (ResultSet rs = depositAmountBalance.getGeneratedKeys()) {
+                                if (rs.next()) {
+                                    int transactionId = rs.getInt(1);
+                                    if (action == "deposit" || action == "withdraw") {
+                                        askReceipt(sc, accReNo, action, actionStatement,
+                                                withdraw_amount, accTypeName,
+                                                accReBalance,name,transactionId);
+                                    } else if (action == "transfer") {
+                                        System.out.printf(
+                                                "%sand your current %s Account Balance is $%.2f.%s\n\n",
+                                                Customer.ANSI_CYAN, accTypeName, accReBalance, Customer.ANSI_RESET);
+                                        return;
+                                    }
+                                }
                             }
                         }
                     } catch (SQLException e) {
@@ -1110,53 +1005,6 @@ public class Customer {
                     persistent = true;
             }
         }
-        // public static void withdraw(String accNum, String pin, double amount, double
-        // balance)
-        // throws ClassNotFoundException, SQLException {
-        // Scanner sc = new Scanner(System.in);
-        // try {
-        // Class.forName("com.mysql.cj.jdbc.Driver");
-        // Connection connection = DriverManager.getConnection(url, user, pass);
-        // Statement statement = connection.createStatement();
-        // String query = "UPDATE transaction t INNER JOIN account a ON t.account_number
-        // = a.account_number SET t.balance_amt = ? - ? WHERE a.account_number = ? AND
-        // a.pin = ? ";
-        // PreparedStatement pStatement = connection.prepareStatement(query);
-        // pStatement.setString(1, String.valueOf(balance));
-        // pStatement.setString(2, String.valueOf(amount));
-        // pStatement.setString(3, accNum);
-        // pStatement.setString(4, pin);
-        // int rowsUpdated = pStatement.executeUpdate();
-        // if (rowsUpdated > 0) {
-        // String query2 = "SELECT balance_amt FROM transaction WHERE account_number = ?
-        // ORDER BY transaction_id DESC LIMIT 1";
-        // PreparedStatement pStatement2 = connection.prepareStatement(query2);
-        // pStatement2.setString(1, accNum);
-        // ResultSet resultSet2 = pStatement2.executeQuery();
-        // // iterate through the result set and print out the values in the desired
-        // format
-        // while (resultSet2.next()) {
-        // double balanceAmt = Double.parseDouble(resultSet2.getString("balance_amt"));
-        // System.out.printf(
-        // "You have successfully withdrawed $%.2f. \nYour current account balance is:
-        // $%.2f.\n",
-        // amount, balanceAmt);
-        // }
-        // resultSet2.close();
-        // pStatement2.close();
-        // } else {
-        // System.out.println("Withdraw failed. Please check account number and PIN.");
-        // }
-        // statement.close();
-        // connection.close();
-        // } catch (ClassNotFoundException e) {
-        // System.out.println("Error: MySQL class not found. Details: \n" +
-        // e.getMessage());
-        // } catch (SQLException e) {
-        // System.out.println("Error executing SQL query. Details: \n" +
-        // e.getMessage());
-        // }
-        // }
     }
 
     public static void printLatestTransactions(String accStatNo, String pin, String accStatType) {
@@ -1204,7 +1052,7 @@ public class Customer {
 
     public static void askReceipt(Scanner sc, String accReNo, String action, String actionStatement,
             double transaction_amount, String accTypeName,
-            double accReBalance) {
+            double accReBalance, String name, int transactionId) {
         boolean persistent = true;
         while (persistent) {
             System.out.println(
@@ -1216,7 +1064,7 @@ public class Customer {
                 case "1":
                     printReceipt(accReNo, action, actionStatement,
                             transaction_amount, accTypeName,
-                            accReBalance);
+                            accReBalance, name, transactionId);
                     break;
                 case "2":
                     noReceipt(action, transaction_amount, accTypeName, accReBalance);
@@ -1231,7 +1079,13 @@ public class Customer {
     }
 
     public static void printReceipt(String accReNo, String action, String actionStatement, double transaction_amount,
-            String accTypeName, double accReBalance) {
+            String accTypeName, double accReBalance, String name, int transactionId) {
+        int option = 0;
+        if (action.equals("ATM DEPOSIT")){
+            option = 0;
+        }else if (action.equals("ATM WITHDRAWAL")){
+            option = 1;
+        }
         String strReFormat = "| %-20s   %-12s |%n";
         String leftReFormat = "| %-20s   %-12.2f |%n";
         System.out.println();
@@ -1254,6 +1108,7 @@ public class Customer {
         System.out.format(
                 "+-------------------------------------+%n");
         System.out.println();
+        receiptPrinter.printReceipt(name,java.sql.Date.valueOf(java.time.LocalDate.now()),accReNo,transactionId,transaction_amount,accReBalance,option);
         noReceipt(action, transaction_amount, accTypeName, accReBalance);
     }
 

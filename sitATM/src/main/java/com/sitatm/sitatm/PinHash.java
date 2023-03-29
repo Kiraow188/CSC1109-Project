@@ -16,7 +16,6 @@ public class PinHash {
         HashNSalt[0] = rSalt;
         HashNSalt[1] = hashedPassword;
         return HashNSalt;
-        //return "Random Salt: "+ rSalt + " | Hashed Password: " + hashedPassword;
     }
 
     private static String hashString(String string) throws NoSuchAlgorithmException {
@@ -32,7 +31,6 @@ public class PinHash {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);
-        //return Base64.getEncoder().encodeToString(salt);
         String encodedSalt = Base64.getEncoder().encodeToString(salt);
         // Replace any '/' and '\' characters with a valid replacement
         encodedSalt = encodedSalt.replaceAll("/", "a");
@@ -42,25 +40,10 @@ public class PinHash {
 
     public static boolean hashMatching(String pin, String salt, String hp) throws NoSuchAlgorithmException{
         String saltedPepperPassword = salt + pin + PEPPER;
-        System.out.println("Salt + Password + Pin: "+saltedPepperPassword);
         String hashedPassword = hashString(saltedPepperPassword);
-        System.out.println("Hashed Password: "+hashedPassword);
-        System.out.println("Stored Hash Password: "+hp);
-        System.out.println("Length of Hashed Pin: "+hashedPassword.length());
-        System.out.println("Length of Stored Pin: "+hp.length());
         if (hashedPassword.equals(hp)){
-            System.out.println("Password Match! Access granted");
             return true;
         }
-        System.out.println("Password does not match! Access denied");
         return false;
     }
-
-    public static void main(String[] args) throws NoSuchAlgorithmException {
-        String password = "123456";
-        String[] pinNSalt = hashPin(password);
-        System.out.println("Random Salt: " + pinNSalt[0]);
-        System.out.println("Hashed Password: " + pinNSalt[1]);
-    }
-
 }

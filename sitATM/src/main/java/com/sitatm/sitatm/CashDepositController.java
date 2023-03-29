@@ -2,27 +2,18 @@ package com.sitatm.sitatm;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
-import java.text.DecimalFormat;
 
 public class CashDepositController {
     ATM atm = new ATM();
@@ -36,9 +27,10 @@ public class CashDepositController {
     private Button btnExit;
     @FXML
     private Button btnBack;
-    private UserHolder holder = UserHolder.getInstance();
+    private Singleton holder = Singleton.getInstance();
     private Localization l = holder.getLocalization();
     private Account a = holder.getAccount();
+    private Customer c = holder.getUser();
     private Database db = holder.getDatabase();
     private final String fxmlFile = "atm-cash-deposit-view.fxml";
     DecimalFormat df = new DecimalFormat("#.##");
@@ -60,6 +52,7 @@ public class CashDepositController {
     }
     @FXML
     private void deposit(ActionEvent event) throws SQLException {
+        Date date = java.sql.Date.valueOf(java.time.LocalDate.now());
         if (accDrpDwn.getValue() == null){
             Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
             withdrawConfirmation.setTitle("SIT ATM: Cash Deposit Warning");
@@ -70,7 +63,6 @@ public class CashDepositController {
         else if (txtFieldAmt.getText().equals("")){
             Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
             withdrawConfirmation.setTitle("SIT ATM: Cash Deposit Warning");
-            //withdrawConfirmation.setGraphic(null);
             withdrawConfirmation.setHeaderText("Please enter an amount!");
             withdrawConfirmation.showAndWait();
         }
@@ -95,17 +87,23 @@ public class CashDepositController {
                         accReBalance = AccRetrieval.getDouble("balance_amt");
                     }
                     accReBalance = accReBalance + deposit_amount;
-                    String depositAmountBalanceQuery = "INSERT INTO transaction(account_number, date, transaction_details, chq_no, withdrawal_amt, deposit_amt, balance_amt) VALUES (?,?,?,?,?,?,?)";
-                    PreparedStatement depositAmountBalance = db.getConnection().prepareStatement(depositAmountBalanceQuery);
-                    depositAmountBalance.setString(1, accNo);
-                    depositAmountBalance.setDate(2,
-                            java.sql.Date.valueOf(java.time.LocalDate.now()));
-                    depositAmountBalance.setString(3, actionStatement);
-                    depositAmountBalance.setInt(4, 0);
-                    depositAmountBalance.setDouble(5, deposit_amount);
-                    depositAmountBalance.setDouble(6, 0);
-                    depositAmountBalance.setDouble(7, accReBalance);
-                    if (db.executeUpdate(depositAmountBalance) > 0) {
+                    String depositQuery = "INSERT INTO transaction(account_number, date, transaction_details, chq_no, withdrawal_amt, deposit_amt, balance_amt) VALUES (?,?,?,?,?,?,?)";
+                    PreparedStatement deposit = db.getConnection().prepareStatement(depositQuery, Statement.RETURN_GENERATED_KEYS);
+                    deposit.setString(1, accNo);
+                    deposit.setDate(2, date);
+                    deposit.setString(3, actionStatement);
+                    deposit.setInt(4, 0);
+                    deposit.setDouble(5, deposit_amount);
+                    deposit.setDouble(6, 0);
+                    deposit.setDouble(7, accReBalance);
+                    if (db.executeUpdate(deposit) > 0) {
+                        try (ResultSet rs = deposit.getGeneratedKeys()) {
+                            if (rs.next()) {
+                                int transactionId = rs.getInt(1);
+                                System.out.println("Transaction ID: " + transactionId);
+                                receiptPrinter.printReceipt(c.getfName(),date, a.getAccountNo(),transactionId,deposit_amount,accReBalance,0);
+                            }
+                        }
                         Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
                         succAlert.setTitle("SIT ATM: Cash Deposit Successful!");
                         succAlert.setGraphic(null);

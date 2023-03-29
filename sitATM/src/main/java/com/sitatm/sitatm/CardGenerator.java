@@ -70,8 +70,6 @@ public class CardGenerator extends Card{
 
         int sum = sumDigits(cardIntArray);  // step 3
 
-        //System.out.println(sum);
-
         if(sum%10==0)  // step 4
         {
             System.out.println("Card is vaild: "+sum);
@@ -80,19 +78,7 @@ public class CardGenerator extends Card{
         System.out.println("Card is invalid: "+sum);
         return false;
     }
-
     public static int sumDigits(int[] arr){
         return Arrays.stream(arr).sum();
     }
-
-
-    /*public static void main (String[] args){
-        String cardNumberVisa = generateCardNumber(1);
-        String cardNumberMasters = generateCardNumber(2);
-        isValidCreditCardNumber(cardNumberVisa);
-        isValidCreditCardNumber(cardNumberMasters);
-        System.out.println(cardNumberVisa);
-        System.out.println(cardNumberMasters);
-    }*/
-
 }

@@ -2,14 +2,12 @@ package com.sitatm.sitatm;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,7 +31,7 @@ public class FundTransferController {
     private Button btnExit;
     @FXML
     private Button btnBack;
-    private UserHolder holder = UserHolder.getInstance();
+    private Singleton holder = Singleton.getInstance();
     private Localization l = holder.getLocalization();
     private Account a = holder.getAccount();
     private Database db = holder.getDatabase();

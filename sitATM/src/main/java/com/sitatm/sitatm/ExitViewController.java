@@ -1,6 +1,5 @@
 package com.sitatm.sitatm;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -12,7 +11,7 @@ public class ExitViewController {
     ATMController atmc = new ATMController();
     @FXML
     private ImageView cardReader;
-    private UserHolder holder = UserHolder.getInstance();
+    private Singleton holder = Singleton.getInstance();
     private Localization l = holder.getLocalization();
     private final String fxmlFile = "atm-exit-view.fxml";
     @FXML

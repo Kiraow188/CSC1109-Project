@@ -2,14 +2,9 @@ package com.sitatm.sitatm;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -17,7 +12,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
 import java.text.DecimalFormat;
 
@@ -35,10 +29,11 @@ public class CashWithdrawalController {
     private Button btnBackspace;
     @FXML
     private ChoiceBox<String> accDrpDwn;
-    private UserHolder holder = UserHolder.getInstance();
+    private Singleton holder = Singleton.getInstance();
     private Localization l = holder.getLocalization();
     private Database db = holder.getDatabase();
     private Account a = holder.getAccount();
+    private Customer c = holder.getUser();
     private final String fxmlFile = "atm-cash-withdrawal-view.fxml";
     DecimalFormat df = new DecimalFormat("#.##");
     @FXML
@@ -76,21 +71,7 @@ public class CashWithdrawalController {
 
     @FXML
     private void withdraw(ActionEvent event){
-        /**
-        Alert withdrawConfirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        withdrawConfirmation.setTitle("SIT ATM: Withdrawal Confirmation");
-        withdrawConfirmation.setGraphic(null);
-        withdrawConfirmation.setHeaderText("Are you sure you want to withdraw $"+txtFieldAmt.getText()+" from your account?");
-        ButtonType yesButton = new ButtonType("Yes", ButtonBar.ButtonData.YES);
-        ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
-        withdrawConfirmation.getButtonTypes().setAll(yesButton, noButton);
-
-        Optional<ButtonType> result = withdrawConfirmation.showAndWait();
-        if (result.get() == yesButton){
-            // Call your "Yes" function here
-        } else {
-            // Call your "No" function here
-        }**/
+        Date date = java.sql.Date.valueOf(java.time.LocalDate.now());
         if (txtFieldAmt.getText().equals("")){
             Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
             withdrawConfirmation.setTitle("SIT ATM: Withdrawal Warning");
@@ -135,17 +116,24 @@ public class CashWithdrawalController {
                         withdrawalError.setHeaderText("You do not have sufficient funds to perform this action.");
                         withdrawalError.showAndWait();
                     }else {
-                        String depositAmountBalanceQuery = "INSERT INTO transaction(account_number, date, transaction_details, chq_no, withdrawal_amt, deposit_amt, balance_amt) VALUES (?,?,?,?,?,?,?)";
-                        PreparedStatement depositAmountBalance = db.getConnection().prepareStatement(depositAmountBalanceQuery);
-                        depositAmountBalance.setString(1, accNo);
-                        depositAmountBalance.setDate(2,
-                                java.sql.Date.valueOf(java.time.LocalDate.now()));
-                        depositAmountBalance.setString(3, actionStatement);
-                        depositAmountBalance.setInt(4, 0);
-                        depositAmountBalance.setDouble(5, withdraw_amount);
-                        depositAmountBalance.setDouble(6, 0);
-                        depositAmountBalance.setDouble(7, accReBalance);
-                        if (db.executeUpdate(depositAmountBalance) > 0) {
+                        String withdrawalQuery = "INSERT INTO transaction(account_number, date, transaction_details, chq_no, withdrawal_amt, deposit_amt, balance_amt) VALUES (?,?,?,?,?,?,?)";
+                        PreparedStatement withdrawal = db.getConnection().prepareStatement(withdrawalQuery,Statement.RETURN_GENERATED_KEYS);
+                        withdrawal.setString(1, accNo);
+                        withdrawal.setDate(2, date);
+                        withdrawal.setString(3, actionStatement);
+                        withdrawal.setInt(4, 0);
+                        withdrawal.setDouble(5, withdraw_amount);
+                        withdrawal.setDouble(6, 0);
+                        withdrawal.setDouble(7, accReBalance);
+                        if (db.executeUpdate(withdrawal) > 0) {
+                            // Get the generated keys
+                            try (ResultSet rs = withdrawal.getGeneratedKeys()) {
+                                if (rs.next()) {
+                                    int transactionId = rs.getInt(1);
+                                    System.out.println("Transaction ID: " + transactionId);
+                                    receiptPrinter.printReceipt(c.getfName(),date, a.getAccountNo(),transactionId,withdraw_amount,accReBalance,1);
+                                }
+                            }
                             Alert succAlert = new Alert(Alert.AlertType.INFORMATION);
                             succAlert.setTitle("SIT ATM: Withdrawal Successful!");
                             succAlert.setGraphic(null);

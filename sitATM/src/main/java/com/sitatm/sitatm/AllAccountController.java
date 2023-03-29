@@ -20,7 +20,7 @@ public class AllAccountController {
     ATM atm = new ATM();
     @FXML
     private Button btnHome;
-    private UserHolder holder = UserHolder.getInstance();
+    private Singleton holder = Singleton.getInstance();
     private Localization l = holder.getLocalization();
     private Database db = holder.getDatabase();
     private Account account = holder.getAccount();
@@ -88,7 +88,6 @@ public class AllAccountController {
                 button.setPrefHeight(130);
                 button.setAlignment(Pos.CENTER_LEFT);
                 button.setStyle("-fx-font-size: 24;-fx-background-color: #F2CD60;-fx-text-fill: white;");
-                //button.setStyle("-fx-background-color: #F2CD60;");
                 // Add the button to the vbox
                 accountVBox.getChildren().add(button);
             }

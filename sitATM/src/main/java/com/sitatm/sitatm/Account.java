@@ -161,9 +161,6 @@ public class Account {
         }
         acc.setAccountNo(bankAccountNumber);
 
-
-        //System.out.println("\nCustomer to enter 6 Digit Pin: ");
-        //String pin = null;
         Console console = System.console();
         System.out.println("\nCustomer to enter 6 Digit Pin: ");
         char[] pinChars = console.readPassword();
@@ -182,10 +179,6 @@ public class Account {
         String[] hashAlgo = PinHash.hashPin(pin);
         acc.setPin(hashAlgo[1]);
         acc.setSalt(hashAlgo[0]);
-
-        // Debug
-        System.out.println("Random Salt: " + hashAlgo[0]);
-        System.out.println("Hashed Password: " + hashAlgo[1]);
 
         // Generate timestamp for account creation
         java.util.Date dt = new java.util.Date();
@@ -367,18 +360,6 @@ public class Account {
                     }
                 }
 
-                /***
-                System.out.println("Please enter the new pin number: ");
-                String newPin = null;
-                while (true) {
-                    newPin = sc.next();
-                    if (newPin.matches("\\d{6}")) {
-                        break;
-                    } else {
-                        System.out.print("Invalid pin. Please enter a 6 digit pin: ");
-                    }
-                }
-                 ***/
                 // Hash customer's pin with Salt and Pepper
                 String[] hashAlgo = PinHash.hashPin(newPin);
                 String hashedPin = hashAlgo[1];
@@ -435,7 +416,6 @@ public class Account {
                 }
             }
         } catch (SQLException e) {
-            // System.out.println("Error: " + e.getMessage());
             System.out.println(
                     Customer.ANSI_RED +
                             "Exception: Invalid username or password!\n" + Customer.ANSI_RESET);
@@ -457,7 +437,6 @@ public class Account {
                 count++;
             }
         } catch (Exception e) {
-            // System.out.println("Error: " + e.getMessage());
             System.out.println(
                     Customer.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
                             + Customer.ANSI_RESET);
@@ -480,7 +459,6 @@ public class Account {
                 accNo = accSet.getString("account_number");
             }
         } catch (Exception e) {
-            // System.out.println("Error: " + e.getMessage());
             System.out.println(
                     Customer.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
                             + Customer.ANSI_RESET);
@@ -504,7 +482,6 @@ public class Account {
                 return balance;
             }
         } catch (Exception e) {
-            // System.out.println("Error: " + e.getMessage());
             System.out.println(
                     Customer.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
                             + Customer.ANSI_RESET);
@@ -588,7 +565,6 @@ public class Account {
                 return rList;
             }
         } catch (Exception e) {
-            // System.out.println("Error: " + e.getMessage());
             System.out.printf("%sAccount is not found.%s\n",
                     Customer.ANSI_RED, Customer.ANSI_RESET);
             rList.add(false);

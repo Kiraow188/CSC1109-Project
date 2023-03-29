@@ -1,51 +1,9 @@
 package com.sitatm.sitatm;
 
-import java.io.Console;
-import java.security.NoSuchAlgorithmException;
-import java.sql.*;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+
     
 public class MainAtmCli {
-    public static boolean accountExists(String accountNumber) {
-        boolean exists = false;
-        Database db = new Database();
-        try {
-            ResultSet resultSet = db
-                    .executeQuery("SELECT * FROM account WHERE account_number=" + accountNumber);
-            exists = resultSet.next();
-            db.closeConnection();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return exists;
-    }
-
-    public static boolean accountDeactivated(String accountNumber) {
-        boolean deactivated = true;
-        Database db = new Database();
-        try {
-            ResultSet resultSet = db
-                    .executeQuery(
-                            "SELECT deactivation_date FROM account WHERE account_number=" + accountNumber);
-            if (resultSet.next()) {
-                String deactivationDate = resultSet.getString("deactivation_date");
-                if (deactivationDate == null) {
-                    deactivated = false;
-                }
-            }
-            db.closeConnection();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return !deactivated;
-    }
-
     public static void main(String[] args) throws Exception {
         System.out.println("\n" +
                 "           ____    __    ____  _______  __        ______   ______   .___  ___.  _______ \n" +

@@ -22,11 +22,4 @@ public class CVVGenerator extends Card{
         // Return the formatted CVV
         return formattedCVV;
     }
-    /* Debug
-    public static void main(String[] args) {
-        String cardNumber = "1234567890123456";
-        String cvv = CVVGenerator.generateCVV(cardNumber, "05/2024");
-        System.out.println("CVV code: " + cvv);
-    }
-     */
 }

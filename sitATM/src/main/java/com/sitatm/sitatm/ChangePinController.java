@@ -12,12 +12,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ChangePinController {
     ATM atm = new ATM();
-    private UserHolder holder = UserHolder.getInstance();
+    private Singleton holder = Singleton.getInstance();
     private Localization l = holder.getLocalization();
     private Database db = holder.getDatabase();
     private Account account = holder.getAccount();
@@ -52,10 +51,6 @@ public class ChangePinController {
     private void changePin() throws NoSuchAlgorithmException, SQLException {
         String oldPin = oldPassTxtbox.getText();
         String newPin = newPassTxtbox.getText();
-        System.out.println("Debuggy{45}: Getting account information from account object");
-        System.out.println("Current Account Number: "+account.getAccountNo());
-        System.out.println("Current Salt: "+account.getSalt());
-        System.out.println("Current Hashed Pin: "+account.getPin());
 
         if (oldPassTxtbox.getText().equals("")){
             Alert withdrawConfirmation = new Alert(Alert.AlertType.ERROR);
@@ -81,7 +76,6 @@ public class ChangePinController {
         else{
             boolean doesPinMatch = PinHash.hashMatching(oldPin, account.getSalt(), account.getPin());
             if (doesPinMatch) {
-                System.out.println("Debuggy{44}: Password match MUTAFUKA!!!!!!!!");
                 //Hash customer's new pin with Salt and Pepper
                 String[] hashAlgo = PinHash.hashPin(newPin);
                 String salt = hashAlgo[0];

@@ -2,27 +2,20 @@ package com.sitatm.sitatm;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalTime;
-import java.util.Locale;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 public class MainViewController {
     ATM atm = new ATM();
@@ -55,11 +48,8 @@ public class MainViewController {
     @FXML
     private Button btnMreSvc;
 
-
-    //public Locale locale = new Locale("en");
-    //public ResourceBundle bundle = ResourceBundle.getBundle("labelText",locale);
     private final String fxmlFile = "atm-main-view.fxml";
-    private UserHolder holder = UserHolder.getInstance();
+    private Singleton holder = Singleton.getInstance();
     private Localization l = holder.getLocalization();
     private Database db = holder.getDatabase();
     private Customer c = holder.getUser();
@@ -218,8 +208,7 @@ public class MainViewController {
         // Get the current time and run it through the getGreetingMessage function
         LocalTime currentTime = LocalTime.now();
         String greeting = getGreetingMessage(currentTime);
-        // Retrieve customer data using UserHolder
-        //Customer c = holder.getUser();
+        // Retrieve customer data using Singleton class
         String name = c.getfName();
         welcomeMsg.setText(greeting+", "+name);
         System.out.println("Debuggy{125}: Current user ID - "+a.getUserId());

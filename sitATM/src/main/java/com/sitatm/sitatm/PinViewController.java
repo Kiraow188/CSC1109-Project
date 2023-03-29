@@ -1,6 +1,5 @@
 package com.sitatm.sitatm;
 
-import com.itextpdf.text.pdf.fonts.otf.Language;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,16 +10,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextFormatter;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
 
@@ -30,7 +25,7 @@ public class PinViewController {
     private PasswordField pinTextBox;
     @FXML
     private Button cancelButton;
-    UserHolder holder = UserHolder.getInstance();
+    Singleton holder = Singleton.getInstance();
     Account user = holder.getAccount();
 
     public void setUser(Account user) {
@@ -54,13 +49,11 @@ public class PinViewController {
 
     @FXML
     private void cancelButtonAction(ActionEvent event) {
-        // TODO: either close this stage or close the program
         try {
             atm.changeScene("atm-login-view.fxml");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @FXML
@@ -92,7 +85,6 @@ public class PinViewController {
                 stage.setScene(scene);
                 stage.show();
             }
-            //atm.changeScene("atm-main-view.fxml");
         } else {
             System.out.println("Incorrect pin number, please try again.");
             Alert alert = new Alert(Alert.AlertType.ERROR);

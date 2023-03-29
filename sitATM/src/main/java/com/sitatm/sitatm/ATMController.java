@@ -5,7 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,7 +19,7 @@ import java.util.function.UnaryOperator;
 
 public class ATMController {
     ATM atm = new ATM();
-    UserHolder holder = UserHolder.getInstance();
+    Singleton holder = Singleton.getInstance();
     Database db = holder.getDatabase();
     private Stage stage;
     private Scene scene;

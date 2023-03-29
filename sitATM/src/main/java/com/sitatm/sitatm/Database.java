@@ -52,29 +52,4 @@ public class Database {
         connection.close();
         statement.close();
     }
-
-    /** -- Experimental Feature
-    public static void main(String[] args){
-        Database db = new Database();
-        try {
-            ResultSet rs = db.executeQuery("SELECT account_number,user_id,account_type,created_date,deactivation_date FROM account ORDER BY created_date DESC");
-            int numCols = rs.getMetaData().getColumnCount();
-
-            // Print header row
-            for (int i = 1; i <= numCols; i++) {
-                System.out.printf("%-20s", rs.getMetaData().getColumnLabel(i));
-            }
-            System.out.println();
-
-            // Print data rows
-            while (rs.next()) {
-                for (int i = 1; i <= numCols; i++) {
-                    System.out.printf("%-20s", rs.getString(i));
-                }
-                System.out.println();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }**/
 }

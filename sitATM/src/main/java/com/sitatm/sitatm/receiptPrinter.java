@@ -7,35 +7,18 @@ import java.sql.Date;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 
 public class receiptPrinter {
-    private static String name;
-    private static String date;
-    private static String account_no;
-    private static int transaction_id;
-    private static double depositwithdraw;
-    private static double balance;
-    private static int option;
-
-    public receiptPrinter(String name, String date, String account_no, int transaction_id, double depositwithdraw, double balance, int option) {
-        this.name = name;
-        this.date = date;
-        this.account_no = account_no;
-        this.transaction_id = transaction_id;
-        this.depositwithdraw = depositwithdraw;
-        this.balance = balance;
-        this.option = option;
-
-    }
-
-    public void printReceipt(){
+    public static void printReceipt(String name, Date date, String account_no, int transaction_id, double depositwithdraw, double balance, int option){
         try {
             //Create Document instance.
             Document document = new Document();
 
-            String filePath = System.getProperty("user.dir") + "\\Test.pdf";
+            String filePath = System.getProperty("user.dir") + "\\Receipt_RID"+transaction_id+".pdf";
 
             //Create OutputStream instance.
             OutputStream outputStream =
@@ -47,23 +30,40 @@ public class receiptPrinter {
             //Open the document.
             document.open();
 
-            String info = String.format("%s             %d", date, transaction_id);
+            // Create a table with 2 columns
+            PdfPTable table = new PdfPTable(new float[] {5f, 2f});
 
-            //adding paragraphs to the PDF
-            document.add(new Paragraph("             SIT ATM            "));
-            document.add(new Paragraph("                                       "));
-            document.add(new Paragraph("TRANSACTION RECEIPT"));
-            document.add(new Paragraph("                                       "));
-            document.add(new Paragraph("Date                       REF"));
-            document.add(new Paragraph(info));
-            document.add(new Paragraph("Account Holder Name: " + name));
-            document.add(new Paragraph("Account Number: " + account_no));
+            // Add table headers
+            PdfPCell cell1 = new PdfPCell(new Paragraph("Transaction Receipt"));
+            PdfPCell cell2 = new PdfPCell();
+            table.addCell(cell1);
+            table.addCell(cell2);
+
+            // Add transaction info
+            table.addCell(new PdfPCell(new Paragraph("Date:")));
+            table.addCell(new PdfPCell(new Paragraph(String.valueOf(date))));
+
+            table.addCell(new PdfPCell(new Paragraph("Transaction ID:")));
+            table.addCell(new PdfPCell(new Paragraph(String.valueOf(transaction_id))));
+
+            table.addCell(new PdfPCell(new Paragraph("Account Holder Name:")));
+            table.addCell(new PdfPCell(new Paragraph(name)));
+
+            table.addCell(new PdfPCell(new Paragraph("Account Number:")));
+            table.addCell(new PdfPCell(new Paragraph(String.valueOf(account_no))));
+
             if (option == 0) {
-                document.add(new Paragraph("Deposit Amount          Available Bal"));
-            }else{
-                document.add(new Paragraph("Withdraw Amount         Available Bal"));
+                table.addCell(new PdfPCell(new Paragraph("Deposit Amount:")));
+            } else {
+                table.addCell(new PdfPCell(new Paragraph("Withdraw Amount:")));
             }
-            document.add(new Paragraph(String.format("%.2f                    %.2f", depositwithdraw, balance)));
+            table.addCell(new PdfPCell(new Paragraph(String.format("%.2f", depositwithdraw))));
+
+            table.addCell(new PdfPCell(new Paragraph("Available Balance:")));
+            table.addCell(new PdfPCell(new Paragraph(String.format("%.2f", balance))));
+
+            // Add the table to the PDF
+            document.add(table);
 
             //Close document and outputStream.
             document.close();

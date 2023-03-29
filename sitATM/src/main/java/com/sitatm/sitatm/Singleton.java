@@ -1,16 +1,16 @@
 package com.sitatm.sitatm;
 
 // This Java file is a Singleton class
-public class UserHolder {
+public class Singleton {
     // Initialize Customer Object
     private Customer customer;
     private Localization localization;
     private Database database;
     private Account account;
     // Initialize Singleton instance
-    private final static UserHolder INSTANCE = new UserHolder();
-    private UserHolder() {}
-    public static UserHolder getInstance() {return INSTANCE;}
+    private final static Singleton INSTANCE = new Singleton();
+    private Singleton() {}
+    public static Singleton getInstance() {return INSTANCE;}
     public void setUser(Customer c) {
         this.customer = c;
     }

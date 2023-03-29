@@ -69,7 +69,7 @@ public class receiptPrinter {
             document.close();
             outputStream.close();
 
-            System.out.println("Pdf created successfully.");
+            System.out.println("Receipt generated successfully.");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -88,7 +88,6 @@ public class FundTransferController {
                 // First Check if the destination account exist in the database and is not deactivated.
                 ResultSet resultSet = db.executeQuery("SELECT * from account where account_number = "+ToAccTxtBox.getText()+" AND deactivation_date IS NULL");
                 if (resultSet.next()){
-                    System.out.println("Debuggy{85}: All good, account exist & is not deactivated");
                     // Next is to check if customer has sufficient funds to transfer.
                     int transfer_amount = Integer.parseInt(TransfAmtTxtbox.getText());
                     double accReBalanceFrom = 0;
@@ -222,9 +221,7 @@ public class FundTransferController {
         };
         ToAccTxtBox.setTextFormatter(new TextFormatter<String>(filter));
         TransfAmtTxtbox.setTextFormatter(new TextFormatter<String>(filter));
-        System.out.println("Hi it's me debuggy!");
         String userID = a.getUserId();
-        System.out.println("Debuggy{167}: Current UserID is - "+userID);
         try{
             ResultSet resultSet = db.executeQuery("SELECT account_number FROM account where user_id = "+userID);
             List<String> accountNumbers = new ArrayList<>();

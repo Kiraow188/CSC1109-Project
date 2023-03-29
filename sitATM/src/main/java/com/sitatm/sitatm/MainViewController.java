@@ -200,7 +200,7 @@ public class MainViewController {
                 System.out.println("An exception has occurred: " + e);
             }
         } else {
-            System.out.println("Debuggy{149}: walao waste my time!");
+            System.out.println("SITATM: Deposit cancelled");
         }
     }
 
@@ -211,7 +211,6 @@ public class MainViewController {
         // Retrieve customer data using Singleton class
         String name = c.getfName();
         welcomeMsg.setText(greeting+", "+name);
-        System.out.println("Debuggy{125}: Current user ID - "+a.getUserId());
     }
 
     public void setZN() throws IOException{

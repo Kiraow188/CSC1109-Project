@@ -36,8 +36,6 @@ public class PinViewController {
     private void keypadButtonAction(ActionEvent event) {
         Button button = (Button) event.getSource();
         String buttonValue = button.getText();
-        // debugging
-        System.out.println(buttonValue);
         String currentPassword = pinTextBox.getText();
         pinTextBox.setText(currentPassword + buttonValue);
     }

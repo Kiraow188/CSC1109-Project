@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -59,6 +60,8 @@ public class FundTransferController {
     private void fundTransfer(ActionEvent event) throws SQLException {
         String fromAccNo = FromAccDrpDwn.getValue();
         String toAccNo = ToAccTxtBox.getText();
+        String actionStatementSender = "";
+        String actionStatementReceiver = "";
         String receiverName = "";
         if (FromAccDrpDwn.getValue() == null){
             Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
@@ -80,7 +83,7 @@ public class FundTransferController {
         }else {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("SIT ATM: Cash Withdrawal");
-            alert.setHeaderText("Please confirm the following action: \n\nTransfer: $"+TransfAmtTxtbox.getText()+"\nFrom Account No."+FromAccDrpDwn.getValue()+"\nTo Account No. "+ToAccTxtBox.getText());
+            alert.setHeaderText("Please confirm the following action: \n\nTransfer: $"+TransfAmtTxtbox.getText()+"\nFrom Account No. "+FromAccDrpDwn.getValue()+"\nTo Account No. "+ToAccTxtBox.getText());
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK){
@@ -89,11 +92,10 @@ public class FundTransferController {
                 if (resultSet.next()){
                     System.out.println("Debuggy{85}: All good, account exist & is not deactivated");
                     // Next is to check if customer has sufficient funds to transfer.
-                    //String fromAccNo = FromAccDrpDwn.getValue();
                     int transfer_amount = Integer.parseInt(TransfAmtTxtbox.getText());
                     double accReBalanceFrom = 0;
                     double accReBalanceTo = 0;
-                    String actionStatement = "FUND TRANSFER";
+
                     //Sender to have their bank balance decrease
                     ResultSet FromAccRetrieval = db.executeQuery(
                             "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
@@ -101,6 +103,8 @@ public class FundTransferController {
                                     + " ORDER BY transaction_id DESC LIMIT 1;");
                     while (FromAccRetrieval.next()) {
                         accReBalanceFrom = FromAccRetrieval.getDouble("balance_amt");
+                        String senderName = FromAccRetrieval.getString("full_name");
+                        actionStatementSender = "FUND TRANSFER FROM "+senderName;
                     }
                     accReBalanceFrom = accReBalanceFrom - transfer_amount;
                     if (accReBalanceFrom < transfer_amount) {
@@ -117,6 +121,7 @@ public class FundTransferController {
                         while (ToAccRetrieval.next()) {
                             accReBalanceTo = ToAccRetrieval.getDouble("balance_amt");
                             receiverName = ToAccRetrieval.getString("full_name");
+                            actionStatementReceiver = "FUND TRANSFER TO "+receiverName;
                         }
                         accReBalanceTo = accReBalanceTo + transfer_amount;
                         //Perform the transfer -> First debit FROM then credit TO
@@ -126,7 +131,7 @@ public class FundTransferController {
                         transferFromAmountBalance.setString(1, fromAccNo);
                         transferFromAmountBalance.setDate(2,
                                 java.sql.Date.valueOf(java.time.LocalDate.now()));
-                        transferFromAmountBalance.setString(3, actionStatement);
+                        transferFromAmountBalance.setString(3, actionStatementReceiver);
                         transferFromAmountBalance.setInt(4, 0);
                         transferFromAmountBalance.setDouble(5, transfer_amount);
                         transferFromAmountBalance.setDouble(6, 0);
@@ -137,10 +142,10 @@ public class FundTransferController {
                         PreparedStatement transferToAmountBalance = db.getConnection().prepareStatement(transferToAmountBalanceQuery);
                         transferToAmountBalance.setString(1, toAccNo);
                         transferToAmountBalance.setDate(2, java.sql.Date.valueOf(java.time.LocalDate.now()));
-                        transferToAmountBalance.setString(3, actionStatement);
+                        transferToAmountBalance.setString(3, actionStatementSender);
                         transferToAmountBalance.setInt(4, 0);
-                        transferToAmountBalance.setDouble(5, transfer_amount);
-                        transferToAmountBalance.setDouble(6, 0);
+                        transferToAmountBalance.setDouble(5, 0);
+                        transferToAmountBalance.setDouble(6, transfer_amount);
                         transferToAmountBalance.setDouble(7, accReBalanceTo);
                         if (db.executeUpdate(transferFromAmountBalance) > 0 && db.executeUpdate(transferToAmountBalance) > 0) {
                             Alert succAlert = new Alert(Alert.AlertType.INFORMATION);

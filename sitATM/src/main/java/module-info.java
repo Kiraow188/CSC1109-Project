@@ -18,4 +18,6 @@ module com.sitatm.sitatm {
 
     opens com.sitatm.sitatm to javafx.fxml;
     exports com.sitatm.sitatm;
+    exports com.sitatm.sitatm.CLI;
+    opens com.sitatm.sitatm.CLI to javafx.fxml;
 }

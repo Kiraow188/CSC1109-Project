@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class CustomerStat {
+class CustomerStat extends MainAtmCli {
     public static String getProfile(String userId, String pin) {
         int count = 0;
         String name = null;

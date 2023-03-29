@@ -11,7 +11,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Scanner;
 
-class CustomerATM {
+class CustomerATM extends MainAtmCli {
     public static void cDeposit(Scanner sc, String userId, String pin, String accReNo, String accTypeName,
                                 String action, String actionStatement, double deposit_amount, double accReBalance, String trfName) {
         boolean persistent = true;

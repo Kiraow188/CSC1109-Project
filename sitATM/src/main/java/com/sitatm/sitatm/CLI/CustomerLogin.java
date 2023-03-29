@@ -6,7 +6,8 @@ import com.sitatm.sitatm.PinHash;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-class CustomerLogin {
+class CustomerLogin extends MainAtmCli {
+   
     public static String validator(String accNum, String pin) throws Exception {
         String userId = null;
         String hashedPin;

@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalTime;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class MainViewController {
     ATM atm = new ATM();
@@ -55,15 +56,16 @@ public class MainViewController {
     private Customer c = holder.getUser();
     private Account a = holder.getAccount();
 
-    public static String getGreetingMessage(LocalTime time) {
+    public String getGreetingMessage(LocalTime time) {
+        ResourceBundle messages = l.getLocale();
         int hour = time.getHour();
 
         if (hour >= 6 && hour < 12) {
-            return "Good Morning";
+            return messages.getString("greeting.morning");
         } else if (hour >= 12 && hour < 18) {
-            return "Good Afternoon";
+            return messages.getString("greeting.afternoon");
         } else {
-            return "Good Evening";
+            return messages.getString("greeting.evening");
         }
     }
     @FXML

@@ -4,6 +4,8 @@ import java.io.Console;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Account {
@@ -343,6 +345,7 @@ public class Account {
             System.out.println("Error: Account does not exist!");
         }
     }
+
     public static void changPin() throws NoSuchAlgorithmException {
         Scanner sc = new Scanner(System.in);
         System.out.println("Please enter the customer's Account Number");
@@ -358,7 +361,7 @@ public class Account {
                     if (newPin.matches("\\d{6}")) {
                         break;
                     } else {
-                        System.out.print(ANSI_RED+"Invalid pin. Please enter a 6 digit pin: "+ANSI_RESET);
+                        System.out.print(ANSI_RED + "Invalid pin. Please enter a 6 digit pin: " + ANSI_RESET);
                         pinChars = console.readPassword();
                         newPin = new String(pinChars);
                     }
@@ -404,6 +407,192 @@ public class Account {
             }
         } else {
             System.out.println("Error: Account does not exist!");
+        }
+    }
+    
+    public static String validator(String accNum, String pin) throws Exception {
+        String userId = null;
+        String hashedPin;
+        String salt;
+        System.out.println("Account Number: " + accNum + "\nPin: " + pin);
+        Database db = new Database();
+        // SQL Connection
+        try {
+            // Customer table
+            ResultSet loginSet = db.executeQuery("SELECT * FROM `account` WHERE `account_number` =" + accNum);
+            if (loginSet.next()) {
+                hashedPin = loginSet.getString("pin");
+                salt = loginSet.getString("salt");
+                boolean correctPin = PinHash.hashMatching(pin, salt, hashedPin);
+                if (correctPin) {
+                    userId = loginSet.getString("user_id");
+                    Customer.showCustomerMenu(accNum, pin, userId);
+                } else {
+                    System.out.println(
+                            Customer.ANSI_RED +
+                                    "Invalid username or password!\n" + Customer.ANSI_RESET);
+                    Customer.CustomerMode();
+                }
+            }
+        } catch (SQLException e) {
+            // System.out.println("Error: " + e.getMessage());
+            System.out.println(
+                    Customer.ANSI_RED +
+                            "Exception: Invalid username or password!\n" + Customer.ANSI_RESET);
+            Customer.CustomerMode();
+        }
+        return userId;
+    }
+
+    public static String getProfile(String userId, String pin) {
+        int count = 0;
+        String name = null;
+        Database db = new Database();
+        try {
+            ResultSet ProfileSet = db.executeQuery(
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id WHERE account.user_id ="
+                                    + userId); //
+            while (ProfileSet.next()) {
+                name = ProfileSet.getString("full_name");
+                count++;
+            }
+        } catch (Exception e) {
+            // System.out.println("Error: " + e.getMessage());
+            System.out.println(
+                    Customer.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                            + Customer.ANSI_RESET);
+            return name;
+        }
+        if (count > 0) {
+            return name;
+        } else {
+            return null;
+        }
+    }
+
+    public static String getAccounts(String userId, String accType, String pin) {
+        String accNo = null;
+        Database db = new Database();
+        try {
+            ResultSet accSet = db.executeQuery("SELECT * FROM `account` WHERE `user_id` =" + userId
+                            + " AND `account_type` = '" + accType + "'");
+            while (accSet.next()) {
+                accNo = accSet.getString("account_number");
+            }
+        } catch (Exception e) {
+            // System.out.println("Error: " + e.getMessage());
+            System.out.println(
+                    Customer.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                            + Customer.ANSI_RESET);
+            return accNo;
+        }
+        return accNo;
+    }
+
+    public static double getBalanceFromAccount(String accNo, String pin) {
+        double balance = 0;
+        int count = 0;
+        Database db = new Database();
+        try {
+            ResultSet balanceSet = db.executeQuery(
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                    + accNo + " AND account.account_number = " + accNo
+                                    + " ORDER BY transaction_id DESC LIMIT 1;"); //
+            while (balanceSet.next()) {
+                balance = balanceSet.getDouble("balance_amt");
+                count++;
+                return balance;
+            }
+        } catch (Exception e) {
+            // System.out.println("Error: " + e.getMessage());
+            System.out.println(
+                    Customer.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                            + Customer.ANSI_RESET);
+            return count;
+        }
+        if (count > 0) {
+            return balance;
+        }
+        return 0;
+    }
+
+    public static List<String> selectAccount(Scanner sc, String CAaccNo, String SAaccNo, String action) {
+        String accType = "checking";
+        boolean persistant = true;
+        String accTypeName = null;
+        List<String> accList = new ArrayList<String>();
+        accList.clear();
+        // loops until valid account type entered
+        while (persistant) {
+            persistant = false;
+            System.out.println(
+                    Customer.ANSI_YELLOW + "\nPlease select the account to " + action + " from: "
+                            + Customer.ANSI_RESET
+                            + "\n[1] for Checking\n[2] for Savings");
+            accType = sc.next();
+
+            switch (accType) {
+                case "1":
+                    accType = "checking";
+                    accTypeName = "Checking";
+                    accList.add(CAaccNo);
+                    accList.add(accTypeName);
+                    break;
+                case "2":
+                    accType = "savings";
+                    accTypeName = "Savings";
+                    accList.add(SAaccNo);
+                    accList.add(accTypeName);
+                    break;
+                default:
+                    System.out.println(
+                            Customer.ANSI_RED + "Invalid option, please re-enter." +
+                                    Customer.ANSI_RESET);
+                    persistant = true;
+            }
+        }
+        return accList;
+    }
+
+    public static List<Object> retrieveAcc(String accNo, String pin, String accTypeName) {
+        List<Object> rList = new ArrayList<Object>();
+        try {
+            int count = 0;
+            double accReBalance = 0;
+            String trfName = null;
+            Database db = new Database();
+            ResultSet AccRetreival = db.executeQuery(
+                            "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN transaction ON account.account_number = transaction.account_number WHERE account.account_number = "
+                                    + accNo + " AND account.account_number = " + accNo
+                                    + " ORDER BY transaction_id DESC LIMIT 1;"); //
+            while (AccRetreival.next()) {
+                accReBalance = AccRetreival.getDouble("balance_amt");
+                trfName = AccRetreival.getString("full_name");
+                count++;
+            }
+            if (count <= 0) {
+                if (accTypeName == "***") {
+                    System.out.printf("%sThis account does not exist.%s\n",
+                            Customer.ANSI_RED, Customer.ANSI_RESET);
+                    rList.add(false);
+                    return rList;
+                }
+                System.out.printf("\n%s%s account is not opened.%s\n\n",
+                        Customer.ANSI_RED, accTypeName, Customer.ANSI_RESET);
+                rList.add(false);
+                return rList;
+            } else {
+                rList.add(true);
+                rList.add(accReBalance);
+                rList.add(trfName);
+                return rList;
+            }
+        } catch (Exception e) {
+            // System.out.println("Error: " + e.getMessage());
+            System.out.printf("%sAccount is not found.%s\n",
+                    Customer.ANSI_RED, Customer.ANSI_RESET);
+            rList.add(false);
+            return rList;
         }
     }
 }

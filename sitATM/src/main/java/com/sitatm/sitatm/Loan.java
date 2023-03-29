@@ -142,7 +142,7 @@ public class Loan {
             fName = getInfo.getString("full_name");
             email = getInfo.getString("email");
         }
-        List<Object> rList = CustomerStat.retrieveAcc(accReNo, pin, accTypeName);
+        List<Object> rList = Account.retrieveAcc(accReNo, pin, accTypeName);
         boolean passedTest = (boolean) rList.get(0);
         if (passedTest) {
             try {
@@ -162,7 +162,7 @@ public class Loan {
 
                 if (count > 0) {
                     System.out.printf("\n%s%s account has an ongoing loan.%s\n\n",
-                            User.ANSI_RED, accTypeName, User.ANSI_RESET);
+                            Customer.ANSI_RED, accTypeName, Customer.ANSI_RESET);
                 } else {
                     String loanTypeOp;
                     int loanType = 0;
@@ -170,7 +170,7 @@ public class Loan {
                     while (persistent) {
                         persistent = false;
                         System.out.println(
-                                User.ANSI_CYAN + "\nPlease select Loan Tenor: " + User.ANSI_RESET
+                                Customer.ANSI_CYAN + "\nPlease select Loan Tenor: " + Customer.ANSI_RESET
                                         + "\n[1] for 3 Months\n[2] for 12 Months\n[3] for 24 Months");
                         loanTypeOp = sc.next();
                         switch (loanTypeOp) {
@@ -185,8 +185,8 @@ public class Loan {
                                 break;
                             default:
                                 System.out.print(
-                                        User.ANSI_RED + "Invalid option, "
-                                                + "please re-enter.\n" + User.ANSI_RESET);
+                                        Customer.ANSI_RED + "Invalid option, "
+                                                + "please re-enter.\n" + Customer.ANSI_RESET);
                                 persistent = true;
                         }
                     }
@@ -198,8 +198,8 @@ public class Loan {
                     persistent = true;
                     while (persistent) {
                         System.out.println(
-                                User.ANSI_CYAN + "Proceed with loan request?  " + User.ANSI_RESET
-                                        + "\n[1] Yes\n[2] No" + User.ANSI_RESET);
+                                Customer.ANSI_CYAN + "Proceed with loan request?  " + Customer.ANSI_RESET
+                                        + "\n[1] Yes\n[2] No" + Customer.ANSI_RESET);
                         String loanOp = sc.next();
                         persistent = false;
                         switch (loanOp) {
@@ -223,30 +223,30 @@ public class Loan {
                                     int rowsDptAffected = depositAmountBalance.executeUpdate();
                                     if (rowsDptAffected <= 0) {
                                         System.out.printf("\n%sSQL Error. Please try again.%s\n\n",
-                                                User.ANSI_RED, User.ANSI_RESET);
+                                                Customer.ANSI_RED, Customer.ANSI_RESET);
                                         break;
                                     } else {
                                         System.out.println(
-                                                User.ANSI_CYAN + "\nLoan request has been processed.\n"
-                                                        + User.ANSI_RESET);
+                                                Customer.ANSI_CYAN + "\nLoan request has been processed.\n"
+                                                        + Customer.ANSI_RESET);
                                         Email.sendLoanApplicationEmail(fName, email);
                                     }
                                 } catch (Exception e) {
                                     // TODO: handle exception
                                     System.out.println(
-                                            User.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
-                                                    + User.ANSI_RESET);
+                                            Customer.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                                                    + Customer.ANSI_RESET);
                                 }
                                 break;
                             case "2":
                                 System.out.println(
-                                        User.ANSI_RED + "\nLoan request cancelled.\n"
-                                                + User.ANSI_RESET);
+                                        Customer.ANSI_RED + "\nLoan request cancelled.\n"
+                                                + Customer.ANSI_RESET);
                                 break;
                             default:
                                 System.out.println(
-                                        User.ANSI_RED + "Invalid option, "
-                                                + "please re-enter.\n" + User.ANSI_RESET);
+                                        Customer.ANSI_RED + "Invalid option, "
+                                                + "please re-enter.\n" + Customer.ANSI_RESET);
                                 persistent = true;
                         }
                     }
@@ -254,8 +254,8 @@ public class Loan {
             } catch (Exception e) {
                 // System.out.println("Error: " + e.getMessage());
                 System.out.println(
-                        User.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
-                                + User.ANSI_RESET);
+                        Customer.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                                + Customer.ANSI_RESET);
                 return;
             }
         }

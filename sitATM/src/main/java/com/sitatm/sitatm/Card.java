@@ -115,13 +115,13 @@ public class Card {
             // Generate 16 digit card number depending on Visa or Masters
             cardNumber = CardGenerator.generateCardNumber(cardNetworkSelection);
             // Debug
-            System.out.println("ATM Card Number Generated: " + cardNumber);
+            System.out.println(ANSI_CYAN+"ATM Card Number Generated: " + cardNumber+ANSI_RESET);
             try {
                 ResultSet resultSet = db
                         .executeQuery("SELECT card_number,account_number FROM card WHERE card_number=" + cardNumber);
                 if (resultSet.next()) {
-                    System.out.println("This card number already exist!" +
-                            "\nRegenerating a new card number...");
+                    System.out.println(ANSI_RED+"This card number already exist!" +
+                            "\nRegenerating a new card number..."+ANSI_RESET);
                     cardNumber = null; // Reset cardNumber to null to regenerate a new card number
                 }
             } catch (SQLException e) {
@@ -158,11 +158,11 @@ public class Card {
             pStatement.setString(6, creationDate);
             int rowsAffected = pStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("The customer's card is successfully created!");
+                System.out.println(ANSI_CYAN+"The customer's card is successfully created!"+ANSI_RESET);
                 Email.sendEmailPrep(accNum, 2);
                 Teller.showTellerMenu();
             } else {
-                System.out.println("Something went wrong, please try again later.");
+                System.out.println(ANSI_RED+"Something went wrong, please try again later."+ANSI_RESET);
             }
             db.closeConnection();
         } catch (SQLException | ClassNotFoundException e) {
@@ -172,7 +172,7 @@ public class Card {
     public static void addCard() {
         Scanner sc = new Scanner(System.in);
         Database db = new Database();
-        System.out.println("\n[Notice] The account number entered will be the account tied to the card!");
+        System.out.println(ANSI_RED+"\n[Notice] The account number entered will be the account tied to the card!"+ANSI_RESET);
         System.out.println("Please enter customer's current account number: ");
         String accNo;
         while (true) {
@@ -180,7 +180,7 @@ public class Card {
             if (accNo.matches("(?=^(250|360)\\d{6}$)\\d{9}")) { // Check if input is a 9-digit number
                 break; // Valid input, exit loop
             } else {
-                System.out.println("Invalid input. Please enter customer's current account number: ");
+                System.out.println(ANSI_RED+"Invalid input. Please enter customer's current account number: "+ANSI_RESET);
             }
         }
         try {

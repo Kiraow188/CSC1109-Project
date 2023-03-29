@@ -13,7 +13,7 @@ public class Email {
     // email ID of Sender.
     private static final String SENDER_EMAIL = "hello.sitatm@outlook.com";
     // password of Sender's email account.
-    private static final String SENDER_PASSWORD = "sitatm123";
+    private static final String SENDER_PASSWORD = "4ky7PswJ1DR9vAZo2kpp";
     // host name for Outlook's SMTP server
     private static final String HOST = "smtp.office365.com";
     // port number for SSL/TLS

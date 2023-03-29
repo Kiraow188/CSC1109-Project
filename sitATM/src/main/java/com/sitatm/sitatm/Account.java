@@ -142,7 +142,7 @@ public class Account {
             // Generate 9-digit account number with prefix
             bankAccountNumber = BnkAccNumGen.generateNumber(accountType);
             // Debug
-            System.out.println("Bank Account Number Generated: " + bankAccountNumber);
+            System.out.println(ANSI_CYAN+"Bank Account Number Generated: " + bankAccountNumber+ANSI_RESET);
             try {
                 ResultSet resultSet;
                 String query = "SELECT account_number, user_id FROM account where account_number=?";
@@ -197,7 +197,7 @@ public class Account {
             pStatement.setString(6, creationDate);
             int rowsAffected = pStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Customer account has been created successfully!");
+                System.out.println(ANSI_CYAN+"Customer account has been created successfully!"+ANSI_RESET);
                 Email.sendEmailPrep(acc.getAccountNo(), 1);
                 int choice;
                 do {
@@ -364,9 +364,6 @@ public class Account {
                 String[] hashAlgo = PinHash.hashPin(newPin);
                 String hashedPin = hashAlgo[1];
                 String salt = hashAlgo[0];
-                // Debug
-                System.out.println("Random Salt: " + hashAlgo[0]);
-                System.out.println("Hashed Password: " + hashAlgo[1]);
                 try {
                     Database db = new Database();
                     String query = "UPDATE account SET pin = ?, salt = ? WHERE account_number = ?";
@@ -376,7 +373,7 @@ public class Account {
                     pStatement.setString(3, accNo);
                     int rowsAffected = pStatement.executeUpdate();
                     if (rowsAffected > 0) {
-                        System.out.println("Customer pin has been changed successfully!\n");
+                        System.out.println(ANSI_CYAN+"Customer pin has been changed successfully!\n"+ANSI_RESET);
                         Teller.showTellerMenu();
                     }
                     db.closeConnection();
@@ -384,10 +381,10 @@ public class Account {
                     throw new RuntimeException(e);
                 }
             } else {
-                System.out.println("Error: You cannot change pin for a deactivated account!");
+                System.out.println(ANSI_RED+"Error: You cannot change pin for a deactivated account!"+ANSI_RESET);
             }
         } else {
-            System.out.println("Error: Account does not exist!");
+            System.out.println(ANSI_RED+"Error: Account does not exist!"+ANSI_RESET);
         }
     }
     

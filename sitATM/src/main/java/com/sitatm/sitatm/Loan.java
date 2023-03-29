@@ -15,7 +15,7 @@ public class Loan {
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_CYAN = "\u001B[36m";
-    static final private double maximumLoanAmount = 30000.0;
+    static final private double maximumLoanAmount = 100000.0;
 
     public static boolean approveLoan(double requestedAmount){
         return !(requestedAmount > maximumLoanAmount);

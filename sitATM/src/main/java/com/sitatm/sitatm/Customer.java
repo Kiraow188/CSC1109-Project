@@ -191,7 +191,7 @@ public class Customer {
                     cust.setNric(nric);
                     isValid = true;
                 } else {
-                    System.out.println(nric + " is not a valid NRIC number. Please enter a valid NRIC.");
+                    System.out.println(ANSI_RED+nric + " is not a valid NRIC number. Please enter a valid NRIC."+ANSI_RESET);
                 }
             }
         } else {
@@ -207,7 +207,7 @@ public class Customer {
                     isValid = true;
                 } else {
                     System.out
-                            .println(passNum + " is not a valid passport number. Please enter a valid passport number");
+                            .println(ANSI_RED+passNum + " is not a valid passport number. Please enter a valid passport number"+ANSI_RESET);
                 }
             }
         }
@@ -237,7 +237,7 @@ public class Customer {
                 System.out.println("Valid mobile number");
                 isValid = true;
             } else {
-                System.out.println("Invalid mobile number, please enter a valid mobile number.");
+                System.out.println(ANSI_RED+"Invalid mobile number, please enter a valid mobile number."+ANSI_RESET);
             }
         }
         isValid = false;
@@ -248,7 +248,7 @@ public class Customer {
                 System.out.println("Valid email");
                 isValid = true;
             } else {
-                System.out.println("Invalid email address, please enter a valid email address.");
+                System.out.println(ANSI_RED+"Invalid email address, please enter a valid email address."+ANSI_RESET);
             }
         }
         // consume the end of line at the end of sc.next()
@@ -279,7 +279,7 @@ public class Customer {
                 resultSet = db.executeQuery(pStatement);
             }
             if (resultSet.next()) {
-                System.out.println("This account already exist!");
+                System.out.println(ANSI_RED+"\nThis account already exist!\n"+ANSI_RESET);
                 Teller.showTellerMenu();
             }
         } catch (ClassNotFoundException e) {
@@ -304,7 +304,7 @@ public class Customer {
             pStatement.setString(10, creationDateTime);
             pStatement.setNull(11, Types.DATE);
             if (db.executeUpdate(pStatement) > 0) {
-                System.out.println("Customer account has been created successfully!");
+                System.out.println(ANSI_CYAN+"Customer account has been created successfully!"+ANSI_RESET);
                 ResultSet resultSet;
                 if (customerType == 1) {
                     System.out.println("NRIC route");
@@ -329,13 +329,6 @@ public class Customer {
     }
 
     public static void CustomerMode() throws Exception {
-        // need to change userid to cc no.?
-        // pin login by decryptng hash
-        // hide pin input
-        // withdrawal/deposit in multiples of 10/50 only.
-        // limit to withdrawal/deposit
-        // error that quits u when int input has alphabets/decimals (int/double)
-        // Comments for each functions
         Console console = System.console();
         Scanner sc = new Scanner(System.in);
         System.out.println("Please Enter Your Account Number: ");

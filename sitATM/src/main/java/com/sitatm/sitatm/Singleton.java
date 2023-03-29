@@ -3,7 +3,7 @@ package com.sitatm.sitatm;
 // This Java file is a Singleton class
 public class Singleton {
     // Initialize Customer Object
-    private Customer customer;
+    private Customer customer = new Customer();
     private Localization localization;
     private Database database;
     private Account account;
@@ -14,9 +14,7 @@ public class Singleton {
     public void setUser(Customer c) {
         this.customer = c;
     }
-    public Customer getUser() {
-        return this.customer;
-    }
+    public Customer getUser() {return this.customer; }
     public void setLocalization(Localization l){ this.localization = l; }
     public Localization getLocalization() { return this.localization; }
     public void setDatabase(Database db) { this.database = db; }

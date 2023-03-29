@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
 
 public class Loan {
@@ -124,6 +126,138 @@ public class Loan {
             }
         } catch (SQLException e) {
             System.out.println("SQL Exception caught: " + e);
+        }
+    }
+
+    public static void applyLoan(Scanner sc, String userId, String pin, String accReNo, String accTypeName,
+            String action, String actionStatement, double loanAmt, double intRate, double proRate, double lateRate)
+            throws SQLException {
+        Database db = new Database();
+        String fName = "";
+        String email = "";
+        ResultSet getInfo = db.executeQuery(
+                "SELECT customer.full_name,customer.email FROM customer INNER JOIN account ON customer.user_id = account.user_id WHERE account.account_number = '"
+                        + accReNo + "'");
+        while (getInfo.next()) {
+            fName = getInfo.getString("full_name");
+            email = getInfo.getString("email");
+        }
+        List<Object> rList = CustomerStat.retrieveAcc(accReNo, pin, accTypeName);
+        boolean passedTest = (boolean) rList.get(0);
+        if (passedTest) {
+            try {
+                int count = 0;
+                ResultSet checkLoanIP = db.executeQuery(
+                                "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN loan ON account.account_number = loan.account_number WHERE account.account_number = "
+                                        + accReNo + " AND loan.status = 'PENDING'"); //
+                while (checkLoanIP.next()) {
+                    count++;
+                }
+                checkLoanIP = db.executeQuery(
+                                "SELECT * FROM account JOIN customer ON account.user_id = customer.user_id LEFT JOIN loan ON account.account_number = loan.account_number WHERE account.account_number = "
+                                        + accReNo + " AND loan.status = 'APPROVED'"); //
+                while (checkLoanIP.next()) {
+                    count++;
+                }
+
+                if (count > 0) {
+                    System.out.printf("\n%s%s account has an ongoing loan.%s\n\n",
+                            User.ANSI_RED, accTypeName, User.ANSI_RESET);
+                } else {
+                    String loanTypeOp;
+                    int loanType = 0;
+                    boolean persistent = true;
+                    while (persistent) {
+                        persistent = false;
+                        System.out.println(
+                                User.ANSI_CYAN + "\nPlease select Loan Tenor: " + User.ANSI_RESET
+                                        + "\n[1] for 3 Months\n[2] for 12 Months\n[3] for 24 Months");
+                        loanTypeOp = sc.next();
+                        switch (loanTypeOp) {
+                            case "1":
+                                loanType = 3;
+                                break;
+                            case "2":
+                                loanType = 12;
+                                break;
+                            case "3":
+                                loanType = 24;
+                                break;
+                            default:
+                                System.out.print(
+                                        User.ANSI_RED + "Invalid option, "
+                                                + "please re-enter.\n" + User.ANSI_RESET);
+                                persistent = true;
+                        }
+                    }
+                    double calcDebt = (loanAmt / ((Math.pow(1 + ((intRate / 100) / 12), loanType) - 1)
+                            / (((intRate / 100) / 12) * (Math.pow(1 + ((intRate / 100) / 12), loanType)))));
+                    System.out.printf("\nInstallment Per Month for Loan $%.2f/%d Months: $%.2f\n\n",
+                            loanAmt, loanType, calcDebt);
+
+                    persistent = true;
+                    while (persistent) {
+                        System.out.println(
+                                User.ANSI_CYAN + "Proceed with loan request?  " + User.ANSI_RESET
+                                        + "\n[1] Yes\n[2] No" + User.ANSI_RESET);
+                        String loanOp = sc.next();
+                        persistent = false;
+                        switch (loanOp) {
+                            case "1":
+                                try {
+                                    DecimalFormat df = new DecimalFormat("#.##");
+                                    calcDebt = Double.valueOf(df.format(calcDebt));
+
+                                    String depositAmountBalanceQuery = "INSERT INTO `loan`(`loan_id`, `account_number`, `principle_amt`, `interest_rate`, `duration`, `debt`, `date_created`, `repayment_date`, `status`) VALUES (?,?,?,?,?,?,?,?,?);";
+                                    PreparedStatement depositAmountBalance = db.getConnection().prepareStatement(depositAmountBalanceQuery);
+                                    depositAmountBalance.setInt(1, 0);
+                                    depositAmountBalance.setString(2, accReNo);
+                                    depositAmountBalance.setDouble(3, loanAmt);
+                                    depositAmountBalance.setDouble(4, intRate);
+                                    depositAmountBalance.setInt(5, loanType);
+                                    depositAmountBalance.setDouble(6, calcDebt * loanType);
+                                    depositAmountBalance.setDate(7,
+                                            java.sql.Date.valueOf(java.time.LocalDate.now()));
+                                    depositAmountBalance.setDate(8, null);
+                                    depositAmountBalance.setString(9, "PENDING");
+                                    int rowsDptAffected = depositAmountBalance.executeUpdate();
+                                    if (rowsDptAffected <= 0) {
+                                        System.out.printf("\n%sSQL Error. Please try again.%s\n\n",
+                                                User.ANSI_RED, User.ANSI_RESET);
+                                        break;
+                                    } else {
+                                        System.out.println(
+                                                User.ANSI_CYAN + "\nLoan request has been processed.\n"
+                                                        + User.ANSI_RESET);
+                                        Email.sendLoanApplicationEmail(fName, email);
+                                    }
+                                } catch (Exception e) {
+                                    // TODO: handle exception
+                                    System.out.println(
+                                            User.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                                                    + User.ANSI_RESET);
+                                }
+                                break;
+                            case "2":
+                                System.out.println(
+                                        User.ANSI_RED + "\nLoan request cancelled.\n"
+                                                + User.ANSI_RESET);
+                                break;
+                            default:
+                                System.out.println(
+                                        User.ANSI_RED + "Invalid option, "
+                                                + "please re-enter.\n" + User.ANSI_RESET);
+                                persistent = true;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // System.out.println("Error: " + e.getMessage());
+                System.out.println(
+                        User.ANSI_RED + "\nAn SQL error has occurred, please try later.\n"
+                                + User.ANSI_RESET);
+                return;
+            }
         }
     }
 }

@@ -13,7 +13,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 
 public class receiptPrinter {
-    public static void printReceipt(String name, Date date, String account_no, int transaction_id, double depositwithdraw, double balance, int option){
+    public static void printReceipt(String name, Date date, String account_no, int transaction_id,
+                                    double depositwithdraw, double balance, int option){
         try {
             //Create Document instance.
             Document document = new Document();
@@ -44,10 +45,7 @@ public class receiptPrinter {
             table.addCell(new PdfPCell(new Paragraph(String.valueOf(date))));
 
             table.addCell(new PdfPCell(new Paragraph("Transaction ID:")));
-            table.addCell(new PdfPCell(new Paragraph(String.valueOf(transaction_id))));
-
-            table.addCell(new PdfPCell(new Paragraph("Account Holder Name:")));
-            table.addCell(new PdfPCell(new Paragraph(name)));
+            table.addCell(new PdfPCell(new Paragraph(String.valueOf("#"+transaction_id))));
 
             table.addCell(new PdfPCell(new Paragraph("Account Number:")));
             table.addCell(new PdfPCell(new Paragraph(String.valueOf(account_no))));
@@ -57,10 +55,10 @@ public class receiptPrinter {
             } else {
                 table.addCell(new PdfPCell(new Paragraph("Withdraw Amount:")));
             }
-            table.addCell(new PdfPCell(new Paragraph(String.format("%.2f", depositwithdraw))));
+            table.addCell(new PdfPCell(new Paragraph(String.format("$%.2f", depositwithdraw))));
 
             table.addCell(new PdfPCell(new Paragraph("Available Balance:")));
-            table.addCell(new PdfPCell(new Paragraph(String.format("%.2f", balance))));
+            table.addCell(new PdfPCell(new Paragraph(String.format("$%.2f", balance))));
 
             // Add the table to the PDF
             document.add(table);

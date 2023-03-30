@@ -84,6 +84,12 @@ public class CashWithdrawalController {
             withdrawConfirmation.setHeaderText("Minimum withdrawal amount is $20!");
             withdrawConfirmation.showAndWait();
         }
+        else if (Integer.parseInt(txtFieldAmt.getText()) > 5000){
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Withdrawal Warning");
+            withdrawConfirmation.setHeaderText("Maximum withdrawal amount is $5000!");
+            withdrawConfirmation.showAndWait();
+        }
         else if (accDrpDwn.getValue() == null){
             Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
             withdrawConfirmation.setTitle("SIT ATM: Withdrawal Warning");
@@ -163,7 +169,7 @@ public class CashWithdrawalController {
                     System.out.println("An exception has occured: " + e);
                 }
             } else {
-                System.out.println("Debuggy{149}: walao waste my time!");
+                System.out.println("SITATM: Transaction Cancelled.");
             }
         }
     }
@@ -197,9 +203,7 @@ public class CashWithdrawalController {
         btnBack.setGraphic(backImgView);
         btnBack.setStyle("-fx-background-color: transparent; -fx-background-radius: 0; -fx-border-color: transparent;");
 
-        System.out.println("Hi it's me debuggy!");
         String userID = a.getUserId();
-        System.out.println("Debuggy{134}: Current UserID is - "+userID);
         try{
             ResultSet resultSet = db.executeQuery("SELECT account_number FROM account where user_id = "+userID);
             List<String> accountNumbers = new ArrayList<>();

@@ -950,7 +950,7 @@ public class Customer {
                     try {
                         accReBalance = accReBalance - withdraw_amount;
                         String depositAmountBalanceQuery = "INSERT INTO `transaction`(`account_number`, `date`, `transaction_details`, `chq_no`, `withdrawal_amt`, `deposit_amt`, `balance_amt`) VALUES (?,?,?,?,?,?,?);";
-                        PreparedStatement depositAmountBalance = db.getConnection().prepareStatement(depositAmountBalanceQuery);
+                        PreparedStatement depositAmountBalance = db.getConnection().prepareStatement(depositAmountBalanceQuery, Statement.RETURN_GENERATED_KEYS);
                         depositAmountBalance.setString(1, accReNo);
                         depositAmountBalance.setDate(2,
                                 java.sql.Date.valueOf(java.time.LocalDate.now()));

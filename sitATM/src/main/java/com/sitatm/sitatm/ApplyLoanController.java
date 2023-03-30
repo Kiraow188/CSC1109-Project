@@ -207,7 +207,6 @@ public class ApplyLoanController {
         btnBack.setGraphic(backImgView);
         btnBack.setStyle("-fx-background-color: transparent; -fx-background-radius: 0; -fx-border-color: transparent;");
         String userID = account.getUserId();
-        System.out.println("Debuggy{204}: Current UserID is - "+userID);
         try{
             ResultSet resultSet = db.executeQuery("SELECT account_number FROM account where user_id = "+userID);
             List<String> accountNumbers = new ArrayList<>();
@@ -233,7 +232,5 @@ public class ApplyLoanController {
             return null;
         };
         txtFieldAmt.setTextFormatter(new TextFormatter<String>(filter));
-
-
     }
 }

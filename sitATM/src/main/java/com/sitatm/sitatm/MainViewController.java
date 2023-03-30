@@ -128,7 +128,6 @@ public class MainViewController {
             ResultSet resultSet = db.executeQuery("SELECT * FROM customer c JOIN account a ON c.user_id = a.user_id JOIN ( SELECT * FROM transaction WHERE account_number = "+accNum+" ORDER BY transaction_id DESC LIMIT 1) t ON a.account_number = t.account_number WHERE a.account_number = "+accNum);
             if (resultSet.next()){
                 String latestBal = resultSet.getString("balance_amt");
-                //chkBalBtn.setText("Balance: "+latestBal);
                 chkBalBtn.setText(l.getLocale().getString("BalanceText") +": $"+ latestBal);
             }
         } catch (SQLException e) {
@@ -140,7 +139,6 @@ public class MainViewController {
     private void fastCashWithdrawal(ActionEvent event){
         Button clickedButton = (Button) event.getSource();
         String buttonValue = clickedButton.getText().substring(1);
-        System.out.println(buttonValue);
 
         String accNo = a.getAccountNo();
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);

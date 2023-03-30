@@ -141,7 +141,9 @@ public class Email {
             // Set Subject: subject of the email
             message.setSubject("Your Loan Application");
             // set body of the email.
-            message.setText("Dear "+fName+",\n\nThank you for applying for a loan with SITATM. We are reviewing your application and will get back to you shortly.\n\nThank you,\nThe SITATM Team");
+            message.setText("Dear "+fName+",\n\nThank you for applying for a loan with SITATM. " +
+                    "We are reviewing your application and will get back to you shortly." +
+                    "\n\nThank you,\nThe SITATM Team");
             // Send email.
             Transport.send(message);
             System.out.println("Loan application email successfully sent to " + recipient);

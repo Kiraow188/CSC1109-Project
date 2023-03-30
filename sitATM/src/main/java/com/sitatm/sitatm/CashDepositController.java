@@ -57,13 +57,19 @@ public class CashDepositController {
             Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
             withdrawConfirmation.setTitle("SIT ATM: Cash Deposit Warning");
             //withdrawConfirmation.setGraphic(null);
-            withdrawConfirmation.setHeaderText("Please select an account number to withdraw from!");
+            withdrawConfirmation.setHeaderText("Please select an account number to deposit into!");
             withdrawConfirmation.showAndWait();
         }
         else if (txtFieldAmt.getText().equals("")){
             Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
             withdrawConfirmation.setTitle("SIT ATM: Cash Deposit Warning");
             withdrawConfirmation.setHeaderText("Please enter an amount!");
+            withdrawConfirmation.showAndWait();
+        }
+        else if (Double.parseDouble(txtFieldAmt.getText()) < 1){
+            Alert withdrawConfirmation = new Alert(Alert.AlertType.WARNING);
+            withdrawConfirmation.setTitle("SIT ATM: Cash Deposit Warning");
+            withdrawConfirmation.setHeaderText("You cannot deposit less than $1!");
             withdrawConfirmation.showAndWait();
         }
         else {
@@ -131,7 +137,7 @@ public class CashDepositController {
                 System.out.println("An exception has occured: " + e);
                 }
             } else {
-                System.out.println("Debuggy{121}: walao waste my time!");
+                System.out.println("SITATM: Transaction Cancelled.");
             }
         }
     }
@@ -165,9 +171,7 @@ public class CashDepositController {
         btnBack.setGraphic(backImgView);
         btnBack.setStyle("-fx-background-color: transparent; -fx-background-radius: 0; -fx-border-color: transparent;");
 
-        System.out.println("Hi it's me debuggy!");
         String userID = a.getUserId();
-        System.out.println("Debuggy{139}: Current UserID is - "+userID);
         try{
             ResultSet resultSet = db.executeQuery("SELECT account_number FROM account where user_id = "+userID);
             List<String> accountNumbers = new ArrayList<>();

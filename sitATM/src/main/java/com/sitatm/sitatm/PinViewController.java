@@ -60,10 +60,8 @@ public class PinViewController {
         Customer customer = new Customer();
         Localization localization = new Localization();
 
-        System.out.println(pinTextBox.getText() + "\n" + user.getSalt() + "\n" + user.getPin());
         boolean doesPinMatch = PinHash.hashMatching(pinTextBox.getText(), user.getSalt(), user.getPin());
         if (doesPinMatch) {
-            System.out.println(user.getUserId());
             ResultSet resultSet = db.executeQuery("SELECT * from customer where user_id = '" + user.getUserId() + "'");
             if (resultSet.next()) {
                 String custName = resultSet.getString("full_name");

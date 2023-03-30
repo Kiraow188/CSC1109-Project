@@ -80,9 +80,6 @@ public class ChangePinController {
                 String[] hashAlgo = PinHash.hashPin(newPin);
                 String salt = hashAlgo[0];
                 String hashedPin = hashAlgo[1];
-                //Debug
-                System.out.println("Hashed Password: " + hashAlgo[1]);
-                System.out.println("Random Salt: " + hashAlgo[0]);
 
                 String query = ("UPDATE account SET pin = ?, salt = ? WHERE account_number = ?");
                 PreparedStatement pStatement = db.getConnection().prepareStatement(query);

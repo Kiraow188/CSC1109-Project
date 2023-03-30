@@ -1,4 +1,12 @@
-# [NOTICE] For the project to run as intended, you have to setup the database using XAMPP!
+# NOTICE: For the project to run as intended, you have to setup the database using XAMPP!
+
+# Our project have two view mode that it can run in. One on the CLI and another is the GUI.
+
+## How to run the CLI version
+1. Due to the nature of the password masking using Java’s Console library, the CLI version can only be run via the console.
+2. To do this, you can execute the **MainAtmCli.java** located in this path (*CSC1109-Project-main.zip\CSC1109-Project-main\sitATM\src\main\java\com\sitatm\sitatm*) using VSCode or via terminal execution.
+## How to run the GUI version
+1. For the GUI version, you can just run the **ATM.java** located in this path (*CSC1109-Project-main.zip\CSC1109-Project-main\sitATM\src\main\java\com\sitatm\sitatm*) using Intellij.
 # Setting up XAMPP for Windows & Mac and Importing SQL Database
 
 XAMPP is a free and open-source tool that allows users to create a local web server environment on their Windows system. This guide will walk you through the steps to set up XAMPP and import our  sitatm.sql database file.

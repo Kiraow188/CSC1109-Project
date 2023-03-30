@@ -1,3 +1,4 @@
+# [NOTICE] For the project to run as intended, you have to setup the database using XAMPP!
 # Setting up XAMPP for Windows & Mac and Importing SQL Database
 
 XAMPP is a free and open-source tool that allows users to create a local web server environment on their Windows system. This guide will walk you through the steps to set up XAMPP and import our  sitatm.sql database file.
